@@ -31,7 +31,7 @@ class User_Management extends MY_Controller {
 	}
 
 	public function authenticate() {
-		$data = array();
+		/*$data = array();
 		$validated = $this -> _submit_validate();
 		if ($validated) {
 			$username = $this -> input -> post("username");
@@ -67,6 +67,9 @@ class User_Management extends MY_Controller {
 			$data['title'] = "System Login";
 			$this -> load -> view("login_v", $data);
 		}
+		 * 
+		 */
+		redirect("home_controller");
 	}
 
 	private function _submit_validate() {

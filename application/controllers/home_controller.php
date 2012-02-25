@@ -14,6 +14,7 @@ class Home_Controller extends MY_Controller {
 
 	public function home() {
 		//
+		/*
 		$rights = User_Right::getRights($this -> session -> userdata('access_level'));
 		$menu_data = array();
 		$menus = array();
@@ -26,11 +27,13 @@ class Home_Controller extends MY_Controller {
 		}
 		$this -> session -> set_userdata($menu_data);
 		$this -> session -> set_userdata($menus);
+		 * 
+		 */
 		$data['title'] = "System Home";
 		$data['content_view'] = "home_v";
 		$data['banner_text'] = "System Home";
 		$data['link'] = "home";
-		$this -> load -> view("template", $data);
+		$this -> load -> view("demo_template", $data);
 
 	}
  
