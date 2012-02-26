@@ -178,6 +178,15 @@
 						<li>
 							<a href="<?php echo site_url('purchase_management/new_purchase')?>">Add Purchases</a>
 						</li>
+						<li>
+							<a href="<?php echo site_url('disbursement_management/new_input_return')?>">Add Input Return</a>
+						</li>
+						<li>
+							<a href="<?php echo site_url('cih_management/new_cih_batch')?>">Add CIH Batch</a>
+						</li>
+						<li>
+							<a href="<?php echo site_url('fpv_batch_management/new_fpv_batch')?>">Add FPV Batch</a>
+						</li>
 					</ul>
 					<!-- End of Lists -->
 					<!--<h2>Accordion</h2>

@@ -41,7 +41,7 @@
 				<input class="distributor_name" name="distributor_name" type="text" value=" " />
 			</p>
 		</div>
-		<table class="fullwidth">
+		<table class="normal" style="margin:0 auto;">
 			<caption>Farm Inputs Loaned</caption>
 			<thead>
 				<tr>

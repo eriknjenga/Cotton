@@ -2,7 +2,7 @@
 	<!-- Fieldset -->
 	<fieldset>
 		<legend>
-			Purchase Produce
+			Disburse Farm Inputs
 		</legend>
 		<p>
 			<label for="farmer">Farmer: </label>
@@ -41,10 +41,8 @@
 				<input class="distributor_name" name="distributor_name" type="text" value=" " />
 			</p>
 		</div>
-		<table class="fullwidth">
-			<caption>
-				Farm Inputs Loaned
-			</caption>
+		<table class="normal" style="margin:0 auto;">
+			<caption>Farm Inputs Loaned</caption>
 			<thead>
 				<tr>
 					<th>Invoice No.</th>
@@ -91,49 +89,39 @@
 				</tr>
 			</tbody>
 		</table>
-		<table class="fullwidth">
-			<caption>
-				Produce Purchased
-			</caption>
+				<table class="normal" style="margin:0 auto;">
+			<caption>Farm Inputs Returned</caption>
 			<thead>
 				<tr>
-					<th>Receipt No.</th>
+					<th>GRN No.</th>
 					<th>Date</th>
-					<th>Buyer</th>
+					<th>Input Name</th>
 					<th>Quantity</th>
-					<th>Unit Price</th>
-					<th>Loan Recovery</th>
-					<th>Farmer Reg. Fee</th>
-					<th>Other Recoveries</th>
+					<th>Value</th>
+					<th>Season</th> 
 					<th>Action</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
 					<td>
-					<input class="receipt_number" name="receipt_number" type="text" value=" " style="width: 50px"/>
+					<input class="grn_number" name="grn_number" type="text" value=" " style="width: 50px"/>
 					</td>
 					<td>
-					<input class="purchase_date" name="purchase_date" type="text" value=" " style="width: 50px"/>
+					<input class="return_date" name="return_date" type="text" value=" " style="width: 50px"/>
 					</td>
 					<td>
-					<select name="buyer" class="dropdown" style="width:50px">
-						<option>Select Buyer </option>
+					<select name="farm_input_returned" class="dropdown" style="width:50px">
+						<option>Select Input </option>
 					</select></td>
 					<td>
-					<input class="purchase_quantity" name="purchase_quantity" type="text" value=" " style="width: 50px"/>
+					<input class="quantity_returned" name="quantity_returned" type="text" value=" " style="width: 50px"/>
 					</td>
 					<td>
-					<input class="unit_price" name="unit_price" type="text" value=" " style="width: 50px"/>
+					<input class="total_value_returned" name="total_value_returned" type="text" value=" " style="width: 50px"/>
 					</td>
 					<td>
-					<input class="loan_recovery" name="loan_recovery" type="text" value=" " style="width: 50px"/>
-					</td>
-					<td>
-					<input class="reg_fee" name="reg_fee" type="text" value=" " style="width: 50px"/>
-					</td>
-					<td>
-					<input class="other" name="other" type="text" value=" " style="width: 50px"/>
+					<input class="season_returned" name="season_returned" type="text" value=" " style="width: 50px"/>
 					</td>
 					<td>
 					<input  class="button"   value="+" style="width:50px; text-align: center"/>
@@ -141,14 +129,6 @@
 				</tr>
 			</tbody>
 		</table>
-		<p>
-			<label for="depot_code">Depot Code: </label>
-			<input class="depot_code" name="depot_code" type="text" value=" " style="width:100px;"/>
-			<label for="purchased_value">Purchased Value: </label>
-			<input class="purchased_value" name="purchased_value" type="text" value="0" style="width:100px;"/>
-			<label for="net_value">Net Value: </label>
-			<input class="net_value" name="net_value" type="text" value="0" style="width:100px;"/>
-		</p>
 		<p>
 			<input class="button" type="submit" value="Submit">
 			<input class="button" type="reset" value="Reset">
