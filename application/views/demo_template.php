@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html> 
+<html>
 	<head>
 		<!-- Meta -->
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -155,38 +155,22 @@
 							<a href="<?php echo site_url('farmer_management/register')?>">Register Farmer</a>
 						</li>
 						<li>
-							<a href="#">Add Agent</a>
+							<a href="<?php echo site_url('user_management/register')?>">Add User</a>
 						</li>
 						<li>
-							<a href="#">Regions</a>
-							<ul>
-								<li>
-									<a href="#">District 1</a>
-								</li>
-								<li>
-									<a href="#">District 2</a>
-								</li>
-								<li>
-									<a href="#">District 3</a>
-									<ul>
-										<li>
-											<a href="#">Area 1</a>
-										</li>
-										<li>
-											<a href="#">Area 2</a>
-										</li>
-										<li>
-											<a href="#">Area 3</a>
-										</li>
-										<li class="last">
-											<a href="#">Area Total</a>
-										</li>
-									</ul>
-								</li>
-								<li class="last">
-									<a href="#">District Total</a>
-								</li>
-							</ul>
+							<a href="<?php echo site_url('farm_input_management/register')?>">Add Input Product</a>
+						</li>
+						<li>
+							<a href="<?php echo site_url('depot_management/new_depot')?>">Add New Depot</a>
+						</li>
+						<li>
+							<a href="<?php echo site_url('area_management/new_area')?>">Add New Area</a>
+						</li>
+						<li>
+							<a href="<?php echo site_url('distributor_management/register')?>">Add Distributor</a>
+						</li>
+						<li>
+							<a href="<?php echo site_url('account_management/new_account')?>">Add an Account</a>
 						</li>
 						<li>
 							<a href="#">Another category</a>

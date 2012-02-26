@@ -79,7 +79,11 @@ class User_Management extends MY_Controller {
 
 		return $this -> form_validation -> run();
 	}
-
+	public function register() {
+		$data['content_view'] = "add_user_v";
+		$data['quick_link'] = "register_user";
+		$this -> base_params($data);
+	}
 	public function go_home($data) {
 		$data['title'] = "System Home";
 		$data['content_view'] = "home_v";
@@ -89,7 +93,7 @@ class User_Management extends MY_Controller {
 	}
 
 	public function base_params($data) {
-		$this -> load -> view("template", $data);
+		$this -> load -> view("demo_template", $data);
 	}
 
 }
