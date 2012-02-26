@@ -173,7 +173,10 @@
 							<a href="<?php echo site_url('account_management/new_account')?>">Add an Account</a>
 						</li>
 						<li>
-							<a href="#">Another category</a>
+							<a href="<?php echo site_url('disbursement_management/new_disbursement')?>">Disburse Inputs</a>
+						</li>
+						<li>
+							<a href="<?php echo site_url('purchase_management/new_purchase')?>">Add Purchases</a>
 						</li>
 					</ul>
 					<!-- End of Lists -->
