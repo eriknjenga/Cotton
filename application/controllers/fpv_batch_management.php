@@ -5,8 +5,12 @@ class FPV_Batch_Management extends MY_Controller {
 	}
 
 	public function index() {
-		$data = array();
-		$this -> listing($data);
+		$this -> listing();
+	}
+
+	public function listing() {
+		$data['content_view'] = "list_fpv_batches_v";
+		$this -> base_params($data);
 	}
 
 	public function new_fpv_batch() {
@@ -18,7 +22,7 @@ class FPV_Batch_Management extends MY_Controller {
 	public function base_params($data) {
 		$data['title'] = "FPV Batch Management";
 		$data['banner_text'] = "New FPV Batch";
-		$data['link'] = "fpv_batch_management";
+		$data['link'] = "batch_management";
 		$this -> load -> view("demo_template", $data);
 	}
 

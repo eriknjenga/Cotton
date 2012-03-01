@@ -1,3 +1,11 @@
+<?php
+if (!isset($quick_link)) {
+	$quick_link = "";
+}
+if (!isset($link)) {
+	$link = "";
+}
+?>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -53,28 +61,79 @@
 				<!-- The navigation bar -->
 				<div id="navbar">
 					<ul class="nav">
-						<li>
-							<a href="#">Dashboard</a>
+						<li >
+							<a class="<?php
+							if ($link == 'home') {echo "active";
+							}
+							?>" href="<?php echo base_url();?>">Dashboard</a>
 						</li>
 						<li>
-							<a href="#">Cotton Purchases</a>
+							<a class="<?php
+							if ($link == 'disbursement_management') {echo "active";
+							}
+							?>" href="<?php echo site_url("disbursement_management");?>">Farmer Loans</a>
+							<ul>
+								<li>
+									<a href="<?php echo site_url("disbursement_management");?>">Input Loans</a>
+								</li>
+								<li>
+									<a href="<?php echo site_url("disbursement_management/loan_returns_listing");?>">Input Loan Returns</a>
+								</li>
+							</ul>
 						</li>
 						<li>
-							<a href="#">Farmer Loans</a>
+							<a class="<?php
+							if ($link == 'purchase_management') {echo "active";
+							}
+							?>" href="<?php echo site_url("purchase_management/listing");?>">Produce Purchases</a>
 						</li>
 						<li>
-							<a href="#">Agents</a>
+							<a class="<?php
+							if ($link == 'batch_management') {echo "active";
+							}
+							?>" href="<?php echo site_url("cih_batch_management");?>">Batches</a>
+							<ul>
+								<li>
+									<a href="<?php echo site_url("cih_batch_management");?>">CIH Batches</a>
+								</li>
+								<li>
+									<a href="<?php echo site_url("fpv_batch_management");?>">FPV Batches</a>
+								</li>
+							</ul>
 						</li>
 						<li>
-							<a href="#">Regions</a>
+							<a class="<?php
+							if ($link == 'admin') {echo "active";
+							}
+							?>" href="<?php echo site_url("farmer_management");?>">Administration</a>
+							<ul>
+								<li>
+									<a href="<?php echo site_url("farmer_management");?>">Farmers</a>
+								</li>
+								<li>
+									<a href="<?php echo site_url("user_management");?>">Users</a>
+								</li>
+								<li>
+									<a href="<?php echo site_url("farm_input_management");?>">Farm Inputs</a>
+								</li>
+								<li>
+									<a href="<?php echo site_url("depot_management");?>">Depots</a>
+								</li>
+								<li>
+									<a href="<?php echo site_url("area_management");?>">Areas</a>
+								</li>
+								<li>
+									<a href="<?php echo site_url("distributor_management");?>">Distributors</a>
+								</li>
+								<li>
+									<a href="<?php echo site_url("account_management");?>">Accounts</a>
+								</li>
+								<li>
+									<a href="<?php echo site_url("region_management");?>">Regions</a>
+								</li>
+							</ul>
 						</li>
-						<li>
-							<a href="#">Routes</a>
-						</li>
-						<li>
-							<a href="#">Transporters</a>
-						</li>
-						<li>
+						<!--<li>
 							<a href="#">Reports</a>
 							<ul>
 								<li>
@@ -85,43 +144,12 @@
 								</li>
 								<li>
 									<a href="#">Report 3</a>
-									<ul>
-										<li>
-											<a href="#">Menu Link 1</a>
-										</li>
-										<li>
-											<a href="#">Menu Link 2</a>
-											<ul>
-												<li>
-													<a href="#">Menu Link 1</a>
-												</li>
-												<li>
-													<a href="#">Menu Link 2</a>
-												</li>
-												<li>
-													<a href="#">Menu Link 3</a>
-												</li>
-											</ul>
-										</li>
-										<li>
-											<a href="#">Menu Link 3</a>
-										</li>
-										<li>
-											<a href="#">Menu Link 4</a>
-										</li>
-										<li>
-											<a href="#">Menu Link 5</a>
-										</li>
-										<li>
-											<a href="#">Menu Link 6</a>
-										</li>
-									</ul>
 								</li>
 								<li>
 									<a href="#">Report 4</a>
 								</li>
 							</ul>
-						</li>
+						</li> -->
 					</ul>
 				</div>
 				<!-- End of navigation bar" -->
@@ -151,41 +179,83 @@
 					<!-- Lists -->
 					<h2>Quick Menu</h2>
 					<ul>
-						<li>
-							<a href="<?php echo site_url('farmer_management/register')?>">Register Farmer</a>
+						<li class="<?php
+						if ($quick_link == "register_farmer") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('farmer_management/register')?>" >Register Farmer</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('user_management/register')?>">Add User</a>
+						<li class="<?php
+						if ($quick_link == "register_user") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('user_management/register')?>" >Add User</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('farm_input_management/register')?>">Add Input Product</a>
+						<li class="<?php
+						if ($quick_link == "add_input_product") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('farm_input_management/register')?>" >Add Input Product</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('depot_management/new_depot')?>">Add New Depot</a>
+						<li class="<?php
+						if ($quick_link == "add_depot") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('depot_management/new_depot')?>" >Add New Depot</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('area_management/new_area')?>">Add New Area</a>
+						<li class="<?php
+						if ($quick_link == "add_area") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('area_management/new_area')?>" >Add New Area</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('distributor_management/register')?>">Add Distributor</a>
+						<li class="<?php
+						if ($quick_link == "add_distributor") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('distributor_management/register')?>" >Add Distributor</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('account_management/new_account')?>">Add an Account</a>
+						<li class="<?php
+						if ($quick_link == "add_region") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('region_management/new_region')?>" >Add Region</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('disbursement_management/new_disbursement')?>">Disburse Inputs</a>
+						<li class="<?php
+						if ($quick_link == "add_account") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('account_management/new_account')?>" >Add an Account</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('purchase_management/new_purchase')?>">Add Purchases</a>
+						<li class="<?php
+						if ($quick_link == "add_disbursement") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('disbursement_management/new_disbursement')?>" >Disburse Inputs</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('disbursement_management/new_input_return')?>">Add Input Return</a>
+						<li class="<?php
+						if ($quick_link == "add_purchase") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('purchase_management/new_purchase')?>" >Add Purchases</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('cih_management/new_cih_batch')?>">Add CIH Batch</a>
+						<li class="<?php
+						if ($quick_link == "add_input_return") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('disbursement_management/new_input_return')?>" >Add Input Return</a>
 						</li>
-						<li>
-							<a href="<?php echo site_url('fpv_batch_management/new_fpv_batch')?>">Add FPV Batch</a>
+						<li class="<?php
+						if ($quick_link == "add_cih_batch") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('cih_batch_management/new_cih_batch')?>" >Add CIH Batch</a>
+						</li>
+						<li class="<?php
+						if ($quick_link == "add_fpv_batch") {echo "active";
+						}
+						?>">
+							<a href="<?php echo site_url('fpv_batch_management/new_fpv_batch')?>" >Add FPV Batch</a>
 						</li>
 					</ul>
 					<!-- End of Lists -->
@@ -251,18 +321,18 @@
 					</div>
 					</div>
 					End of Sortable Dialogs -->
-					<!-- Statistics -->
+					<!-- Statistics
 					<h2>Statistics</h2>
 					<p>
-						<b>Articles:</b> 2201
+					<b>Articles:</b> 2201
 					</p>
 					<p>
-						<b>Comments:</b> 17092
+					<b>Comments:</b> 17092
 					</p>
 					<p>
-						<b>Users:</b> 3788
+					<b>Users:</b> 3788
 					</p>
-					<!-- End of Statistics -->
+					End of Statistics -->
 				</div>
 				<!-- End of Sidebar -->
 			</div>

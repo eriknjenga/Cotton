@@ -5,8 +5,12 @@ class Farmer_Management extends MY_Controller {
 	}
 
 	public function index() {
-		$data = array();
-		$this -> listing($data);
+		$this -> listing();
+	}
+
+	public function listing() {
+		$data['content_view'] = "list_farmers_v";
+		$this -> base_params($data);
 	}
 
 	public function register() {
@@ -18,7 +22,7 @@ class Farmer_Management extends MY_Controller {
 	public function base_params($data) {
 		$data['title'] = "Farmer Management";
 		$data['banner_text'] = "Farmer Registration";
-		$data['link'] = "farmer_management";
+		$data['link'] = "admin";
 		$this -> load -> view("demo_template", $data);
 	}
 

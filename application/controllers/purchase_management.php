@@ -5,10 +5,12 @@ class Purchase_Management extends MY_Controller {
 	}
 
 	public function index() {
-		$data = array();
-		$this -> listing($data);
+		$this -> listing();
 	}
-
+	public function listing() {
+		$data['content_view'] = "list_purchases_v";
+		$this -> base_params($data);
+	}
 	public function new_purchase() {
 		$data['content_view'] = "add_purchase_v";
 		$data['quick_link'] = "add_purchase";

@@ -18,16 +18,8 @@ class User_Management extends MY_Controller {
 	}
 
 	public function listing() {
-		$users = Users::getAll();
-		$this -> table -> set_heading(array('id', 'Name', 'Username', 'Email Address', 'Phone Number', 'Access Level', 'Registered By'));
-		$data['users'] = $users;
-		$data['title'] = "System Users";
-		$data['content_view'] = "users_v";
-		$data['banner_text'] = "System Users";
-		$data['link'] = "users";
-		$actions = array(0 => array('Edit','edit'),1 => array('Disable','disable'));
-		$data['actions'] = $actions;
-		$this -> load -> view("template", $data);
+		$data['content_view'] = "list_users_v";
+		$this -> base_params($data);
 	}
 
 	public function authenticate() {
@@ -93,6 +85,7 @@ class User_Management extends MY_Controller {
 	}
 
 	public function base_params($data) {
+		$data['link'] = "admin";
 		$this -> load -> view("demo_template", $data);
 	}
 

@@ -489,6 +489,9 @@ table.fullwidth td, table.normal td {
 	padding:7px 9px;
 	margin:1px 0;
 }
+table tr.odd{
+	background-color: #F0F0F0 !important;
+}
 /* End of Tables */
 
 #columns {
@@ -597,4 +600,10 @@ table.fullwidth td, table.normal td {
 .input_field {
 	display:block;
 	margin-bottom:10px;
+}
+.link{
+	text-decoration: none;
+	font-weight: bold;
+	letter-spacing: 1px;
+	color:#C44509;
 }

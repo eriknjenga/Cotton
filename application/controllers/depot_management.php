@@ -5,8 +5,12 @@ class Depot_Management extends MY_Controller {
 	}
 
 	public function index() {
-		$data = array();
-		$this -> listing($data);
+		$this -> listing();
+	}
+
+	public function listing() {
+		$data['content_view'] = "list_depots_v";
+		$this -> base_params($data);
 	}
 
 	public function new_depot() {
@@ -18,7 +22,7 @@ class Depot_Management extends MY_Controller {
 	public function base_params($data) {
 		$data['title'] = "Depots Management";
 		$data['banner_text'] = "Depot Registration";
-		$data['link'] = "depot_management";
+		$data['link'] = "admin";
 		$this -> load -> view("demo_template", $data);
 	}
 

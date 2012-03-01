@@ -15,6 +15,11 @@
 			<span class="field_desc">Enter the Surname for this user</span>
 		</p>
 		<p>
+			<label for="username">Username: </label>
+			<input class="username" name="username" type="text" value=" " />
+			<span class="field_desc">Enter the Username for this user</span>
+		</p>
+		<p>
 			<label for="mf">Password: </label>
 			<input class="national_id" name="national_id" type="text" value=" " />
 			<span class="field_desc">Enter the National ID Number for this farmer</span>

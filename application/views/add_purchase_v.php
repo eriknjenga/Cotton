@@ -54,8 +54,7 @@
 					<th>Total Value</th>
 					<th>Season</th>
 					<th>GD Batch</th>
-					<th>ID Batch</th>
-					<th>Action</th>
+					<th>ID Batch</th> 
 				</tr>
 			</thead>
 			<tbody>
@@ -84,10 +83,7 @@
 					</td>
 					<td>
 					<input class="id_batch" name="id_batch" type="text" value=" " style="width: 50px"/>
-					</td>
-					<td>
-					<input  class="button"   value="+" style="width:50px; text-align: center"/>
-					</td>
+					</td> 
 				</tr>
 			</tbody>
 		</table>

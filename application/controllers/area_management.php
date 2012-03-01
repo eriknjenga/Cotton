@@ -5,8 +5,12 @@ class Area_Management extends MY_Controller {
 	}
 
 	public function index() {
-		$data = array();
-		$this -> listing($data);
+		$this -> listing();
+	}
+
+	public function listing() {
+		$data['content_view'] = "list_areas_v";
+		$this -> base_params($data);
 	}
 
 	public function new_area() {
@@ -18,7 +22,7 @@ class Area_Management extends MY_Controller {
 	public function base_params($data) {
 		$data['title'] = "Area Management";
 		$data['banner_text'] = "Area Registration";
-		$data['link'] = "area_management";
+		$data['link'] = "admin";
 		$this -> load -> view("demo_template", $data);
 	}
 

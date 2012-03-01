@@ -5,8 +5,12 @@ class Distributor_Management extends MY_Controller {
 	}
 
 	public function index() {
-		$data = array();
-		$this -> listing($data);
+		$this -> listing();
+	}
+
+	public function listing() {
+		$data['content_view'] = "list_distributors_v";
+		$this -> base_params($data);
 	}
 
 	public function register() {
@@ -18,7 +22,7 @@ class Distributor_Management extends MY_Controller {
 	public function base_params($data) {
 		$data['title'] = "Distributor Management";
 		$data['banner_text'] = "Distributor Registration";
-		$data['link'] = "area_management";
+		$data['link'] = "admin";
 		$this -> load -> view("demo_template", $data);
 	}
 

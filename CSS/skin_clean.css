@@ -89,6 +89,11 @@ ul.nav li a:hover {
  color:#fff;
  background:url('../Images/mhover.png') bottom center no-repeat;
 }
+ul.nav li a.active {
+ color:#fff;
+ font-weight: bolder;
+ background:url('../Images/mhover.png') bottom center no-repeat;
+}
 
 ul.nav ul li {
 	 border-left:3px solid #000;
@@ -124,6 +129,11 @@ ul.nav li li a:hover {
  text-decoration:none;
  color:#555;
  font-size:11px;
+}
+
+#sidebar ul li.active {
+ font-weight: bolder; 
+ background:url('../Images/arrow_left_hover.png') 5px 8px no-repeat;
 }
 
 #sidebar ul li a:hover {

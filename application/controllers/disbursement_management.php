@@ -5,8 +5,17 @@ class Disbursement_Management extends MY_Controller {
 	}
 
 	public function index() {
-		$data = array();
-		$this -> listing($data);
+		$this -> disbursement_listing();
+	}
+
+	public function disbursement_listing() {
+		$data['content_view'] = "list_disbursement_v";
+		$this -> base_params($data);
+	}
+
+	public function loan_returns_listing() {
+		$data['content_view'] = "list_loan_returns_v";
+		$this -> base_params($data);
 	}
 
 	public function new_disbursement() {
