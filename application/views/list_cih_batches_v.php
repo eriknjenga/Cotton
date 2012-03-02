@@ -22,7 +22,7 @@
 			<td>Details</td>
 			<td>20,000</td> 
 			 
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr>
 			<td>156</td>
@@ -33,7 +33,7 @@
 			<td>Details</td>
 			<td>200,000</td> 
 			 
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr class="odd">
 			<td>156</td>
@@ -44,7 +44,7 @@
 			<td>Details</td>
 			<td>15,000</td> 
 			 
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr>
 			<td>156</td>
@@ -55,7 +55,7 @@
 			<td>Details</td>
 			<td>45,000</td> 
 			 
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 	</tbody>
 </table>

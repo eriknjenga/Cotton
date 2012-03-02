@@ -170,6 +170,7 @@ INPUT[type="checkbox"], INPUT[type="radio"] {
 	float:left;
 	display:inline;
 	width:361px;
+	margin:20px 0 0 20px;
 }
 
 #top .meta {

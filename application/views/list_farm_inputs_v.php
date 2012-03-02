@@ -15,28 +15,28 @@
 			<td>Acetam/Spear - 100mls</td>
 			<td>Desc</td>
 			<td>900</td>
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr>
 			<td>1235</td>
 			<td>Nutricot/Soluber - 1/2Kg</td>
 			<td>Desc</td>
 			<td>5000</td>
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr class="odd">
 			<td>1235</td>
 			<td>Rubber Gloves - Unit</td>
 			<td>Desc</td>
 			<td>8000</td>
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr>
 			<td>1235</td>
 			<td>Certified Seed (Treated)</td>
 			<td>Desc</td>
 			<td>8,500</td>
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 	</tbody>
 </table>

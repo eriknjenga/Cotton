@@ -27,7 +27,8 @@
 			<td>2012</td>
 			<td>5548</td>
 			<td>6654</td>
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr>
 			<td>455</td>
@@ -40,7 +41,7 @@
 			<td>2012</td>
 			<td>3548</td>
 			<td>8554</td>
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr class="odd">
 			<td>454</td>
@@ -53,7 +54,7 @@
 			<td>2012</td>
 			<td>8548</td>
 			<td>3954</td>
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr>
 			<td>453</td>
@@ -66,7 +67,7 @@
 			<td>2012</td>
 			<td>9548</td>
 			<td>3554</td>
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 	</tbody>
 </table>

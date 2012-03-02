@@ -14,28 +14,28 @@
 			<td>asifeko</td>
 			<td>Data Clerk</td> 
 			 
-			<td><a href="#" class="link">Change Password</a> |<a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr>
 			<td>Abdullah Taib</td>
 			<td>ataib</td>
 			<td>System Administrator</td> 
 			 
-			<td><a href="#" class="link">Change Password</a> |<a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr class="odd">
 			<td>Marariose chilufya Lushika</td>
 			<td>mchilufya</td>
 			<td>Data Clerk</td> 
 			 
-			<td><a href="#" class="link">Change Password</a> |<a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr>
 			<td>Christine Malupande</td>
 			<td>cmalupande</td>
 			<td>Data Clerk</td> 
 			 
-			<td><a href="#" class="link">Change Password</a> |<a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 	</tbody>
 </table>

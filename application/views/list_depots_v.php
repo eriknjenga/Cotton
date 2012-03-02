@@ -17,7 +17,7 @@
 			<td>Distributor Code (Distributor Name)</td>
 			<td>Area Code (Area Name)</td>
 			<td>Route</td>
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 		<tr >
 			<td>1235</td>
@@ -25,7 +25,7 @@
 			<td>Distributor Code (Distributor Name)</td>
 			<td>Area Code (Area Name)</td>
 			<td>Route</td>
-			<td><a href="#" class="link">Edit</a> | <a href="#" class="link">Delete</a></td>
+			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
 		</tr>
 	</tbody>
 </table>
