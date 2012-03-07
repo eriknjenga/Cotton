@@ -6,7 +6,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<!-- End of Meta -->
 		<!-- Page title -->
-		<title>Wide Admin - Login</title>
+		<title><?php echo $title;?></title>
 		<!-- End of Page title -->
 		<!-- Libraries -->
 		<link type="text/css" href="<?php echo base_url().'CSS/login.css'?>" rel="stylesheet" />
@@ -30,12 +30,12 @@
 					echo "<p class='error'>The Account is not active. Seek help from the Administrator</p>";
 				}
 				?>
-				<form action="<?php echo base_url().'user_management/authenticate'?>" method="post" >
+				<form action="<?php echo base_url().'user_management/authenticate'?>" method="post"  >
 					<p class="main">
 						<label>Username: </label>
-						<input name="username" value="username" />
+						<input name="username" value="" />
 						<label>Password: </label>
-						<input type="password" name="password" value="asdf1234">
+						<input type="password" name="password" value="">
 					</p>
 					<p class="space">
 						<span>

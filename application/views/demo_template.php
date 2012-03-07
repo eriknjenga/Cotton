@@ -1,4 +1,7 @@
 <?php
+if (!$this -> session -> userdata('user_id')) {
+	redirect("User_Management/login");
+}
 if (!isset($quick_link)) {
 	$quick_link = "";
 }
@@ -35,17 +38,17 @@ if (!isset($link)) {
 				<div id="top">
 					<!-- Logo -->
 					<div class="logo">
-						<a href="#" title="Administration Home" class="tooltip"><img src="<?php echo base_url().'Images/logo.png'?>" alt="farm2" /></a>
+						<a href="#" title="Administration Home" class="tooltip"><img src="<?php echo base_url().'Images/logo.png'?>" alt="logo" /></a>
 					</div>
 					<!-- End of Logo -->
 					<!-- Meta information -->
 					<div class="meta">
 						<p>
-							Welcome, Abdullah Taib! <!--<a href="#" title="1 new private message from Elaine!" class="tooltip">1 new message!</a>-->
+							Welcome, <?php echo $this -> session -> userdata('full_name');?>! <!--<a href="#" title="1 new private message from Elaine!" class="tooltip">1 new message!</a>-->
 						</p>
 						<ul>
 							<li>
-								<a href="#" title="End administrator session" class="tooltip"><span class="ui-icon ui-icon-power"></span>Logout</a>
+								<a href="<?php echo site_url("user_management/logout");?>" ><span class="ui-icon ui-icon-power"></span>Logout</a>
 							</li>
 							<li>
 								<a href="#" title="Change current settings" class="tooltip"><span class="ui-icon ui-icon-wrench"></span>Settings</a>

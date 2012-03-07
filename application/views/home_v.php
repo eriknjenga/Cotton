@@ -1,4 +1,4 @@
-						<h1>Welcome, <span>Abdulla</span>!</h1>
+						<h1>Welcome, <span><?php echo $this -> session -> userdata('full_name');?></span>!</h1>
 						<p>
 							What would you like to do today?
 						</p>

@@ -5,14 +5,12 @@ class Users extends Doctrine_Record {
 		$this -> hasColumn('Name', 'varchar', 100);
 		$this -> hasColumn('Username', 'varchar', 12);
 		$this -> hasColumn('Password', 'varchar', 32);
-		$this -> hasColumn('Access_Level', 'varchar', 1);
-		$this -> hasColumn('Flag', 'varchar', 10);
-		$this -> hasColumn('Telephone', 'varchar', 50);
-		$this -> hasColumn('Postal', 'varchar', 50);
-		$this -> hasColumn('Email', 'varchar', 50);
-		$this -> hasColumn('Added_By', 'varchar', 5);
-		$this -> hasColumn('District_Or_Province', 'varchar', 50);
-		$this -> hasColumn('Timestamp', 'varchar', 32);
+		$this -> hasColumn('Access_Level', 'varchar', 10); 
+		$this -> hasColumn('Phone_Number', 'varchar', 50);
+		$this -> hasColumn('Created_By', 'varchar', 10);
+		$this -> hasColumn('Email_Address', 'varchar', 50); 
+		$this -> hasColumn('Time_Created', 'varchar', 32);
+		$this -> hasColumn('Active', 'varchar', 2);
 	}
 
 	public function setUp() {

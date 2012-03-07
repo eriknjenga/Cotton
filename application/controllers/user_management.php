@@ -16,6 +16,11 @@ class User_Management extends MY_Controller {
 		$data['title'] = "System Login";
 		$this -> load -> view("login_v", $data);
 	}
+	public function logout(){
+		//destroy the session first
+		$this->session->sess_destroy();
+		redirect("user_management/login");
+	}
 
 	public function listing() {
 		$data['content_view'] = "list_users_v";
@@ -23,7 +28,7 @@ class User_Management extends MY_Controller {
 	}
 
 	public function authenticate() {
-		/*$data = array();
+		$data = array();
 		$validated = $this -> _submit_validate();
 		if ($validated) {
 			$username = $this -> input -> post("username");
@@ -39,14 +44,14 @@ class User_Management extends MY_Controller {
 			//If the credentials are valid, continue
 			else {
 				//check to see whether the user is active
-				if ($logged_in -> Flag == "0") {
+				if ($logged_in -> Active == "0") {
 					$data['inactive'] = true;
 					$data['title'] = "System Login";
 					$this -> load -> view("login_v", $data);
 				}
 				//looks good. Continue!
 				else {
-					$session_data = array('user_id' => $logged_in -> id,'user_indicator'=>$logged_in -> Access->Indicator, 'access_level' => $logged_in -> Access_Level, 'username' => $logged_in -> Username, 'full_name' => $logged_in -> Name, 'district_province_id' => $logged_in -> District_Or_Province);
+					$session_data = array('user_id' => $logged_in -> id,'user_indicator'=>$logged_in -> Access->Indicator, 'access_level' => $logged_in -> Access_Level, 'username' => $logged_in -> Username, 'full_name' => $logged_in -> Name);
 					$this -> session -> set_userdata($session_data);
 
 					redirect("home_controller");
@@ -59,8 +64,6 @@ class User_Management extends MY_Controller {
 			$data['title'] = "System Login";
 			$this -> load -> view("login_v", $data);
 		}
-		 * 
-		 */
 		redirect("home_controller");
 	}
 
