@@ -22,7 +22,7 @@ class Area_Management extends MY_Controller {
 	public function base_params($data) {
 		$data['title'] = "Area Management";
 		$data['banner_text'] = "Area Registration";
-		$data['link'] = "admin";
+		$data['link'] = "area_management";
 		$this -> load -> view("demo_template", $data);
 	}
 

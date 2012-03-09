@@ -94,7 +94,7 @@ foreach($menus as $menu){?>
 	<a href = "<?php echo base_url() . $menu['url'];?>" class="top_menu_link <?php
 	if ($current == $menu['url'] || $menu['url'] == $link) {echo " top_menu_active ";
 	}
-?>"><?php echo $menu['text'];?>
+?>"><?php echo $menu['text'];?></a>
 <?php
 $counter++;
 }

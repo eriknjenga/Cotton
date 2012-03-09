@@ -88,7 +88,7 @@ class User_Management extends MY_Controller {
 	}
 
 	public function base_params($data) {
-		$data['link'] = "admin";
+		$data['link'] = "user_management";
 		$this -> load -> view("demo_template", $data);
 	}
 
