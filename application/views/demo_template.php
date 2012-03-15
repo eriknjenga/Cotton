@@ -1,6 +1,6 @@
 <?php
 if (!$this -> session -> userdata('user_id')) {
-	redirect("User_Management/login");
+	redirect("user_management/login");
 }
 if (!isset($quick_link)) {
 	$quick_link = "";
@@ -25,8 +25,32 @@ if (!isset($link)) {
 		<script type="text/javascript" src="<?php echo base_url().'Scripts/easyTooltip.js'?>"></script>
 		<script type="text/javascript" src="<?php echo base_url().'Scripts/jquery.wysiwyg.js'?>"></script>
 		<script type="text/javascript" src="<?php echo base_url().'Scripts/hoverIntent.js'?>"></script>
-		<script type="text/javascript" src="<?php echo base_url().'Scripts/superfish.js'?>"></script>
-		<script type="text/javascript" src="<?php echo base_url().'Scripts/custom.js'?>"></script>
+		<script type="text/javascript" src="<?php echo base_url().'Scripts/superfish.js'?>"></script> 
+		<?php
+		if (isset($script_urls)) {
+			foreach ($script_urls as $script_url) {
+				echo "<script src=\"" . $script_url . "\" type=\"text/javascript\"></script>";
+			}
+		}
+	?>
+
+<?php
+if (isset($scripts)) {
+	foreach ($scripts as $script) {
+		echo "<script src=\"" . base_url() . "Scripts/" . $script . "\" type=\"text/javascript\"></script>";
+	}
+}
+?>
+
+
+ 
+<?php
+if (isset($styles)) {
+	foreach ($styles as $style) {
+		echo "<link href=\"" . base_url() . "CSS/" . $style . "\" type=\"text/css\" rel=\"stylesheet\"/>";
+	}
+}
+?>  
 		<!-- End of Libraries -->
 	</head>
 	<body>
@@ -77,8 +101,8 @@ foreach($menus as $menu){
 						?>
 						<li>
 							<a  class="<?php
-						if ($link == $menu['url'] || $menu['url'] == $link) {echo "active";
-						}
+							if ($link == $menu['url'] || $menu['url'] == $link) {echo "active";
+							}
 						?>" href = "<?php echo base_url() . $menu['url'];?>" ><?php echo $menu['text'];?></a>
 						</li>
 						<?php }?>

@@ -6,6 +6,7 @@ class Dashboard extends Doctrine_Record {
 		$this -> hasColumn('Dashboard_Url', 'varchar', 50);
 		$this -> hasColumn('Dashboard_Tooltip', 'varchar', 100);
 		$this -> hasColumn('Description', 'text');
+		$this -> hasColumn('Dashboard_Id', 'varchar', 100);
 	}
 
 	public function setUp() {

@@ -41,6 +41,7 @@ class Home_Controller extends MY_Controller {
 			$dashboards['dashboard_items'][$counter]['text'] = $right -> Dashboard_Item -> Dashboard_Text;
 			$dashboards['dashboard_items'][$counter]['icon'] = $right -> Dashboard_Item -> Dashboard_Icon;
 			$dashboards['dashboard_items'][$counter]['tooltip'] = $right -> Dashboard_Item -> Dashboard_Tooltip;
+			$dashboards['dashboard_items'][$counter]['dashboard_id'] = $right -> Dashboard_Item -> Dashboard_Id;
 			$counter++;
 		}
 		$this -> session -> set_userdata($dashboards);
@@ -49,6 +50,7 @@ class Home_Controller extends MY_Controller {
 		$data['content_view'] = "home_v";
 		$data['banner_text'] = "System Home";
 		$data['link'] = "home";
+		$data['scripts'] = array("FusionCharts/FusionCharts.js");
 		$this -> load -> view("demo_template", $data);
 
 	}
