@@ -74,7 +74,7 @@ class User_Management extends MY_Controller {
 
 		return $this -> form_validation -> run();
 	}
-	public function register() {
+	public function new_user() {
 		$data['content_view'] = "add_user_v";
 		$data['quick_link'] = "register_user";
 		$this -> base_params($data);

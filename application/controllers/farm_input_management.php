@@ -13,7 +13,7 @@ class Farm_Input_Management extends MY_Controller {
 		$this -> base_params($data);
 	}
 
-	public function register() {
+	public function new_input() {
 		$data['content_view'] = "add_farm_input_v";
 		$data['quick_link'] = "add_input_product";
 		$this -> base_params($data);

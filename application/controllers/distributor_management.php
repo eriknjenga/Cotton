@@ -13,7 +13,7 @@ class Distributor_Management extends MY_Controller {
 		$this -> base_params($data);
 	}
 
-	public function register() {
+	public function new_distributor() {
 		$data['content_view'] = "add_distributor_v";
 		$data['quick_link'] = "add_distributor";
 		$this -> base_params($data);
