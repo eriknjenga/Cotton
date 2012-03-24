@@ -16,9 +16,10 @@ class User_Management extends MY_Controller {
 		$data['title'] = "System Login";
 		$this -> load -> view("login_v", $data);
 	}
-	public function logout(){
+
+	public function logout() {
 		//destroy the session first
-		$this->session->sess_destroy();
+		$this -> session -> sess_destroy();
 		redirect("user_management/login");
 	}
 
@@ -51,7 +52,7 @@ class User_Management extends MY_Controller {
 				}
 				//looks good. Continue!
 				else {
-					$session_data = array('user_id' => $logged_in -> id,'user_indicator'=>$logged_in -> Access->Indicator, 'access_level' => $logged_in -> Access_Level, 'username' => $logged_in -> Username, 'full_name' => $logged_in -> Name);
+					$session_data = array('user_id' => $logged_in -> id, 'user_indicator' => $logged_in -> Access -> Indicator, 'access_level' => $logged_in -> Access_Level, 'full_name' => $logged_in -> Name);
 					$this -> session -> set_userdata($session_data);
 
 					redirect("home_controller");
@@ -74,11 +75,13 @@ class User_Management extends MY_Controller {
 
 		return $this -> form_validation -> run();
 	}
+
 	public function new_user() {
 		$data['content_view'] = "add_user_v";
 		$data['quick_link'] = "register_user";
 		$this -> base_params($data);
 	}
+
 	public function go_home($data) {
 		$data['title'] = "System Home";
 		$data['content_view'] = "home_v";

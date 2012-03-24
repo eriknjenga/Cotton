@@ -4,6 +4,7 @@ class Quick_Menu extends Doctrine_Record {
 		$this -> hasColumn('Menu_Text', 'varchar', 50);
 		$this -> hasColumn('Menu_Url', 'varchar', 100);
 		$this -> hasColumn('Description', 'text');
+		$this -> hasColumn('Indicator', 'varchar', 100);
 	}
 
 	public function setUp() {

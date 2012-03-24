@@ -96,7 +96,7 @@ if (isset($styles)) {
 							?>" href="<?php echo base_url();?>">Dashboard</a>
 						</li>
 						<?php
-$menus = $this -> session -> userdata('menu_items');
+$menus = $this -> menus -> userdata('menu_items'); 
 foreach($menus as $menu){
 						?>
 						<li>
@@ -135,12 +135,12 @@ foreach($menus as $menu){
 					<!-- Lists -->
 					<h2>Quick Menu</h2>
 					<ul>
-						<?php
-$quick_menus = $this -> session -> userdata('quick_menu_items');
+						<?php 
+$quick_menus = $this -> quick_menus -> userdata('quick_menu_items');
 foreach($quick_menus as $quick_menu){
 						?>
 						<li class="<?php
-						if ($quick_link == $quick_menu['url'] || $quick_menu['url'] == $link) {echo " active ";
+						if ($quick_link == $quick_menu['indicator']) {echo " active ";
 						}
 						?>">
 							<a href = "<?php echo base_url() . $quick_menu['url'];?>" ><?php echo $quick_menu['text'];?></a>

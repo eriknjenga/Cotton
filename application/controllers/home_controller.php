@@ -13,6 +13,14 @@ class Home_Controller extends MY_Controller {
 	}
 
 	public function home() {
+		// Create session for holding quick menus
+		$config_session1 = array('sess_cookie_name' => 'quick_menus');
+		$this -> load -> library('session', $config_session1, 'quick_menus');
+		
+		// Create session for holding  menus
+		$config_session = array('sess_cookie_name' => 'menus');
+		$this -> load -> library('session', $config_session, 'menus');
+		
 		$quick_menu_rights = Quick_Menu_User_Right::getRights($this -> session -> userdata('access_level'));
 		$menu_rights = User_Right::getRights($this -> session -> userdata('access_level'));
 		$dashboard_rights = Dashboard_User_Right::getRights($this -> session -> userdata('access_level'));
@@ -21,9 +29,10 @@ class Home_Controller extends MY_Controller {
 		foreach ($quick_menu_rights as $right) {
 			$quick_menus['quick_menu_items'][$counter]['url'] = $right -> Menu_Item -> Menu_Url;
 			$quick_menus['quick_menu_items'][$counter]['text'] = $right -> Menu_Item -> Menu_Text;
+			$quick_menus['quick_menu_items'][$counter]['indicator'] = $right -> Menu_Item -> Indicator;
 			$counter++;
 		}
-		$this -> session -> set_userdata($quick_menus);
+		$this -> quick_menus -> set_userdata($quick_menus);
 
 		$menus = array();
 		$counter = 0;
@@ -32,7 +41,7 @@ class Home_Controller extends MY_Controller {
 			$menus['menu_items'][$counter]['text'] = $right -> Menu_Item -> Menu_Text;
 			$counter++;
 		}
-		$this -> session -> set_userdata($menus);
+		$this -> menus -> set_userdata($menus);
 
 		$dashboards = array();
 		$counter = 0;
@@ -44,8 +53,7 @@ class Home_Controller extends MY_Controller {
 			$dashboards['dashboard_items'][$counter]['dashboard_id'] = $right -> Dashboard_Item -> Dashboard_Id;
 			$counter++;
 		}
-		$this -> session -> set_userdata($dashboards);
-
+		$data['dashboards'] = $dashboards;
 		$data['title'] = "System Home";
 		$data['content_view'] = "home_v";
 		$data['banner_text'] = "System Home";

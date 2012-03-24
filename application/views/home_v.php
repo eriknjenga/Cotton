@@ -90,7 +90,7 @@
 	<!-- Big buttons -->
 	<ul class="dash">
 		<?php
-$dashboards = $this -> session -> userdata('dashboard_items');
+$dashboards = $dashboards['dashboard_items'];
 foreach($dashboards as $dashboard){
 		?>
 		<li>

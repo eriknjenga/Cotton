@@ -18,8 +18,8 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'distributor_management/delete_distributor/'?>
-		" +$(this).attr("distributor");
+	url = "<?php echo base_url().'field_officer_management/delete_officer/'?>
+		" +$(this).attr("field_officer");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -27,22 +27,21 @@
 		window.location = url;
 		}
 </script>
-<h1>Distributor Listing</h1>
+<h1>Field Officer Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Code</th>
-			<th>Name</th> 
-			<th>National Id</th> 
-			<th>Area</th> 
+			<th>Officer Code</th>
+			<th>Officer Name</th>
+			<th>National ID</th> 
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-if (isset($distributors[0])) {
+if (isset($officers[0])) {
 $counter = 1;
-foreach ($distributors as $distributor) {
+foreach ($officers as $officer) {
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
@@ -52,20 +51,18 @@ $class = "odd";
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $distributor -> Distributor_Code;?>
+		<?php echo $officer -> Officer_Code;?>
 		</td>
 		<td>
-		<?php echo $distributor -> First_Name." ".$distributor -> Surname;?>
-		</td> 
-		<td>
-		<?php echo $distributor ->National_Id;?>
+		<?php echo $officer -> Officer_Name;?>
 		</td>
 		<td>
-		<?php echo $distributor -> Area_Object->Area_Name;?>
+		<?php echo $officer -> National_Id;?>
 		</td> 
-		<td><a href="<?php echo base_url()."distributor_management/edit_distributor/".$distributor->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" distributor = "<?php echo $distributor -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		<td><a href="<?php echo base_url()."field_officer_management/edit_officer/".$officer->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" field_officer = "<?php echo $officer -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
 		<?php
+
 		$counter++;
 		}
 		}

@@ -608,3 +608,8 @@ table tr.odd{
 	letter-spacing: 1px;
 	color:#C44509;
 }
+p.form_error {
+	background-color: #FDCEA4;
+	border: 1px solid #C44509; 
+	letter-spacing: 1.5px; 
+}

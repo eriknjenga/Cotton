@@ -18,8 +18,8 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'distributor_management/delete_distributor/'?>
-		" +$(this).attr("distributor");
+	url = "<?php echo base_url().'fbg_management/delete_fbg/'?>
+		" +$(this).attr("fbg");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -27,22 +27,23 @@
 		window.location = url;
 		}
 </script>
-<h1>Distributor Listing</h1>
+<h1>FBG Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Code</th>
-			<th>Name</th> 
-			<th>National Id</th> 
-			<th>Area</th> 
+			<th>GD</th>
+			<th>CPC</th>
+			<th>Group Name</th>
+			<th>Distributor</th>
+			<th>Hectares</th>
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-if (isset($distributors[0])) {
+if (isset($fbgs[0])) {
 $counter = 1;
-foreach ($distributors as $distributor) {
+foreach ($fbgs as $fbg) {
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
@@ -52,18 +53,22 @@ $class = "odd";
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $distributor -> Distributor_Code;?>
+		<?php echo $fbg -> GD_Id;?>
 		</td>
 		<td>
-		<?php echo $distributor -> First_Name." ".$distributor -> Surname;?>
-		</td> 
-		<td>
-		<?php echo $distributor ->National_Id;?>
+		<?php echo $fbg -> CPC_Number;?>
 		</td>
 		<td>
-		<?php echo $distributor -> Area_Object->Area_Name;?>
-		</td> 
-		<td><a href="<?php echo base_url()."distributor_management/edit_distributor/".$distributor->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" distributor = "<?php echo $distributor -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		<?php echo $fbg -> Group_Name;?>
+		</td>
+
+		<td>
+		<?php echo $fbg -> Distributor_Object -> First_Name . " " . $fbg -> Distributor_Object -> Surname;?>
+		</td>
+		<td>
+		<?php echo $fbg -> Hectares_Available;?>
+		</td>
+		<td><a href="<?php echo base_url()."fbg_management/edit_fbg/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" fbg = "<?php echo $fbg -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
 		<?php
 		$counter++;
