@@ -28,5 +28,9 @@ class Farm_Input extends Doctrine_Record {
 		$input = $query -> execute();
 		return $input[0];
 	}
-
+	public function getAll() {
+		$query = Doctrine_Query::create() -> select("*") -> from("Farm_Input");
+		$inputs = $query -> execute();
+		return $inputs;
+	}
 }

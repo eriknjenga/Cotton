@@ -18,8 +18,8 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'fbg_management/delete_fbg/'?>
-		" +$(this).attr("fbg");
+	url = "<?php echo base_url().'disbursement_management/delete_disbursement/'?>
+		" +$(this).attr("area");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -27,23 +27,25 @@
 		window.location = url;
 		}
 </script>
-<h1>FBG Listing</h1>
+<h1>Farmer Input Loans Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>GD</th>
-			<th>CPC</th>
-			<th>Group Name</th>
-			<th>Distributor</th>
-			<th>Hectares</th>
+			<th>Invoice No.</th>
+			<th>Date</th>
+			<th>FBG Name</th>
+			<th>Input</th>
+			<th>Quantity</th>
+			<th>Total Value</th>
+			<th>Season</th>
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-if (isset($fbgs[0])) {
+if (isset($disbursements[0])) {
 $counter = 1;
-foreach ($fbgs as $fbg) {
+foreach ($disbursements as $disbursement) {
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
@@ -53,24 +55,30 @@ $class = "odd";
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $fbg -> GD_Id;?>
+		<?php echo $disbursement -> Invoice_Number;?>
 		</td>
 		<td>
-		<?php echo $fbg -> CPC_Number;?>
+		<?php echo $disbursement -> Date;?>
 		</td>
 		<td>
-		<?php echo $fbg -> Group_Name;?>
-		</td>
-
-		<td>
-		<?php echo $fbg -> Distributor_Object -> First_Name . " " . $fbg -> Distributor_Object -> Surname;?>
+		<?php echo $disbursement -> FBG_Object->Group_Name;?>
 		</td>
 		<td>
-		<?php echo $fbg -> Hectares_Available;?>
+		<?php echo $disbursement -> Farm_Input_Object->Product_Name;?>
 		</td>
-		<td><a href="<?php echo base_url()."fbg_management/edit_fbg/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" fbg = "<?php echo $fbg -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><a href="<?php echo base_url()."disbursement_management/disburse_inputs/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-cart"></span>Disburse Inputs</a></td>
+		<td>
+		<?php echo $disbursement -> Quantity;?>
+		</td>
+		<td>
+		<?php echo $disbursement -> Total_Value;?>
+		</td>
+		<td>
+		<?php echo $disbursement -> Season;?>
+		</td>
+		<td><a href="<?php echo base_url()."disbursement_management/edit_disbursement/".$disbursement->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" area = "<?php echo $disbursement -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
 		<?php
+
 		$counter++;
 		}
 		}

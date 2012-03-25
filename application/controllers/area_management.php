@@ -15,7 +15,7 @@ class Area_Management extends MY_Controller {
 		$areas = Area::getPagedAreas($offset, $items_per_page);
 		if ($number_of_areas > $items_per_page) {
 			$config['base_url'] = base_url() . "area_management/listing/";
-			$config['total_rows'] = $number_of_inputs;
+			$config['total_rows'] = $number_of_areas;
 			$config['per_page'] = $items_per_page;
 			$config['uri_segment'] = 3;
 			$config['num_links'] = 5;

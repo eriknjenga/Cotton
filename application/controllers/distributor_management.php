@@ -15,7 +15,7 @@ class Distributor_Management extends MY_Controller {
 		$distributors = Distributor::getPagedDistributors($offset, $items_per_page);
 		if ($number_of_distributors > $items_per_page) {
 			$config['base_url'] = base_url() . "area_management/listing/";
-			$config['total_rows'] = $number_of_inputs;
+			$config['total_rows'] = $number_of_distributors;
 			$config['per_page'] = $items_per_page;
 			$config['uri_segment'] = 3;
 			$config['num_links'] = 5;

@@ -15,7 +15,7 @@ class FBG_Management extends MY_Controller {
 		$fbgs = FBG::getPagedFbgs($offset, $items_per_page);
 		if ($number_of_fbgs > $items_per_page) {
 			$config['base_url'] = base_url() . "fbg_management/listing/";
-			$config['total_rows'] = $number_of_inputs;
+			$config['total_rows'] = $number_of_fbgs;
 			$config['per_page'] = $items_per_page;
 			$config['uri_segment'] = 3;
 			$config['num_links'] = 5;
