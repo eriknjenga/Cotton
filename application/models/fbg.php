@@ -4,13 +4,14 @@ class FBG extends Doctrine_Record {
 		$this -> hasColumn('GD_Id', 'varchar', 20);
 		$this -> hasColumn('CPC_Number', 'varchar', 20);
 		$this -> hasColumn('Group_Name', 'varchar','100'); 
-		$this -> hasColumn('Distributor', 'varchar', 10);
+		$this -> hasColumn('Field_Officer', 'varchar', 10);
 		$this -> hasColumn('Hectares_Available', 'varchar', 20);
+		$this -> hasColumn('Type', 'varchar', 5);
 	}
 
 	public function setUp() {
 		$this -> setTableName('fbg');
-		$this -> hasOne('Distributor as Distributor_Object', array('local' => 'Distributor', 'foreign' => 'id'));
+		$this -> hasOne('Field_Officer as Officer_Object', array('local' => 'Field_Officer', 'foreign' => 'id'));
 	}
 
 	public function getTotalFbgs() {

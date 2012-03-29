@@ -4,10 +4,12 @@ class Field_Officer extends Doctrine_Record {
 		$this -> hasColumn('Officer_Code', 'varchar', 100);
 		$this -> hasColumn('Officer_Name', 'varchar', 100); 
 		$this -> hasColumn('National_Id', 'varchar', 20);
+		$this -> hasColumn('Area', 'varchar', 10);
 	}
 
 	public function setUp() {
 		$this -> setTableName('field_officer');
+		$this -> hasOne('Area as Area_Object', array('local' => 'Area', 'foreign' => 'id'));
 	}
 
 	public function getTotalOfficers() {
@@ -26,6 +28,11 @@ class Field_Officer extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Field_Officer")->where("id = '$id'");
 		$officer = $query -> execute();
 		return $officer[0];
+	}
+	public function getAll() {
+		$query = Doctrine_Query::create() -> select("*") -> from("Field_Officer");
+		$field_officers = $query -> execute();
+		return $field_officers;
 	}
 
 }

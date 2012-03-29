@@ -13,7 +13,7 @@ class Purchase_Management extends MY_Controller {
 		$this -> base_params($data);
 	}
 
-	public function new_purchase() {
+	public function purchase_from_registered($farmer) {
 		$data['content_view'] = "add_purchase_v";
 		$data['quick_link'] = "add_purchase";
 		$this -> base_params($data);

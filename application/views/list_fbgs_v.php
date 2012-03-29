@@ -27,14 +27,13 @@
 		window.location = url;
 		}
 </script>
-<h1>FBG Listing</h1>
+<h1>Farmers Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>GD</th>
 			<th>CPC</th>
-			<th>Group Name</th>
-			<th>Distributor</th>
+			<th>Name</th>
+			<th>Type</th> 
 			<th>Hectares</th>
 			<th>Action</th>
 		</tr>
@@ -42,6 +41,7 @@
 	<tbody>
 		<?php
 if (isset($fbgs[0])) {
+	$types = array(1=>"FBG",2=>"Individual Farmer");
 $counter = 1;
 foreach ($fbgs as $fbg) {
 $rem = $counter % 2;
@@ -53,22 +53,18 @@ $class = "odd";
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $fbg -> GD_Id;?>
-		</td>
-		<td>
 		<?php echo $fbg -> CPC_Number;?>
 		</td>
 		<td>
 		<?php echo $fbg -> Group_Name;?>
 		</td>
-
 		<td>
-		<?php echo $fbg -> Distributor_Object -> First_Name . " " . $fbg -> Distributor_Object -> Surname;?>
-		</td>
+		<?php echo $types[$fbg -> Type];?>
+		</td> 
 		<td>
 		<?php echo $fbg -> Hectares_Available;?>
 		</td>
-		<td><a href="<?php echo base_url()."fbg_management/edit_fbg/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" fbg = "<?php echo $fbg -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><a href="<?php echo base_url()."disbursement_management/disburse_inputs/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-cart"></span>Disburse Inputs</a></td>
+		<td><a href="<?php echo base_url()."fbg_management/edit_fbg/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" fbg = "<?php echo $fbg -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><a href="<?php echo base_url()."disbursement_management/disburse_inputs/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-suitcase"></span>Disburse</a><a href="<?php echo base_url()."purchase_management/purchase_from_registered/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-cart"></span>Purchase</a></td>
 		</tr>
 		<?php
 		$counter++;

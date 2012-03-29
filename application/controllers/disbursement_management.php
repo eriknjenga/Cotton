@@ -35,6 +35,7 @@ class Disbursement_Management extends MY_Controller {
 			$data = array();
 		}
 		$data['farm_inputs'] = Farm_Input::getAll();
+		$data['distributors'] = Distributor::getAll();
 		$data['content_view'] = "add_disbursement_v";
 		$data['quick_link'] = "add_disbursement";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");

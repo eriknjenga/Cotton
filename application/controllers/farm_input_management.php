@@ -44,21 +44,20 @@ class Farm_Input_Management extends MY_Controller {
 	public function edit_input($id) {
 		$input = Farm_Input::getInput($id);
 		$data['input'] = $input;
-		$this->new_input($data);
+		$this -> new_input($data);
 	}
 
 	public function save() {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
 		if ($valid) {
-			$editing = $this->input->post("editing_id");
+			$editing = $this -> input -> post("editing_id");
 			//Check if we are editing the record first
-			if(strlen($editing)>0){
+			if (strlen($editing) > 0) {
 				$input = Farm_Input::getInput($editing);
-			}
-			else{
+			} else {
 				$input = new Farm_Input();
-			}			
+			}
 			$input -> Product_Code = $this -> input -> post("product_code");
 			$input -> Product_Name = $this -> input -> post("product_name");
 			$input -> Product_Description = $this -> input -> post("product_desc");
@@ -69,10 +68,11 @@ class Farm_Input_Management extends MY_Controller {
 			$this -> new_input();
 		}
 	}
-	public function delete_input($id){
+
+	public function delete_input($id) {
 		$input = Farm_Input::getInput($id);
-		$input->delete();
-		$previous_page = $this -> session -> userdata('old_url'); 
+		$input -> delete();
+		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
 	}
 
@@ -85,10 +85,20 @@ class Farm_Input_Management extends MY_Controller {
 	}
 
 	public function base_params($data) {
-		$data['title'] = "Farmer Inputs Management"; 
+		$data['title'] = "Farmer Inputs Management";
 		$data['link'] = "farm_input_management";
 
 		$this -> load -> view("demo_template", $data);
+	}
+
+	public function issue_to_distributor() {
+		$data['content_view'] = "issue_distributor_v";
+		$data['quick_link'] = "issue_to_distributor";
+		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['styles'] = array("Validator.css");
+		$data['farm_inputs'] = Farm_Input::getAll();
+		$data['distributors'] = Distributor::getAll();
+		$this -> base_params($data);
 	}
 
 	public function get_loan_movement_graph_data() {

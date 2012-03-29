@@ -10,11 +10,14 @@ if (isset($officer)) {
 	$officer_name = $officer -> Officer_Name;
 	$national_id = $officer -> National_Id; 
 	$officer_id = $officer -> id;
+	$area = $officer -> Area;
 } else {
 	$officer_code = "";
 	$officer_name = "";
 	$national_id = "";
-	$officer_id = ""; 
+	$officer_id = "";
+	$area= ""; 
+	
 }
 $attributes = array("method" => "post", "id" => "add_field_officer_input");
 echo form_open('field_officer_management/save', $attributes);
@@ -43,7 +46,21 @@ echo validation_errors('
 		<input name="national_id" id="national_id" value="<?php echo $national_id;?>" type="text" class="validate[required]" />
 		<span class="field_desc">Enter the National ID Number for this officer</span>
 	</p>
-	 
+	 <p>
+		<label for="area">Area</label>
+		<select name="area" class="dropdown validate[required]" id="area">
+			<option></option>
+			<?php
+foreach($areas as $area_object){
+			?>
+			<option value="<?php echo $area_object -> id;?>" <?php
+				if ($area_object -> id == $area) {echo "selected";
+				}
+			?>><?php echo $area_object -> Area_Name;?></option>
+			<?php }?>
+		</select>
+		<span class="field_desc">Select the area covered by this field officer</span>
+	</p>
 	<p>
 		<input class="button" type="submit" value="Submit">
 		<input class="button" type="reset" value="Reset">

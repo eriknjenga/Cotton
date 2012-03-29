@@ -34,7 +34,7 @@ class FBG_Management extends MY_Controller {
 		if ($data == null) {
 			$data = array();
 		}
-		$data['distributors'] = Distributor::getAll();
+		$data['field_officers'] = Field_Officer::getAll();
 		$data['content_view'] = "add_fbg_v";
 		$data['quick_link'] = "add_fbg";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
@@ -62,8 +62,9 @@ class FBG_Management extends MY_Controller {
 			$fbg -> GD_Id = $this -> input -> post("gd_id");
 			$fbg -> CPC_Number = $this -> input -> post("cpc_number");
 			$fbg -> Group_Name = $this -> input -> post("group_name"); 
-			$fbg -> Distributor = $this -> input -> post("distributor");  
+			$fbg -> Field_Officer = $this -> input -> post("field_officer");  
 			$fbg -> Hectares_Available = $this -> input -> post("hectares_available");  
+			$fbg -> Type = $this -> input -> post("type");  
 			$fbg -> save();
 			redirect("fbg_management/listing");
 		} else {
@@ -80,17 +81,17 @@ class FBG_Management extends MY_Controller {
 
 	public function validate_form() {
 		$this -> form_validation -> set_rules('gd_id', 'GD Id', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('type', 'Farmer Type', 'trim|required|xss_clean');
 		$this -> form_validation -> set_rules('cpc_number', 'CPC Number', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('group_name', 'First Name', 'trim|required|max_length[100]|xss_clean');  
-		$this -> form_validation -> set_rules('distributor', 'Distributor', 'trim|required|max_length[20]|xss_clean'); 
+		$this -> form_validation -> set_rules('field_officer', 'Field Officer', 'trim|required|max_length[20]|xss_clean'); 
 		$this -> form_validation -> set_rules('hectares_available', 'Hectares Available', 'trim|required|max_length[20]|xss_clean'); 
 		return $this -> form_validation -> run();
 	}
 
 	public function base_params($data) {
-		$data['title'] = "Farmer Business Group Management";
+		$data['title'] = "Farmer Management";
 		$data['link'] = "fbg_management";
-
 		$this -> load -> view("demo_template", $data);
 	}
  
