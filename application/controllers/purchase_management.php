@@ -18,7 +18,11 @@ class Purchase_Management extends MY_Controller {
 		$data['quick_link'] = "add_purchase";
 		$this -> base_params($data);
 	}
-
+	public function free_farmer_purchase() {
+		$data['content_view'] = "add_free_farmer_purchase_v";
+		$data['quick_link'] = "free_farmer_purchase";
+		$this -> base_params($data);
+	}
 	public function get_average_price_graph_data() {
 		echo '<chart caption="Average Buying Price" xAxisName="Month" yAxisName="Price per Tonne" showValues="0" decimals="0" formatNumberScale="0">
 <set label="Jan" value="25000"/>

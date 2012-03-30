@@ -1,4 +1,4 @@
-<h1>Registered Farmers Listing</h1>
+<h1>Registered Buyers Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
