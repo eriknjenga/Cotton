@@ -4,12 +4,12 @@ class Field_Officer extends Doctrine_Record {
 		$this -> hasColumn('Officer_Code', 'varchar', 100);
 		$this -> hasColumn('Officer_Name', 'varchar', 100); 
 		$this -> hasColumn('National_Id', 'varchar', 20);
-		$this -> hasColumn('Area', 'varchar', 10);
+		$this -> hasColumn('Region', 'varchar', 10);
 	}
 
 	public function setUp() {
 		$this -> setTableName('field_officer');
-		$this -> hasOne('Area as Area_Object', array('local' => 'Area', 'foreign' => 'id'));
+		$this -> hasOne('Region as Region_Object', array('local' => 'Region', 'foreign' => 'id'));
 	}
 
 	public function getTotalOfficers() {

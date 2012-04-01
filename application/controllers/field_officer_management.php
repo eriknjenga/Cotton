@@ -35,7 +35,7 @@ class Field_Officer_Management extends MY_Controller {
 			$data = array();
 		}
 		$data['content_view'] = "add_field_officer_v";
-		$data['areas'] = Area::getAll();
+		$data['regions'] = Region::getAll();
 		$data['quick_link'] = "add_field_officer";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("Validator.css");
@@ -63,7 +63,7 @@ class Field_Officer_Management extends MY_Controller {
 			$officer -> Officer_Name = $this -> input -> post("officer_name");
 			$officer -> National_Id = $this -> input -> post("national_id");
 			$officer -> Officer_Code = $this -> input -> post("officer_code"); 
-			$officer -> Area = $this -> input -> post("area"); 
+			$officer -> Region = $this -> input -> post("region"); 
 			$officer -> save();
 			redirect("field_officer_management/listing");
 		} else {

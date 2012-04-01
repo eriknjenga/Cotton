@@ -10,13 +10,13 @@ if (isset($officer)) {
 	$officer_name = $officer -> Officer_Name;
 	$national_id = $officer -> National_Id; 
 	$officer_id = $officer -> id;
-	$area = $officer -> Area;
+	$region = $officer -> Region;
 } else {
 	$officer_code = "";
 	$officer_name = "";
 	$national_id = "";
 	$officer_id = "";
-	$area= ""; 
+	$region= ""; 
 	
 }
 $attributes = array("method" => "post", "id" => "add_field_officer_input");
@@ -48,18 +48,18 @@ echo validation_errors('
 	</p>
 	 <p>
 		<label for="area">Area</label>
-		<select name="area" class="dropdown validate[required]" id="area">
+		<select name="region" class="dropdown validate[required]" id="region">
 			<option></option>
 			<?php
-foreach($areas as $area_object){
+foreach($regions as $region_object){
 			?>
-			<option value="<?php echo $area_object -> id;?>" <?php
-				if ($area_object -> id == $area) {echo "selected";
+			<option value="<?php echo $region_object -> id;?>" <?php
+				if ($region_object -> id == $region) {echo "selected";
 				}
-			?>><?php echo $area_object -> Area_Name;?></option>
+			?>><?php echo $region_object -> Region_Name;?></option>
 			<?php }?>
 		</select>
-		<span class="field_desc">Select the area covered by this field officer</span>
+		<span class="field_desc">Select the region covered by this field officer</span>
 	</p>
 	<p>
 		<input class="button" type="submit" value="Submit">

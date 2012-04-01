@@ -1,27 +1,25 @@
 <script type="text/javascript">
 	$(function() {
-		$("#add_distributor_input").validationEngine();
+		$("#add_agent_input").validationEngine();
 	});
 
 </script>
 <?php
-if (isset($distributor)) {
-	$distributor_code = $distributor -> Distributor_Code;
-	$first_name = $distributor -> First_Name;
-	$surname = $distributor -> Surname;
-	$national_id = $distributor -> National_Id;
-	$area = $distributor -> Area;
-	$distributor_id = $distributor -> id;
+if (isset($agent)) {
+	$agent_code = $agent -> Agent_Code;
+	$first_name = $agent -> First_Name;
+	$surname = $agent -> Surname;
+	$national_id = $agent -> National_Id; 
+	$agent_id = $agent -> id;
 } else {
-	$distributor_code = "";
+	$agent_code = "";
 	$first_name = "";
 	$surname = "";
-	$national_id = "";
-	$area = "";
-	$distributor_id = "";
+	$national_id = ""; 
+	$agent_id = "";
 }
-$attributes = array("method" => "post", "id" => "add_distributor_input");
-echo form_open('distributor_management/save', $attributes);
+$attributes = array("method" => "post", "id" => "add_agent_input");
+echo form_open('agent_management/save', $attributes);
 echo validation_errors('
 <p class="form_error">', '</p>
 ');
@@ -29,11 +27,11 @@ echo validation_errors('
 <!-- Fieldset -->
 <fieldset>
 	<legend>
-		Register New Distributor
+		Register New Agent
 	</legend>
-	<input type="hidden" name="editing_id" value="<?php echo $distributor_id;?>" />
+	<input type="hidden" name="editing_id" value="<?php echo $agent_id;?>" />
 	<p>
-		<label for="distributor_code">Distributor Code: </label>
+		<label for="agent_code">Agent Code: </label>
 		<input id="distributor_code" name="distributor_code" type="text" value="<?php echo $distributor_code;?>" class="validate[required]" />
 		<span class="field_desc">Enter the code for this distributor</span>
 	</p>

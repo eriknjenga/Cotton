@@ -34,7 +34,7 @@
 			<th>Officer Code</th>
 			<th>Officer Name</th>
 			<th>National ID</th> 
-			<th>Area</th> 
+			<th>Region</th> 
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -61,7 +61,7 @@ $class = "odd";
 		<?php echo $officer -> National_Id;?>
 		</td> 
 		<td>
-		<?php echo $officer -> Area_Object->Area_Name;?>
+		<?php echo $officer -> Region_Object->Region_Name;?>
 		</td> 
 		<td><a href="<?php echo base_url()."field_officer_management/edit_officer/".$officer->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" field_officer = "<?php echo $officer -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
