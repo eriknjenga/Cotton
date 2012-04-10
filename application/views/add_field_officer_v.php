@@ -47,7 +47,7 @@ echo validation_errors('
 		<span class="field_desc">Enter the National ID Number for this officer</span>
 	</p>
 	 <p>
-		<label for="area">Area</label>
+		<label for="area">Region</label>
 		<select name="region" class="dropdown validate[required]" id="region">
 			<option></option>
 			<?php

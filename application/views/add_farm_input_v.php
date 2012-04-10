@@ -8,14 +8,12 @@
 if (isset($input)) {
 	$product_code = $input -> Product_Code;
 	$product_name = $input -> Product_Name;
-	$product_desc = $input -> Product_Description;
-	$unit_price = $input -> Unit_Price;
+	$product_desc = $input -> Product_Description; 
 	$product_id = $input -> id;
 } else {
 	$product_code = "";
 	$product_name = "";
-	$product_desc = "";
-	$unit_price = "";
+	$product_desc = ""; 
 	$product_id = "";
 }
 $attributes = array("method" => "post", "id" => "add_farm_input");
@@ -47,7 +45,7 @@ echo validation_errors('
 	</p>
 	<p>
 		<label for="unit_price">Unit Price: </label>
-		<input id="unit_price" name="unit_price" type="text"  value="<?php echo $unit_price;?>" class="validate[required]"/>
+		<input id="unit_price" name="unit_price" type="text"class="validate[required]"/>
 		<span class="field_desc">Enter the unit price for this item</span>
 	</p>
 	<p>

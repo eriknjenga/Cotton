@@ -1,74 +1,34 @@
 <script type="text/javascript">
 	$(function() {
-		$("#disbursement_form").validationEngine();
-		$("#date").datepicker({
-			defaultDate : new Date(),
-			changeYear : true,
-			changeMonth : true
-		});
-		$(".farm_input").change(function() {
-			$(this).closest("tr").find(".total_value").attr("value", "");
-			var quantity = $(this).closest("tr").find(".quantity").attr("value");
-			var total_value = 0;
-			if(parseInt(quantity) >= 0 && parseInt($(this).find(":selected").attr("price")) > 0) {
-				total_value = quantity * $(this).find(":selected").attr("price");
-				$(this).closest("tr").find(".total_value").attr("value", total_value);
-			}
-		});
-		$(".quantity").keyup(function() {
-			$(this).closest("tr").find(".total_value").attr("value", "");
-			var price = $(this).closest("tr").find(".farm_input").find(":selected").attr("price");
-			var total_value = 0;
-			if(parseInt(price) >= 0 && parseInt($(this).attr("value")) > 0) {
-				total_value = price * $(this).attr("value");
-				$(this).closest("tr").find(".total_value").attr("value", total_value);
-			}
-		});
+		$("#route_form").validationEngine();
 		$(".add").click(function() {
-			var cloned_object = $('#inputs_table tr:last').clone(true);
-			var input_row = cloned_object.attr("input_row");
-			var next_input_row = parseInt(input_row) + 1;
-			cloned_object.attr("input_row", next_input_row);
-			var invoice_id = "invoice_number_" + next_input_row;
-			var date_id = "date_" + next_input_row;
-			var farm_input_id = "farm_input_" + next_input_row;
-			var quantity_id = "quantity_" + next_input_row;
-			var total_value_id = "total_value_" + next_input_row;
-			var season_id = "season_" + next_input_row;
-			cloned_object.find(".invoice_number").attr("id", invoice_id);
-			cloned_object.find(".farm_input").attr("id", farm_input_id);
-			cloned_object.find(".quantity").attr("id", quantity_id);
-			cloned_object.find(".total_value").attr("id", total_value_id);
-			cloned_object.find(".quantity").attr("value", "");
-			cloned_object.find(".total_value").attr("value", "");
-			cloned_object.find(".season").attr("id", season_id);
-			var date_selector = "#" + date_id;
-
-			$(date_selector).datepicker({
-				defaultDate : new Date(),
-				changeYear : true,
-				changeMonth : true
-			});
-			cloned_object.insertAfter('#inputs_table tr:last');
-			refreshDatePickers();
+			var cloned_object = $('#depots_table tr:last').clone(true);
+			var depot_row = cloned_object.attr("depot_row");
+			var next_depot_row = parseInt(depot_row) + 1;
+			cloned_object.attr("depot_row", next_depot_row);
+			var depot_id = "depot_" + next_depot_row; 
+			cloned_object.find(".depot").attr("id", depot_id);
+			cloned_object.insertAfter('#depots_table tr:last');
 			return false;
 		});
 	});
-	function refreshDatePickers() {
-		var counter = 0;
-		$('.date').each(function() {
-			var new_id = "date_" + counter;
-			$(this).attr("id", new_id);
-			$(this).datepicker("destroy");
-			$(this).not('.hasDatePicker').datepicker();
-			counter++;
 
-		});
-	}
 </script>
 <?php
-$attributes = array("method" => "post", "id" => "disbursement_form");
-echo form_open('disbursement_management/save', $attributes);
+if (isset($route)) {
+	$route_code = $route -> Route_Code;
+	$route_name = $route -> Route_Name;
+	$field_cashier = $route -> Field_Cashier;
+	$route_id = $route -> id;
+} else {
+	$route_code = "";
+	$route_name = "";
+	$field_cashier = "";
+	$route_id = "";
+
+}
+$attributes = array("method" => "post", "id" => "route_form");
+echo form_open('route_management/save', $attributes);
 echo validation_errors('
 <p class="form_error">', '</p>
 ');
@@ -80,63 +40,94 @@ echo validation_errors('
 	<legend>
 		Add a New Route
 	</legend>
+	<input type="hidden" name="editing_id" value="<?php echo $route_id;?>" />
 	<p>
-			<label for="cpc">Select Buyer: </label>
-			<select>
-				<option></option>
-				<option>Thiga Memia</option>
-				<option>Daniel Mwangi</option>
-				<option>Peter Manjeru</option>
-			</select>
-			<span class="field_desc">Select the buyer responsible for this route</span>
-		</p>
-				<p>
-			<label for="cpc">Route Code: </label>
-			<input class="cpc" name="cpc" type="text" value=" " />
-			<span class="field_desc">Enter the code for this route</span>
-		</p>
-		<p>
-			<label for="cpc">Route Name: </label>
-			<input class="cpc" name="cpc" type="text" value=" " />
-			<span class="field_desc">Enter the name for this route</span>
-		</p>
-		<p>
-			<label for="cpc">Depot Code: </label>
-			<input class="cpc" name="cpc" type="text" value=" " />
-			<span class="field_desc">Enter the code for the depot on this route</span>
-		</p>
-		<p>
-			<label for="cpc">Depot Name: </label>
-			<input class="cpc" name="cpc" type="text" value=" " />
-			<span class="field_desc">Enter the name for the depot on this route</span>
-		</p>
-	<table class="normal" id="inputs_table" style="margin:0 auto;">
+		<label for="route_code">Route Code: </label>
+		<input id="route_code"  name="route_code" type="text"  value="<?php echo $route_code;?>" class="validate[required]"/>
+		<span class="field_desc">Enter the code for this Route</span>
+	</p>
+	<p>
+		<label for="route_name">Route Name: </label>
+		<input id="route_name"  name="route_name" type="text"  value="<?php echo $route_name;?>" class="validate[required]"/>
+		<span class="field_desc">Enter the name for this Route</span>
+	</p>
+	<p>
+		<label for="field_cashier">Field Cashier</label>
+		<select name="field_cashier" class="dropdown validate[required]" id="field_cashier">
+			<option></option>
+			<?php
+
+foreach($field_cashiers as $field_cashier_object){
+			?>
+			<option value="<?php echo $field_cashier_object -> id;?>" <?php
+			if ($field_cashier_object -> id == $field_cashier) {echo "selected";
+			}
+			?>><?php echo $field_cashier_object -> Field_Cashier_Name;?></option>
+			<?php }?>
+		</select>
+		<span class="field_desc">Select this route's field cashier</span>
+	</p>
+	<table class="normal" id="depots_table" style="margin:0 auto;">
 		<caption>
-			Areas along this route
+			Depots along this route
 		</caption>
 		<thead>
 			<tr>
-				<th>Area</th>
-				 
+				<th>Depot</th>
 				<th></th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr input_row="1">
-				 
+			<?php if(isset($route_depots[0])){
+$counter = 0;
+foreach($route_depots as $route_depot){
+
+			?>
+			<tr depot_row="<?php echo $counter;?>">
 				<td>
-				<select name="farm_input[]" id="farm_input" class="dropdown farm_input validate[required]" style="width: 70px; padding:2px;">
+				<select name="depot[]" class="dropdown depot validate[required]" id="depot_<?php echo $counter;?>" >
 					<option></option>
 					<?php
-foreach($areas as $area){
+foreach($depots as $depot_object){
 					?>
-					<option value="<?php echo $area -> id;?>" ><?php echo $area -> Area_Name;?></option>
-					<?php }?>
+					<option value="<?php echo $depot_object -> id;?>" <?php
+					if ($depot_object -> id == $route_depot -> Depot) {echo "selected";
+					}
+						?>><?php echo $depot_object -> Depot_Name;?></option>
+					<?php
+					$counter++;
+					}
+					?>
 				</select></td>
-				 
 				<td>
 				<input  class="add button"   value="+" style="width:20px; text-align: center"/>
 				</td>
+			</tr>
+			<?php
+			}//end foreach loop
+			}//endif
+			else{
+			?>
+			<tr depot_row="1">
+				<td>
+				<select name="depot[]" class="dropdown depot validate[required]" id="depot" >
+					<option></option>
+					<?php
+foreach($depots as $depot_object){
+					?>
+					<option value="<?php echo $depot_object -> id;?>"><?php echo $depot_object -> Depot_Name;?></option>
+					<?php }?>
+				</select></td>
+				<td>
+				<input  class="add button"   value="+" style="width:20px; text-align: center"/>
+				</td>
+			</tr>
+			<?php
+			}
+			?>
+
+			</td>
+
 			</tr>
 		</tbody>
 	</table>

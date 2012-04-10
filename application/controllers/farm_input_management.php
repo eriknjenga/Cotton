@@ -41,6 +41,46 @@ class Farm_Input_Management extends MY_Controller {
 		$this -> base_params($data);
 	}
 
+	public function change_price($input) {
+		$data['input_prices'] = Input_Price::getInputPrices($input);
+		$data['input'] = $input;
+		$data['content_view'] = "input_prices_v";
+		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['styles'] = array("Validator.css");
+		$this -> base_params($data);
+	}
+
+	public function save_prices() {
+		$dates = $this -> input -> post("dates");
+		$input = $this -> input -> post("farm_input");
+		$prices = $this -> input -> post("prices");
+
+		$current_prices = Input_Price::getInputPrices($input);
+		foreach ($current_prices as $current_price) {
+			$current_price -> delete();
+		}
+		$counter = 0;
+		//Loop to get all the year-population combinations. Only add the ones that have actual values
+		foreach ($dates as $date) {
+			if (strlen($date) > 1) {
+				if ($prices[$counter]) {
+					$input_price = new Input_Price();
+					$input_price->Timestamp = strtotime($dates[$counter]);
+					$input_price->Price = $prices[$counter];
+					$input_price->Farm_Input = $input;
+					$input_price->save(); 
+				}
+
+				$counter++;
+			} else {
+				 
+				continue;
+			}
+
+		}
+		redirect("farm_input_management/listing");
+	}
+
 	public function edit_input($id) {
 		$input = Farm_Input::getInput($id);
 		$data['input'] = $input;
@@ -61,8 +101,12 @@ class Farm_Input_Management extends MY_Controller {
 			$input -> Product_Code = $this -> input -> post("product_code");
 			$input -> Product_Name = $this -> input -> post("product_name");
 			$input -> Product_Description = $this -> input -> post("product_desc");
-			$input -> Unit_Price = $this -> input -> post("unit_price");
 			$input -> save();
+			$input_price = new Input_Price();
+			$input_price -> Farm_Input = $input -> id;
+			$input_price -> Timestamp = date('U');
+			$input_price -> Price = $this -> input -> post("unit_price");
+			$input_price -> save();
 			redirect("farm_input_management/listing");
 		} else {
 			$this -> new_input();
@@ -90,17 +134,6 @@ class Farm_Input_Management extends MY_Controller {
 
 		$this -> load -> view("demo_template", $data);
 	}
-
-	public function issue_to_distributor() {
-		$data['content_view'] = "issue_distributor_v";
-		$data['quick_link'] = "issue_to_distributor";
-		$data['scripts'] = array("validationEngine-en.js", "validator.js");
-		$data['styles'] = array("Validator.css");
-		$data['farm_inputs'] = Farm_Input::getAll();
-		$data['distributors'] = Distributor::getAll();
-		$this -> base_params($data);
-	}
-
 	public function get_loan_movement_graph_data() {
 		echo '<chart caption="Total Loans Outstanding" xAxisName="Month" yAxisName="Total Value (Millions)" showValues="0" decimals="0" formatNumberScale="0">
 <set label="Jan" value="462"/>

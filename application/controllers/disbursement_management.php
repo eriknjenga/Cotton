@@ -35,7 +35,7 @@ class Disbursement_Management extends MY_Controller {
 			$data = array();
 		}
 		$data['farm_inputs'] = Farm_Input::getAll();
-		$data['distributors'] = Distributor::getAll();
+		$data['agents'] = Agent::getAll();
 		$data['content_view'] = "add_disbursement_v";
 		$data['quick_link'] = "add_disbursement";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
@@ -69,6 +69,7 @@ class Disbursement_Management extends MY_Controller {
 			$gd_batches = $this -> input -> post("gd_batch");
 			$id_batches = $this -> input -> post("id_batch");
 			$fbg = $this -> input -> post("fbg"); 
+			$agent = $this -> input -> post("agent"); 
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$disbursement = Disbursement::getDisbursement($editing);
@@ -85,6 +86,8 @@ class Disbursement_Management extends MY_Controller {
 			$disbursement -> GD_Batch = $gd_batches[0];
 			$disbursement -> ID_Batch = $id_batches[0];
 			$disbursement -> Timestamp = date('U');
+			$disbursement -> Agent = $agent;
+			
 			$disbursement -> save();
 
 			//Loop through the rest of the disbursements
@@ -100,6 +103,7 @@ class Disbursement_Management extends MY_Controller {
 				$disbursement -> GD_Batch = $gd_batches[$x];
 				$disbursement -> ID_Batch = $id_batches[$x];
 				$disbursement -> Timestamp = date('U');
+				$disbursement -> Agent = $agent;
 				$disbursement -> save();
 			}
 			redirect("disbursement_management/listing");
@@ -117,15 +121,14 @@ class Disbursement_Management extends MY_Controller {
 
 	public function validate_form() {
 		$this -> form_validation -> set_rules('invoice_number[]', 'Invoice Number', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('agent', 'Agent', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('date[]', 'Date', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('farm_input[]', 'Farm Input', 'trim|required|xss_clean');
 		$this -> form_validation -> set_rules('quantity[]', 'Invoice Number', 'trim|required|xss_clean');
-		$this -> form_validation -> set_rules('season[]', 'Planting Season', 'trim|required|max_length[20]|xss_clean');
 		return $this -> form_validation -> run();
 	}
 
 	public function base_params($data) {
-		$data['title'] = "Disbursement Management";
 		$data['link'] = "disbursement_management";
 
 		$this -> load -> view("demo_template", $data);

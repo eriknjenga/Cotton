@@ -19,7 +19,7 @@
 
 	$(".delete").click(function(){
 	url = "<?php echo base_url().'disbursement_management/delete_disbursement/'?>
-		" +$(this).attr("area");
+		" +$(this).attr("disbursement");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -75,7 +75,7 @@ $class = "odd";
 		<td>
 		<?php echo $disbursement -> Season;?>
 		</td>
-		<td><a href="<?php echo base_url()."disbursement_management/edit_disbursement/".$disbursement->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" area = "<?php echo $disbursement -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		<td><a href="<?php echo base_url()."disbursement_management/edit_disbursement/".$disbursement->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" disbursement = "<?php echo $disbursement -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
 		<?php
 

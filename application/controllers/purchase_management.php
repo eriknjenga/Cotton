@@ -2,77 +2,120 @@
 class Purchase_Management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
+		$this -> load -> library('pagination');
 	}
 
 	public function index() {
 		$this -> listing();
 	}
 
-	public function listing() {
+	public function listing($offset = 0) {
+		$items_per_page = 20;
+		$number_of_purchases = Purchase::getTotalPurchases();
+		$purchases = Purchase::getPagedPurchases($offset, $items_per_page);
+		if ($number_of_purchases > $items_per_page) {
+			$config['base_url'] = base_url() . "purchase_management/listing/";
+			$config['total_rows'] = $number_of_purchases;
+			$config['per_page'] = $items_per_page;
+			$config['uri_segment'] = 3;
+			$config['num_links'] = 5;
+			$this -> pagination -> initialize($config);
+			$data['pagination'] = $this -> pagination -> create_links();
+		}
+		$data['purchases'] = $purchases;
+		$data['title'] = "Cotton Disbursements";
 		$data['content_view'] = "list_purchases_v";
+		$data['styles'] = array("pagination.css");
 		$this -> base_params($data);
+
 	}
 
-	public function purchase_from_registered($farmer) {
+	public function new_purchase($data = null) {
+		if ($data == null) {
+			$data = array();
+		}
+		$data['depots'] = Depot::getAll();
+		$data['prices'] = Cotton_Price::getCottonPrices();		
 		$data['content_view'] = "add_purchase_v";
 		$data['quick_link'] = "add_purchase";
+		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['styles'] = array("Validator.css");
 		$this -> base_params($data);
-	}
-	public function free_farmer_purchase() {
-		$data['content_view'] = "add_free_farmer_purchase_v";
-		$data['quick_link'] = "free_farmer_purchase";
-		$this -> base_params($data);
-	}
-	public function get_average_price_graph_data() {
-		echo '<chart caption="Average Buying Price" xAxisName="Month" yAxisName="Price per Tonne" showValues="0" decimals="0" formatNumberScale="0">
-<set label="Jan" value="25000"/>
-<set label="Feb" value="24500"/>
-<set label="Mar" value="26000"/>
-<set label="Apr" value="26000"/>
-<set label="May" value="25000"/>
-<set label="Jun" value="25500"/>
-<set label="Jul" value="26000"/>
-<set label="Aug" value="28000"/>
-<set label="Sep" value="26000"/>
-<set label="Oct" value="25500"/>
-<set label="Nov" value="26500"/>
-<set label="Dec" value="26000"/>
-</chart>';
 	}
 
-	public function get_purchases_to_date_graph_data() {
-		echo '<chart palette="4" caption="Total Purchases to Date (in Tonnes) from 1st Jan."     enableRotation="1" bgColor="99CCFF,FFFFFF" bgAlpha="40,100" bgRatio="0,100" bgAngle="360" showBorder="1" startingAngle="70">
-<set label="Mumbwa Region" value="1700"/>
-<set label="Southern Region" value="1200"/>
-<set label="Nothern Region" value="1800"/>
-<set label="Mapanza" value="800" />
-<set label="Siavonga" value="1000" />
-<set label="Mvumbe" value="2600" isSliced="1"/>
-<set label="Situmbeko" value="1100"/>  
-</chart>';
+	public function edit_purchase($id) {
+		$purchase = Purchase::getPurchase($id);
+		$data['purchase'] = $purchase;
+		$this -> new_purchase($data);
 	}
-		public function get_area_production_graph_data() {
-		echo '<chart caption="Total Area Production" xAxisName="Month" yAxisName="Total Tonnage" showValues="0" decimals="0" formatNumberScale="0">
-<set label="Jan" value="17400"/>
-<set label="Feb" value="19800"/>
-<set label="Mar" value="21800"/>
-<set label="Apr" value="23800"/>
-<set label="May" value="29600"/>
-<set label="Jun" value="27600"/>
-<set label="Jul" value="31800"/>
-<set label="Aug" value="39700"/>
-<set label="Sep" value="37800"/>
-<set label="Oct" value="21900"/>
-<set label="Nov" value="32900"/>
-<set label="Dec" value="39800"/>
-</chart>';
+
+	public function purchase_produce($fbg) {
+		$recipient = FBG::getFbg($fbg);
+		$data['disbursements'] = Disbursement::getFBGDisbursements($fbg);
+		$data['fbg'] = $recipient;
+		$this -> new_purchase($data);
 	}
-	
+
+	public function save() {
+		$valid = $this -> validate_form();
+		//If the fields have been validated, save the input
+		if ($valid) {
+			$editing = $this -> input -> post("editing_id");
+			$dpn = $this -> input -> post("dpn");
+			$dates = $this -> input -> post("date");
+			$quantity = $this -> input -> post("quantity");
+			$total_value = $this -> input -> post("total_value");
+			$season = $this -> input -> post("season");
+			$fbg = $this -> input -> post("fbg");
+			$depot = $this -> input -> post("depot");
+			$loan_recovery = $this -> input -> post("loan_recovery");
+			$farmer_registration = $this -> input -> post("farmer_registration");
+			$other_recoveries = $this -> input -> post("other_recoveries");
+			$buyer = $this -> input -> post("buyer");
+			//Check if we are editing the record first
+			if (strlen($editing) > 0) {
+				$disbursement = Disbursement::getDisbursement($editing);
+			} else {
+				$disbursement = new Disbursement();
+			}
+			$disbursement -> FBG = $fbg;
+			$disbursement -> Invoice_Number = $invoices[0];
+			$disbursement -> Date = $dates[0];
+			$disbursement -> Farm_Input = $farm_inputs[0];
+			$disbursement -> Quantity = $quantities[0];
+			$disbursement -> Total_Value = $total_values[0];
+			$disbursement -> Season = $seasons[0];
+			$disbursement -> GD_Batch = $gd_batches[0];
+			$disbursement -> ID_Batch = $id_batches[0];
+			$disbursement -> Timestamp = date('U');
+			$disbursement -> Agent = $agent;
+
+			$disbursement -> save();
+			redirect("purchase_management/listing");
+		} else {
+			$this -> new_disbursement();
+		}
+	}
+
+	public function delete_purchase($id) {
+		$purchase = Purchase::getPurchase($id);
+		$purchase -> delete();
+		$previous_page = $this -> session -> userdata('old_url');
+		redirect($previous_page);
+	}
+
+	public function validate_form() {
+		$this -> form_validation -> set_rules('invoice_number[]', 'Invoice Number', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('agent', 'Agent', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('date[]', 'Date', 'trim|required|max_length[100]|xss_clean');
+		$this -> form_validation -> set_rules('farm_input[]', 'Farm Input', 'trim|required|xss_clean');
+		$this -> form_validation -> set_rules('quantity[]', 'Invoice Number', 'trim|required|xss_clean');
+		return $this -> form_validation -> run();
+	}
 
 	public function base_params($data) {
-		$data['title'] = "Produce Purchase Management";
-		$data['banner_text'] = "New Purchase";
 		$data['link'] = "purchase_management";
+
 		$this -> load -> view("demo_template", $data);
 	}
 

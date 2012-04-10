@@ -18,8 +18,8 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'distributor_management/delete_distributor/'?>
-		" +$(this).attr("distributor");
+	url = "<?php echo base_url().'field_cashier_management/delete_field_cashier/'?>
+		" +$(this).attr("field_cashier");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -27,22 +27,22 @@
 		window.location = url;
 		}
 </script>
-<h1>Distributor Listing</h1>
+<h1>Field Cashier Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Code</th>
-			<th>Name</th> 
-			<th>National Id</th> 
-			<th>Area</th> 
+			<th>Field Cashier Code</th>
+			<th>Full Name</th>
+			<th>Phone Number</th>
+			<th>National ID</th>
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-if (isset($distributors[0])) {
+if (isset($field_cashiers[0])) {
 $counter = 1;
-foreach ($distributors as $distributor) {
+foreach ($field_cashiers as $field_cashier) {
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
@@ -52,20 +52,21 @@ $class = "odd";
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $distributor -> Distributor_Code;?>
+		<?php echo $field_cashier -> Field_Cashier_Code;?>
 		</td>
 		<td>
-		<?php echo $distributor -> First_Name." ".$distributor -> Surname;?>
-		</td> 
-		<td>
-		<?php echo $distributor ->National_Id;?>
+		<?php echo $field_cashier -> Field_Cashier_Name;?>
 		</td>
-		<td>
-		<?php echo $distributor -> Area_Object->Area_Name;?>
-		</td> 
-		<td><a href="<?php echo base_url()."distributor_management/edit_distributor/".$distributor->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" distributor = "<?php echo $distributor -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+				<td>
+		<?php echo $field_cashier -> Phone_Number;?>
+		</td>
+				<td>
+		<?php echo $field_cashier -> National_Id;?>
+		</td>
+		<td><a href="<?php echo base_url()."field_cashier_management/edit_field_cashier/".$field_cashier->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" field_cashier = "<?php echo $field_cashier -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
 		<?php
+
 		$counter++;
 		}
 		}

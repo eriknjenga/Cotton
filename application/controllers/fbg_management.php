@@ -59,12 +59,10 @@ class FBG_Management extends MY_Controller {
 			} else {
 				$fbg = new FBG();
 			}
-			$fbg -> GD_Id = $this -> input -> post("gd_id");
 			$fbg -> CPC_Number = $this -> input -> post("cpc_number");
 			$fbg -> Group_Name = $this -> input -> post("group_name"); 
 			$fbg -> Field_Officer = $this -> input -> post("field_officer");  
 			$fbg -> Hectares_Available = $this -> input -> post("hectares_available");  
-			$fbg -> Type = $this -> input -> post("type");  
 			$fbg -> save();
 			redirect("fbg_management/listing");
 		} else {
@@ -80,8 +78,6 @@ class FBG_Management extends MY_Controller {
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('gd_id', 'GD Id', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('type', 'Farmer Type', 'trim|required|xss_clean');
 		$this -> form_validation -> set_rules('cpc_number', 'CPC Number', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('group_name', 'First Name', 'trim|required|max_length[100]|xss_clean');  
 		$this -> form_validation -> set_rules('field_officer', 'Field Officer', 'trim|required|max_length[20]|xss_clean'); 

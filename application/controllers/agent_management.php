@@ -33,8 +33,7 @@ class Agent_Management extends MY_Controller {
 	public function new_agent($data = null) {
 		if ($data == null) {
 			$data = array();
-		}
-		$data['agents'] = Agent::getAll();
+		} 
 		$data['content_view'] = "add_agent_v";
 		$data['quick_link'] = "add_agent";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");

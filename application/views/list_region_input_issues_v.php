@@ -18,8 +18,8 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'farm_input_management/delete_input/'?>
-		" +$(this).attr("farm_input");
+	url = "<?php echo base_url().'region_input_issue_management/delete_issue/'?>
+		" +$(this).attr("issue");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -27,22 +27,24 @@
 		window.location = url;
 		}
 </script>
-<h1>Farm Inputs Listing</h1>
+<h1>Region Inputs Issued Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Product Code</th>
-			<th>Product Name</th>
-			<th>Product Description</th>
-			<th>Unit Price</th>
+			<th>Delivery Note No.</th>
+			<th>Date</th>
+			<th>Region</th>
+			<th>Input</th>
+			<th>Quantity</th>
+			<th>Total Value</th>
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-if (isset($inputs[0])) {
+if (isset($issues[0])) {
 $counter = 1;
-foreach ($inputs as $input) {
+foreach ($issues as $issue) {
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
@@ -52,18 +54,25 @@ $class = "odd";
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $input -> Product_Code;?>
+		<?php echo $issue -> Delivery_Note_Number;?>
 		</td>
 		<td>
-		<?php echo $input -> Product_Name;?>
+		<?php echo $issue -> Date;?>
+		</td>
+
+		<td>
+		<?php echo $issue -> Region_Object -> Region_Name;?>
 		</td>
 		<td>
-		<?php echo $input -> Product_Description;?>
-		</td> 
-		<td>
-			<a href="<?php echo base_url()."farm_input_management/change_price/".$input->id?>" class="button"><span class="ui-icon ui-icon-cart"></span>View Prices</a>
+		<?php echo $issue -> Farm_Input_Object -> Product_Name;?>
 		</td>
-		<td><a href="<?php echo base_url()."farm_input_management/edit_input/".$input->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" farm_input = "<?php echo $input -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		<td>
+		<?php echo $issue -> Quantity;?>
+		</td>
+		<td>
+		<?php echo $issue -> Total_Value;?>
+		</td>
+		<td><a href="<?php echo base_url()."region_input_issue_management/edit_issue/".$issue->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" issue = "<?php echo $issue -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
 		<?php
 

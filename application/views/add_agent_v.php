@@ -32,7 +32,7 @@ echo validation_errors('
 	<input type="hidden" name="editing_id" value="<?php echo $agent_id;?>" />
 	<p>
 		<label for="agent_code">Agent Code: </label>
-		<input id="distributor_code" name="distributor_code" type="text" value="<?php echo $distributor_code;?>" class="validate[required]" />
+		<input id="agent_code" name="agent_code" type="text" value="<?php echo $agent_code;?>" class="validate[required]" />
 		<span class="field_desc">Enter the code for this distributor</span>
 	</p>
 	<p>
@@ -50,21 +50,7 @@ echo validation_errors('
 		<input id="national_id" name="national_id" type="text" value="<?php echo $national_id;?>" class="validate[required]"/>
 		<span class="field_desc">Enter the national id number for this distributor</span>
 	</p>
-	<p>
-		<label for="area">Area</label>
-		<select name="area" class="dropdown validate[required]" id="area">
-			<option></option>
-			<?php
-foreach($areas as $area_object){
-			?>
-			<option value="<?php echo $area_object -> id;?>" <?php
-				if ($area_object -> id == $area) {echo "selected";
-				}
-			?>><?php echo $area_object -> Area_Name;?></option>
-			<?php }?>
-		</select>
-		<span class="field_desc">Select the area covered by this distributor</span>
-	</p>
+ 
 	<p>
 		<input class="button" type="submit" value="Submit">
 		<input class="button" type="reset" value="Reset">

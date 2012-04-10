@@ -11,12 +11,14 @@ class Disbursement extends Doctrine_Record {
 		$this -> hasColumn('GD_Batch', 'varchar', 20);
 		$this -> hasColumn('ID_Batch', 'varchar', 20);
 		$this -> hasColumn('Timestamp', 'varchar', 32);
+		$this -> hasColumn('Agent', 'varchar', 10);
 
 	}
 
 	public function setUp() {
 		$this -> setTableName('disbursement');
 		$this -> hasOne('FBG as FBG_Object', array('local' => 'FBG', 'foreign' => 'id'));
+		$this -> hasOne('Agent as Agent_Object', array('local' => 'Agent', 'foreign' => 'id'));
 		$this -> hasOne('Farm_Input as Farm_Input_Object', array('local' => 'Farm_Input', 'foreign' => 'id'));
 	}
 
@@ -43,5 +45,9 @@ class Disbursement extends Doctrine_Record {
 		$disbursement = $query -> execute();
 		return $disbursement;
 	}
-
+	public function getFBGDisbursements($fbg) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> where("fbg = '$fbg'");
+		$disbursements = $query -> execute();
+		return $disbursements;
+	}
 }

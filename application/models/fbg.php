@@ -1,12 +1,10 @@
 <?php
 class FBG extends Doctrine_Record {
 	public function setTableDefinition() {
-		$this -> hasColumn('GD_Id', 'varchar', 20);
 		$this -> hasColumn('CPC_Number', 'varchar', 20);
 		$this -> hasColumn('Group_Name', 'varchar','100'); 
 		$this -> hasColumn('Field_Officer', 'varchar', 10);
 		$this -> hasColumn('Hectares_Available', 'varchar', 20);
-		$this -> hasColumn('Type', 'varchar', 5);
 	}
 
 	public function setUp() {

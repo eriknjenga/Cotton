@@ -3,12 +3,12 @@ class Farm_Input extends Doctrine_Record {
 	public function setTableDefinition() {
 		$this -> hasColumn('Product_Code', 'varchar', 100);
 		$this -> hasColumn('Product_Name', 'varchar', 100);
-		$this -> hasColumn('Product_Description', 'text');
-		$this -> hasColumn('Unit_Price', 'varchar', 10);
+		$this -> hasColumn('Product_Description', 'text'); 
 	}
 
 	public function setUp() {
 		$this -> setTableName('farm_input');
+		$this -> hasMany('Input_Price as Prices', array('local' => 'id', 'foreign' => 'Farm_Input'));
 	}
 
 	public function getTotalInputs() {

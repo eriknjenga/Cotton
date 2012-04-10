@@ -6,21 +6,17 @@
 </script>
 <?php
 if (isset($fbg)) {
-	$gd_id = $fbg -> GD_Id;
 	$cpc_number = $fbg -> CPC_Number;
-	$group_name = $fbg -> Group_Name; 
+	$group_name = $fbg -> Group_Name;
 	$field_officer = $fbg -> Field_Officer;
 	$hectares_available = $fbg -> Hectares_Available;
 	$fbg_id = $fbg -> id;
-	$type = $fbg->Type;
 } else {
-	$gd_id = "";
 	$cpc_number = "";
-	$group_name = ""; 
+	$group_name = "";
 	$field_officer = "";
 	$hectares_available = "";
-	$fbg_id = ""; 
-	$type = "";
+	$fbg_id = "";
 }
 $attributes = array("method" => "post", "id" => "add_fbg_input");
 echo form_open('fbg_management/save', $attributes);
@@ -31,33 +27,18 @@ echo validation_errors('
 <!-- Fieldset -->
 <fieldset>
 	<legend>
-		Register New Farmer/Farmer Business Group
+		Register New Farmer Business Group
 	</legend>
 	<input type="hidden" name="editing_id" value="<?php echo $fbg_id;?>" />
 	<p>
-		<label for="gd_id">GD Id: </label>
-		<input id="gd_id" name="gd_id" type="text" value="<?php echo $gd_id;?>" class="validate[required]" />
-		<span class="field_desc">Enter the GD Id for this Farmer/FBG</span>
-	</p>
-		<p>
-		<label for="cpc_number">CPC Number: </label>
+		<label for="cpc_number">FBG Contract Number: </label>
 		<input id="cpc_number" name="cpc_number" type="text" value="<?php echo $cpc_number;?>" class="validate[required]" />
-		<span class="field_desc">Enter the CPC Number for this Farmer/FBG</span>
+		<span class="field_desc">Enter the FBG Contract Number for this FBG</span>
 	</p>
 	<p>
-		<label for="group_name">Farmer/FBG Name: </label>
+		<label for="group_name">FBG Name: </label>
 		<input id="group_name" name="group_name" type="text" value="<?php echo $group_name;?>" class="validate[required]"/>
-		<span class="field_desc">Enter the group name for this Farmer/FBG</span>
-	</p>
-	<p>
-		<label for="type">Type: </label>
-		<select name="type" class="dropdown validate[required]" id="feo">
-			<option></option>
-			<option value="1" <?php if ($type == "1") {echo "selected";	}?>>Farmer Business Group</option>
-			<option value="2" <?php if ($type == "2") {echo "selected";	}?>>Individual Farmer</option>			
-
-		</select>
-		<span class="field_desc">Specify whether it is an individual farmer or an FBG</span>
+		<span class="field_desc">Enter the name for this group</span>
 	</p>
 	<p>
 		<label for="field_officer">Field Extension Officer</label>
@@ -72,12 +53,12 @@ foreach($field_officers as $officer){
 			?>><?php echo $officer -> Officer_Name;?></option>
 			<?php }?>
 		</select>
-		<span class="field_desc">Select the FEO who recruited this Farmer/FBG</span>
+		<span class="field_desc">Select the FEO who recruited this FBG</span>
 	</p>
-		<p>
+	<p>
 		<label for="hectares_available">Hectares Available: </label>
 		<input id="hectares_available" name="hectares_available" type="text" value="<?php echo $hectares_available;?>" class="validate[required]"/>
-		<span class="field_desc">Enter the hectares offered by this Farmer/FBG</span>
+		<span class="field_desc">Enter the hectares offered by this FBG</span>
 	</p>
 	<p>
 		<input class="button" type="submit" value="Submit">
