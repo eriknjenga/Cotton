@@ -35,7 +35,7 @@ class Purchase_Management extends MY_Controller {
 			$data = array();
 		}
 		$data['depots'] = Depot::getAll();
-		$data['prices'] = Cotton_Price::getCottonPrices();		
+		$data['prices'] = Cotton_Price::getCottonPrices();
 		$data['content_view'] = "add_purchase_v";
 		$data['quick_link'] = "add_purchase";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
@@ -45,6 +45,9 @@ class Purchase_Management extends MY_Controller {
 
 	public function edit_purchase($id) {
 		$purchase = Purchase::getPurchase($id);
+		$fbg = $purchase->FBG;
+		$recipient = FBG::getFbg($fbg);
+		$data['disbursements'] = Disbursement::getFBGDisbursements($fbg);
 		$data['purchase'] = $purchase;
 		$this -> new_purchase($data);
 	}
@@ -62,9 +65,9 @@ class Purchase_Management extends MY_Controller {
 		if ($valid) {
 			$editing = $this -> input -> post("editing_id");
 			$dpn = $this -> input -> post("dpn");
-			$dates = $this -> input -> post("date");
+			$date = $this -> input -> post("date");
 			$quantity = $this -> input -> post("quantity");
-			$total_value = $this -> input -> post("total_value");
+			$total_value = $this -> input -> post("purchased_value");
 			$season = $this -> input -> post("season");
 			$fbg = $this -> input -> post("fbg");
 			$depot = $this -> input -> post("depot");
@@ -72,25 +75,30 @@ class Purchase_Management extends MY_Controller {
 			$farmer_registration = $this -> input -> post("farmer_registration");
 			$other_recoveries = $this -> input -> post("other_recoveries");
 			$buyer = $this -> input -> post("buyer");
+			$net_value = $this -> input -> post("net_value");
+			$price = $this -> input -> post("price");
+
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
-				$disbursement = Disbursement::getDisbursement($editing);
+				$purchase = Purchase::getPurchase($editing);
 			} else {
-				$disbursement = new Disbursement();
+				$purchase = new Purchase();
 			}
-			$disbursement -> FBG = $fbg;
-			$disbursement -> Invoice_Number = $invoices[0];
-			$disbursement -> Date = $dates[0];
-			$disbursement -> Farm_Input = $farm_inputs[0];
-			$disbursement -> Quantity = $quantities[0];
-			$disbursement -> Total_Value = $total_values[0];
-			$disbursement -> Season = $seasons[0];
-			$disbursement -> GD_Batch = $gd_batches[0];
-			$disbursement -> ID_Batch = $id_batches[0];
-			$disbursement -> Timestamp = date('U');
-			$disbursement -> Agent = $agent;
-
-			$disbursement -> save();
+			$purchase -> FBG = $fbg;
+			$purchase -> DPN = $dpn;
+			$purchase -> Date = $date;
+			$purchase -> Depot = $depot;
+			$purchase -> Quantity = $quantity;
+			$purchase -> Unit_Price = $price;
+			$purchase -> Gross_Value = $total_value;
+			$purchase -> Net_Value = $net_value;
+			$purchase -> Season = $season;
+			$purchase -> Loan_Recovery = $loan_recovery;
+			$purchase -> Farmer_Reg_Fee = $farmer_registration;
+			$purchase -> Other_Recoveries = $other_recoveries;
+			$purchase -> Buyer = $buyer;
+			$purchase -> Timestamp = date('U');
+			$purchase -> save();
 			redirect("purchase_management/listing");
 		} else {
 			$this -> new_disbursement();
@@ -105,11 +113,11 @@ class Purchase_Management extends MY_Controller {
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('invoice_number[]', 'Invoice Number', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('agent', 'Agent', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('date[]', 'Date', 'trim|required|max_length[100]|xss_clean');
-		$this -> form_validation -> set_rules('farm_input[]', 'Farm Input', 'trim|required|xss_clean');
-		$this -> form_validation -> set_rules('quantity[]', 'Invoice Number', 'trim|required|xss_clean');
+		$this -> form_validation -> set_rules('dpn', 'Daily Purchases Number', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('depot', 'Depot', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('date', 'Date', 'trim|required|max_length[100]|xss_clean');
+		$this -> form_validation -> set_rules('price', 'Unit Price', 'trim|required|xss_clean');
+		$this -> form_validation -> set_rules('quantity', 'Quantity', 'trim|required|xss_clean');
 		return $this -> form_validation -> run();
 	}
 

@@ -1,72 +1,103 @@
+<script type="text/javascript">
+		var url = "";
+	$(function() {
+	$("#confirm_delete").dialog( {
+	height: 150,
+	width: 300,
+	modal: true,
+	autoOpen: false,
+	buttons: {
+	"Delete Record": function() {
+	delete_record();
+	},
+	Cancel: function() {
+	$( this ).dialog( "close" );
+	}
+	}
+
+	} );
+
+	$(".delete").click(function(){
+	url = "<?php echo base_url().'purchase_management/delete_purchase/'?>
+		" +$(this).attr("purchase");
+		$("#confirm_delete").dialog('open');
+		});
+		});
+		function delete_record(){
+		window.location = url;
+		}
+</script>
 <h1>Produce Purchases Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Receipt No.</th>
+			<th>DPN No.</th>
 			<th>Date</th>
-			<th>Farmer GD ID.</th>
-			<th>Farmer Name</th>
+			<th>FBG</th>
 			<th>Buyer</th>
+			<th>Depot</th>
 			<th>Quantity</th>
 			<th>Unit Price</th>
-			<th>Loan Recovery</th>
-			<th>Farmer Reg. Fee</th>
-			<th>Other Recoveries</th>
+			<th>Gross Value</th>
+			<th>Cash Payed</th>
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr class="odd">
-			<td>156</td>
-			<td>2/29/2012</td>
-			<td>5421</td>
-			<td>Cathrine Chilombo</td>
-			<td>Peter Chela</td>
-			<td>100</td>
-			<td>3,500</td>
-			<td>70,000</td>
-			<td>0</td>
-			<td>0</td>
-			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		<?php
+if (isset($purchases[0])) {
+$counter = 1;
+foreach ($purchases as $purchase) {
+$rem = $counter % 2;
+if ($rem == 0) {
+$class = "even";
+} else {
+$class = "odd";
+}
+		?><tr class="<?php echo $class;?>
+		">
+		<td>
+		<?php echo $purchase -> DPN;?>
+		</td>
+		<td>
+		<?php echo $purchase -> Date;?>
+		</td>
+		<td>
+		<?php echo $purchase -> FBG_Object->Group_Name;?>
+		</td>
+		<td>
+		<?php echo $purchase -> Buyer_Object->Name;?>
+		</td>
+		<td>
+		<?php echo $purchase -> Depot_Object->Depot_Name;?>
+		</td>
+		<td>
+		<?php echo $purchase -> Quantity;?>
+		</td>
+				<td>
+		<?php echo $purchase -> Unit_Price;?>
+		</td>
+		<td>
+		<?php echo $purchase -> Gross_Value;?>
+		</td>
+		<td>
+		<?php echo $purchase -> Net_Value;?>
+		</td>
+		<td><a href="<?php echo base_url()."purchase_management/edit_purchase/".$purchase->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" purchase = "<?php echo $purchase -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
-		<tr>
-			<td>155</td>
-			<td>2/29/2012</td>
-			<td>5426</td>
-			<td>Given Luwaya</td>
-			<td>Peter Chela</td>
-			<td>100</td>
-			<td>3,500</td>
-			<td>70,000</td>
-			<td>0</td>
-			<td>0</td>
-			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
-		</tr>
-		<tr class="odd">
-			<td>154</td>
-			<td>2/28/2012</td>
-			<td>4458</td>
-			<td>Nkhosi Khuzwayo</td>
-			<td>Peter Chela</td>
-			<td>100</td>
-			<td>3,500</td>
-			<td>70,000</td>
-			<td>0</td>
-			<td>0</td>
-			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
-		</tr>
-		<tr>
-			<td>153</td>
-			<td>2/26/2012</td>
-			<td>8426</td>
-			<td>Somon Chiponda</td>
-			<td>Peter Chela</td>
-			<td>100</td>
-			<td>3,500</td>
-			<td>70,000</td>
-			<td>0</td>
-			<td>0</td>
-			<td><a href="#" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a> <a href="#" class="button"><span class="ui-icon ui-icon-trash"></span>Delete</a> </td>
-		</tr>
+		<?php
+
+		$counter++;
+		}
+		}
+		?>
 	</tbody>
 </table>
+<div title="Confirm Delete!" id="confirm_delete" style="width: 300px; height: 150px; margin: 5px auto 5px auto;">
+	Are you sure you want to delete this record?
+</div>
+<?php if (isset($pagination)):
+?>
+<div style="width:450px; margin:0 auto 60px auto">
+	<?php echo $pagination;?>
+</div><?php endif;?>

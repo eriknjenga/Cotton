@@ -14,6 +14,12 @@
 		$(".date").change(function() {
 			updateCottonPrice($(this));
 		});
+		$(".depot").change(function() {
+			$("#buyer").attr("value", "");
+			$("#buyer_id").attr("value", "");
+			$("#buyer").attr("value", $(this).find(":selected").attr("buyer"));
+			$("#buyer_id").attr("value", $(this).find(":selected").attr("buyer_id"));
+		});
 
 		$("#loan_recovery").keyup(function() {
 			updateNetCalculations();
@@ -25,13 +31,14 @@
 			updateNetCalculations();
 		});
 	});
-	function updateNetCalculations(){
+	function updateNetCalculations() {
 		var gross_total = $("#purchased_value").attr("value");
-		var total_deductions = parseInt($("#loan_recovery").attr("value"))+parseInt($("#farmer_registration").attr("value"))+parseInt($("#other_recoveries").attr("value"));
-		$("#total_deductions").attr("value",total_deductions);
-		$("#net_value").attr("value",parseInt(gross_total)-parseInt(total_deductions));
-		
+		var total_deductions = parseInt($("#loan_recovery").attr("value")) + parseInt($("#farmer_registration").attr("value")) + parseInt($("#other_recoveries").attr("value"));
+		$("#total_deductions").attr("value", total_deductions);
+		$("#net_value").attr("value", parseInt(gross_total) - parseInt(total_deductions));
+
 	}
+
 	function updateCottonPrice(date_object) {
 		var prices = $("#cotton_prices").attr("prices");
 		var price_dates = $("#cotton_prices").attr("price_dates");
@@ -72,14 +79,15 @@ if (isset($purchase)) {
 	$date = $purchase -> Date;
 	$depot = $purchase -> Depot;
 	$quantity = $purchase -> Quantity;
-	$total_value = $purchase -> Total_Value;
+	$total_value = $purchase -> Gross_Value;
 	$season = $purchase -> Season;
 	$loan_recovery = $purchase -> Loan_Recovery;
-	$farmer_registration = $purchase -> Farmer_Registration;
+	$farmer_registration = $purchase -> Farmer_Reg_Fee;
 	$other_recoveries = $purchase -> Other_Recoveries;
 	$purchase_id = $purchase -> id;
-	$price = $purchase -> Price;
-	$buyer = $purchase -> Buyer;
+	$price = $purchase -> Unit_Price;
+	$buyer_id = $purchase -> Buyer;
+	$buyer = $purchase -> Buyer_Object -> Name;
 
 } else {
 	$fbg_id = "";
@@ -95,8 +103,12 @@ if (isset($purchase)) {
 	$other_recoveries = "0";
 	$purchase_id = "";
 	$buyer = "";
+	$buyer_id = "";
+	
 
 }
+$total_deductions = $loan_recovery+$farmer_registration+$other_recoveries;
+$net_value = $total_value - $total_deductions;
 $attributes = array("method" => "post", "id" => "purchase_form");
 echo form_open('purchase_management/save', $attributes);
 echo validation_errors('
@@ -187,18 +199,18 @@ foreach($disbursements as $disbursement){
 	<tbody>
 		<tr input_row="1">
 			<td>
-			<input id="dpn" name="dpn[]" type="text" value="<?php echo $dpn;?>" class="dpn validate[required]" style="width: 40px; padding:2px;"/>
+			<input id="dpn" name="dpn" type="text" value="<?php echo $dpn;?>" class="dpn validate[required]" style="width: 40px; padding:2px;"/>
 			</td>
 			<td>
-			<input class="date validate[required]" id="date" name="date[]" type="text" value="<?php echo $date;?>" style="width: 40px; padding:2px;"/>
+			<input class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>" style="width: 40px; padding:2px;"/>
 			</td>
 			<td>
-			<select name="depot[]" id="depot" class="dropdown depot validate[required]" style="width: 70px; padding:2px;">
+			<select name="depot" id="depot" class="dropdown depot validate[required]" style="width: 70px; padding:2px;">
 				<option></option>
 				<?php
 foreach($depots as $depot_object){
 				?>
-				<option buyer = "<?php echo $depot_object -> Buyer_Object -> Name;?>"
+				<option buyer = "<?php echo $depot_object -> Buyer_Object -> Name;?>" buyer_id = "<?php echo $depot_object -> Buyer_Object -> id;?>"
 				value="<?php echo $depot_object -> id;?>" <?php
 				if ($depot_object -> id == $depot) {echo "selected";
 				}
@@ -229,14 +241,14 @@ foreach($depots as $depot_object){
 <p></p>
 <p>
 	<label for="buyer">Buyer: </label>
-	<input class="buyer" name="buyer" id="buyer" type="text" value="<?php echo $buyer;?>" style="width:100px;"/>
-	
+	<input class="buyer"  id="buyer" type="text" value="<?php echo $buyer;?>" style="width:100px;"/>
+	<input name="buyer" id="buyer_id" type="hidden" value="<?php echo $buyer_id;?>" style="width:100px;"/>
 	<label for="purchased_value">Purchased Value: </label>
 	<input class="purchased_value" name="purchased_value" id="purchased_value" type="text" value="<?php echo $total_value;?>" style="width:100px;"/>
 	<label for="total_deductions">Total Deductions: </label>
-	<input class="total_deductions" name="total_deductions" id="total_deductions" type="text" value="" style="width:100px;"/>
+	<input class="total_deductions" name="total_deductions" id="total_deductions" type="text" value="<?php echo $total_deductions;?>" style="width:100px;"/>
 	<label for="net_value">Net Value: </label>
-	<input class="net_value" name="net_value" id="net_value" type="text" value="0" style="width:100px;"/>
+	<input class="net_value" name="net_value" id="net_value" type="text" value="<?php echo $net_value;?>" style="width:100px;"/>
 </p>
 <p>
 	<input class="button" type="submit" value="Submit">
