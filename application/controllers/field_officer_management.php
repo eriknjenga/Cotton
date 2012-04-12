@@ -38,7 +38,7 @@ class Field_Officer_Management extends MY_Controller {
 		$data['regions'] = Region::getAll();
 		$data['quick_link'] = "add_field_officer";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
-		$data['styles'] = array("Validator.css");
+		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
 

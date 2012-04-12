@@ -39,7 +39,7 @@ class Disbursement_Management extends MY_Controller {
 		$data['content_view'] = "add_disbursement_v";
 		$data['quick_link'] = "add_disbursement";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
-		$data['styles'] = array("Validator.css");
+		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
 

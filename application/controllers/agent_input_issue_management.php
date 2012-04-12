@@ -37,7 +37,7 @@ class Agent_Input_Issue_Management extends MY_Controller {
 		$data['content_view'] = "issue_agent_v";
 		$data['quick_link'] = "new_issue";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
-		$data['styles'] = array("Validator.css");
+		$data['styles'] = array("validator.css");
 		$data['farm_inputs'] = Farm_Input::getAll();
 		$data['agents'] = Agent::getAll();
 		$this -> base_params($data);

@@ -13,6 +13,8 @@
 if (isset($disbursement)) {
 	$amount = $disbursement -> Amount;
 	$field_cashier = $disbursement -> Field_Cashier;
+	$receipt = $disbursement -> Receipt;
+	$buyer = $disbursement -> Buyer;
 	$cih = $disbursement -> CIH;
 	$disbursement_id = $disbursement -> id;
 	$date = $disbursement -> Date;
@@ -21,11 +23,13 @@ if (isset($disbursement)) {
 	$field_cashier = "";
 	$cih = "";
 	$disbursement_id = "";
+	$receipt = "";
+	$buyer = "";
 	$date = "";
 
 }
 $attributes = array("method" => "post", "id" => "disburse_cash_input");
-echo form_open('cash_management/save', $attributes);
+echo form_open('field_cash_management/save', $attributes);
 echo validation_errors('
 <p class="form_error">', '</p>
 ');
@@ -33,13 +37,18 @@ echo validation_errors('
 <!-- Fieldset -->
 <fieldset>
 	<legend>
-		Disburse Cash
+		New Field Payment
 	</legend>
 	<input type="hidden" name="editing_id" value="<?php echo $disbursement_id;?>" />
 	<p>
-		<label for="cih">CIH(c) Voucher Number: </label>
+		<label for="cih">CIH(b) Voucher Number: </label>
 		<input id="cih"  name="cih" type="text"  value="<?php echo $cih;?>" class="validate[required]"/>
-		<span class="field_desc">Enter the CIH(c) Voucher Number for this transaction</span>
+		<span class="field_desc">Enter the CIH(b) Voucher Number for this transaction</span>
+	</p>
+	<p>
+		<label for="receipt">Receipt Number: </label>
+		<input id="receipt"  name="receipt" type="text"  value="<?php echo $receipt;?>" class="validate[required]"/>
+		<span class="field_desc">Enter the Buying Center Receipt Number for this transaction</span>
 	</p>
 	<p>
 		<label for="date">Transaction Date: </label>
@@ -57,6 +66,21 @@ foreach($field_cashiers as $field_cashier_object){
 			if ($field_cashier_object -> id == $field_cashier) {echo "selected";
 			}
 			?>><?php echo $field_cashier_object -> Field_Cashier_Name;?></option>
+			<?php }?>
+		</select>
+		<span class="field_desc">Select the origin of the cash</span>
+	</p>
+	<p>
+		<label for="buyer">Buyer</label>
+		<select name="buyer" class="dropdown validate[required]" id="buyer">
+			<option></option>
+			<?php
+foreach($buyers as $buyer_object){
+			?>
+			<option value="<?php echo $buyer_object -> id;?>" <?php
+			if ($buyer_object -> id == $buyer) {echo "selected";
+			}
+			?>><?php echo $buyer_object -> Name;?></option>
 			<?php }?>
 		</select>
 		<span class="field_desc">Select the recipient of the cash</span>

@@ -39,7 +39,7 @@ class Route_Management extends MY_Controller {
 		$data['content_view'] = "add_route_v";
 		$data['quick_link'] = "add_route";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
-		$data['styles'] = array("Validator.css");
+		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
 

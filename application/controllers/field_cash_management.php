@@ -1,5 +1,5 @@
 <?php
-class Cash_Management extends MY_Controller {
+class Field_Cash_Management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$this -> load -> library('pagination');
@@ -11,10 +11,10 @@ class Cash_Management extends MY_Controller {
 
 	public function listing($offset = 0) {
 		$items_per_page = 20;
-		$number_of_disbursements = Cash_Disbursement::getTotalDisbursements();
-		$disbursements = Cash_Disbursement::getPagedDisbursements($offset, $items_per_page);
+		$number_of_disbursements = Field_Cash_Disbursement::getTotalDisbursements();
+		$disbursements = Field_Cash_Disbursement::getPagedDisbursements($offset, $items_per_page);
 		if ($number_of_disbursements > $items_per_page) {
-			$config['base_url'] = base_url() . "cash_management/listing/";
+			$config['base_url'] = base_url() . "field_cash_management/listing/";
 			$config['total_rows'] = $number_of_disbursements;
 			$config['per_page'] = $items_per_page;
 			$config['uri_segment'] = 3;
@@ -23,29 +23,30 @@ class Cash_Management extends MY_Controller {
 			$data['pagination'] = $this -> pagination -> create_links();
 		}
 		$data['disbursements'] = $disbursements;
-		$data['title'] = "Cash Disbursements";
-		$data['content_view'] = "list_cash_disbursements_v";
+		$data['title'] = "Field Cash Payments";
+		$data['content_view'] = "list_field_cash_disbursements_v";
 		$data['styles'] = array("pagination.css");
 		$this -> base_params($data);
 
 	}
 
-	public function issue_cash($data = null) {
+	public function new_payment($data = null) {
 		if ($data == null) {
 			$data = array();
 		}
 		$data['field_cashiers'] = Field_Cashier::getAll();
-		$data['content_view'] = "add_cash_disbursement_v";
-		$data['quick_link'] = "issue_cash";
+		$data['buyers'] = Buyer::getAll();
+		$data['content_view'] = "add_field_cash_disbursement_v";
+		$data['quick_link'] = "new_payment";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
 
 	public function edit_disbursement($id) {
-		$disbursement = Cash_Disbursement::getDisbursement($id);
+		$disbursement = Field_Cash_Disbursement::getDisbursement($id);
 		$data['disbursement'] = $disbursement;
-		$this -> issue_cash($data);
+		$this -> new_payment($data);
 	}
 
 	public function save() {
@@ -55,23 +56,25 @@ class Cash_Management extends MY_Controller {
 			$editing = $this -> input -> post("editing_id");
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
-				$disbursement = Cash_Disbursement::getDisbursement($editing);
+				$disbursement = Field_Cash_Disbursement::getDisbursement($editing);
 			} else {
-				$disbursement = new Cash_Disbursement();
+				$disbursement = new Field_Cash_Disbursement();
 			}
 			$disbursement -> Field_Cashier = $this -> input -> post("field_cashier");
+			$disbursement -> Buyer = $this -> input -> post("buyer");
 			$disbursement -> Amount = $this -> input -> post("amount");
 			$disbursement -> CIH = $this -> input -> post("cih");
+			$disbursement -> Receipt = $this -> input -> post("receipt");
 			$disbursement -> Date = $this -> input -> post("date");
 			$disbursement -> save();
-			redirect("cash_management/listing");
+			redirect("field_cash_management/listing");
 		} else {
-			$this -> issue_cash();
+			$this -> new_payment();
 		}
 	}
 
 	public function delete_disbursement($id) {
-		$disbursement = Cash_Disbursement::getDisbursement($id);
+		$disbursement = Field_Cash_Disbursement::getDisbursement($id);
 		$disbursement -> delete();
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
@@ -79,14 +82,16 @@ class Cash_Management extends MY_Controller {
 
 	public function validate_form() {
 		$this -> form_validation -> set_rules('field_cashier', 'Field Cashier', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('buyer', 'Buyer', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('receipt', 'Buying Center Receipt', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('amount', 'Amount Disbursed', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('cih', 'CIH Voucher', 'trim|required|max_length[50]|xss_clean');
 		return $this -> form_validation -> run();
 	}
 
 	public function base_params($data) {
-		$data['title'] = "Cash Management";
-		$data['link'] = "cash_management";
+		$data['title'] = "Field Cash Management";
+		$data['link'] = "field_cash_management";
 		$this -> load -> view("demo_template", $data);
 	}
 

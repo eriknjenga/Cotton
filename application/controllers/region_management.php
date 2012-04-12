@@ -37,7 +37,7 @@ class Region_Management extends MY_Controller {
 		$data['content_view'] = "add_region_v";
 		$data['quick_link'] = "add_region";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
-		$data['styles'] = array("Validator.css");
+		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
 

@@ -37,7 +37,7 @@ class Farm_Input_Management extends MY_Controller {
 		$data['content_view'] = "add_farm_input_v";
 		$data['quick_link'] = "add_farm_input";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
-		$data['styles'] = array("Validator.css");
+		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
 
