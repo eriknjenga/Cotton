@@ -108,16 +108,7 @@ foreach($menus as $menu){
 						<?php }?>
 					</ul>
 				</div>
-				<!-- End of navigation bar" -->
-				<!-- Search bar -->
-				<div id="search">
-					<form action="" method="POST">
-						<p>
-							<input type="submit" value="" class="but" />
-							<input type="text" name="q" value="Search the farm2 system" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;" />
-						</p>
-					</form>
-				</div>
+				<!-- End of navigation bar" --> 
 				<!-- End of Search bar -->
 			</div>
 			<!-- End of Header -->
