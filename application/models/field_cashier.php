@@ -18,7 +18,7 @@ class Field_Cashier extends Doctrine_Record {
 	}
 
 	public function getPagedFieldCashiers($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cashier") -> offset($offset) -> limit($items);
+		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cashier") -> offset($offset) -> limit($items)->orderBy("id Desc");
 		$field_cashiers = $query -> execute(array());
 		return $field_cashiers;
 	}

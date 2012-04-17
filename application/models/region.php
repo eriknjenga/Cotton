@@ -22,7 +22,7 @@ class Region extends Doctrine_Record {
 	}
 
 	public function getPagedRegions($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Region") -> offset($offset) -> limit($items);
+		$query = Doctrine_Query::create() -> select("*") -> from("Region") -> offset($offset) -> limit($items)->orderBy("id Desc");
 		$regions = $query -> execute(array());
 		return $regions;
 	}

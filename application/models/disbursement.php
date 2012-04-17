@@ -29,7 +29,7 @@ class Disbursement extends Doctrine_Record {
 	}
 
 	public function getPagedDisbursements($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> offset($offset) -> limit($items);
+		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> offset($offset) -> limit($items)->orderBy("id Desc");
 		$disbursements = $query -> execute(array());
 		return $disbursements;
 	}

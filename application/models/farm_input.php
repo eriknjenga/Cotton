@@ -18,7 +18,7 @@ class Farm_Input extends Doctrine_Record {
 	}
 
 	public function getPagedInputs($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Farm_Input") -> offset($offset) -> limit($items);
+		$query = Doctrine_Query::create() -> select("*") -> from("Farm_Input") -> offset($offset) -> limit($items)->orderBy("id Desc");
 		$inputs = $query -> execute(array());
 		return $inputs;
 	}

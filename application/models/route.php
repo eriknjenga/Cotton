@@ -18,7 +18,7 @@ class Route extends Doctrine_Record {
 	}
 
 	public function getPagedRoutes($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Route") -> offset($offset) -> limit($items);
+		$query = Doctrine_Query::create() -> select("*") -> from("Route") -> offset($offset) -> limit($items)->orderBy("id Desc");
 		$routes = $query -> execute(array());
 		return $routes;
 	}

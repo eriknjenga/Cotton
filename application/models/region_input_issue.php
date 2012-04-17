@@ -27,7 +27,7 @@ class Region_Input_Issue extends Doctrine_Record {
 	}
 
 	public function getPagedIssues($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Region_Input_Issue") -> offset($offset) -> limit($items);
+		$query = Doctrine_Query::create() -> select("*") -> from("Region_Input_Issue") -> offset($offset) -> limit($items)->orderBy("id Desc");
 		$issues = $query -> execute(array());
 		return $issues;
 	}

@@ -43,6 +43,16 @@ class Disbursement_Management extends MY_Controller {
 		$this -> base_params($data);
 	}
 
+	public function search_fbg() {
+		$data['content_view'] = "search_fbg_v";
+		$data['link'] = "fbg_management";
+		$data['quick_link'] = "search_fbg";
+		$data['search_title'] = "Search For an FBG to Disburse Inputs to";
+		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['styles'] = array("validator.css");
+		$this -> load -> view("demo_template", $data);
+	}
+
 	public function edit_disbursement($id) {
 		$disbursement = Disbursement::getDisbursement($id);
 		$data['disbursement'] = $disbursement;
@@ -60,16 +70,16 @@ class Disbursement_Management extends MY_Controller {
 		//If the fields have been validated, save the input
 		if ($valid) {
 			$editing = $this -> input -> post("editing_id");
-			$invoices = $this -> input -> post("invoice_number");
-			$dates = $this -> input -> post("date");
+			$invoice = $this -> input -> post("invoice_number");
+			$date = $this -> input -> post("date");
 			$farm_inputs = $this -> input -> post("farm_input");
 			$quantities = $this -> input -> post("quantity");
 			$total_values = $this -> input -> post("total_value");
 			$seasons = $this -> input -> post("season");
 			$gd_batches = $this -> input -> post("gd_batch");
 			$id_batches = $this -> input -> post("id_batch");
-			$fbg = $this -> input -> post("fbg"); 
-			$agent = $this -> input -> post("agent"); 
+			$fbg = $this -> input -> post("fbg");
+			$agent = $this -> input -> post("agent");
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$disbursement = Disbursement::getDisbursement($editing);
@@ -77,8 +87,8 @@ class Disbursement_Management extends MY_Controller {
 				$disbursement = new Disbursement();
 			}
 			$disbursement -> FBG = $fbg;
-			$disbursement -> Invoice_Number = $invoices[0];
-			$disbursement -> Date = $dates[0];
+			$disbursement -> Invoice_Number = $invoice;
+			$disbursement -> Date = $date;
 			$disbursement -> Farm_Input = $farm_inputs[0];
 			$disbursement -> Quantity = $quantities[0];
 			$disbursement -> Total_Value = $total_values[0];
@@ -87,15 +97,15 @@ class Disbursement_Management extends MY_Controller {
 			$disbursement -> ID_Batch = $id_batches[0];
 			$disbursement -> Timestamp = date('U');
 			$disbursement -> Agent = $agent;
-			
+
 			$disbursement -> save();
 
 			//Loop through the rest of the disbursements
-			for ($x = 1; $x < sizeof($invoices); $x++) {
+			for ($x = 1; $x < sizeof($farm_inputs); $x++) {
 				$disbursement = new Disbursement();
 				$disbursement -> FBG = $fbg;
-				$disbursement -> Invoice_Number = $invoices[$x];
-				$disbursement -> Date = $dates[$x];
+				$disbursement -> Invoice_Number = $invoice;
+				$disbursement -> Date = $date;
 				$disbursement -> Farm_Input = $farm_inputs[$x];
 				$disbursement -> Quantity = $quantities[$x];
 				$disbursement -> Total_Value = $total_values[$x];
@@ -106,7 +116,13 @@ class Disbursement_Management extends MY_Controller {
 				$disbursement -> Agent = $agent;
 				$disbursement -> save();
 			}
-			redirect("disbursement_management/listing");
+			$submit_button = $this -> input -> post("submit");
+			if ($submit_button == "Save & Add New") {
+				redirect("disbursement_management/search_fbg");
+			} else if ($submit_button == "Save & View List") {
+				redirect("disbursement_management/listing");
+			}
+
 		} else {
 			$this -> new_disbursement();
 		}
@@ -120,9 +136,9 @@ class Disbursement_Management extends MY_Controller {
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('invoice_number[]', 'Invoice Number', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('invoice_number', 'Invoice Number', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('agent', 'Agent', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('date[]', 'Date', 'trim|required|max_length[100]|xss_clean');
+		$this -> form_validation -> set_rules('date', 'Date', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('farm_input[]', 'Farm Input', 'trim|required|xss_clean');
 		$this -> form_validation -> set_rules('quantity[]', 'Invoice Number', 'trim|required|xss_clean');
 		return $this -> form_validation -> run();

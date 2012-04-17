@@ -19,7 +19,7 @@ class Field_Officer extends Doctrine_Record {
 	}
 
 	public function getPagedOfficers($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Field_Officer") -> offset($offset) -> limit($items);
+		$query = Doctrine_Query::create() -> select("*") -> from("Field_Officer") -> offset($offset) -> limit($items)->orderBy("id Desc");
 		$officers = $query -> execute(array());
 		return $officers;
 	}

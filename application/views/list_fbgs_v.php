@@ -27,7 +27,7 @@
 		window.location = url;
 		}
 </script>
-<h1>Farmers Listing</h1>
+<h1><?php echo $listing_title;?></h1>
 <table class="fullwidth">
 	<thead>
 		<tr>

@@ -20,7 +20,7 @@ class Depot extends Doctrine_Record {
 	}
 
 	public function getPagedDepots($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Depot") -> offset($offset) -> limit($items);
+		$query = Doctrine_Query::create() -> select("*") -> from("Depot") -> offset($offset) -> limit($items)->orderBy("id Desc");
 		$depots = $query -> execute(array());
 		return $depots;
 	}
