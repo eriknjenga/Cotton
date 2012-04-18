@@ -45,7 +45,7 @@ class Disbursement_Management extends MY_Controller {
 
 	public function search_fbg() {
 		$data['content_view'] = "search_fbg_v";
-		$data['link'] = "fbg_management";
+		$data['link'] = "disbursement_management";
 		$data['quick_link'] = "search_fbg";
 		$data['search_title'] = "Search For an FBG to Disburse Inputs to";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");

@@ -7,17 +7,19 @@
 			changeMonth : true
 		});
 		$(".farm_input").change(function() {
-			var date_object = $(this).closest("tr").find(".date");
+			var date_object = $("#date");
 			updateInputPrice($(this), date_object);
 		});
 		$(".quantity").keyup(function() {
-			var date_object = $(this).closest("tr").find(".date");
+			var date_object = $("#date");
 			var input_object = $(this).closest("tr").find(".farm_input");
 			updateInputPrice(input_object, date_object);
 		});
-		$(".date").change(function() {
-			var farm_input = $(this).closest("tr").find(".farm_input");
-			updateInputPrice(farm_input, $(this));
+		$("#date").change(function() { 
+			var date_object = $(this);
+			$.each($(".farm_input"), function() {
+				updateInputPrice($(this),date_object);
+			}); 
 		});
 		$(".add").click(function() {
 			var cloned_object = $('#inputs_table tr:last').clone(true);
@@ -25,7 +27,6 @@
 			var next_input_row = parseInt(input_row) + 1;
 			cloned_object.attr("input_row", next_input_row);
 			var invoice_id = "invoice_number_" + next_input_row;
-			var date_id = "date_" + next_input_row;
 			var farm_input_id = "farm_input_" + next_input_row;
 			var quantity_id = "quantity_" + next_input_row;
 			var total_value_id = "total_value_" + next_input_row;
@@ -37,33 +38,16 @@
 			cloned_object.find(".quantity").attr("value", "");
 			cloned_object.find(".total_value").attr("value", "");
 			cloned_object.find(".season").attr("id", season_id);
-			var date_selector = "#" + date_id;
-
-			$(date_selector).datepicker({
-				defaultDate : new Date(),
-				changeYear : true,
-				changeMonth : true
-			});
 			cloned_object.insertAfter('#inputs_table tr:last');
-			refreshDatePickers();
 			return false;
 		});
 	});
-	function refreshDatePickers() {
-		var counter = 0;
-		$('.date').each(function() {
-			var new_id = "date_" + counter;
-			$(this).attr("id", new_id);
-			$(this).datepicker("destroy");
-			$(this).not('.hasDatePicker').datepicker();
-			counter++;
-
-		});
-	}
-
 	function updateInputPrice(input_object, date_object) {
 		var prices = input_object.find(":selected").attr("prices");
-		var price_dates = input_object.find(":selected").attr("price_dates");
+		var price_dates = input_object.find(":selected").attr("price_dates"); 
+		if(prices == null || price_dates == null) {
+			return;
+		}
 		var price_dates_array = price_dates.split(",");
 		var prices_array = prices.split(",");
 		var selected_date_value = date_object.attr("value");
@@ -74,14 +58,14 @@
 		$.each(price_dates_array, function() {
 			if(this.length > 0 && selected_date_value.length > 0) {
 				var price_date = new Date(this);
-				var day_difference = Math.floor((selected_date - price_date) / 86400000);
+				var day_difference = Math.floor((selected_date - price_date) / 86400000); 
 				if(day_difference >= 0 && (difference == 0 || day_difference < difference)) {
 					difference = day_difference;
 					most_current_price = prices_array[counter];
 				}
 			}
 			counter++;
-		});
+		}); 
 		//Clear out the 'total value' field
 		input_object.closest("tr").find(".total_value").attr("value", "");
 		var quantity = input_object.closest("tr").find(".quantity").attr("value");
@@ -159,11 +143,15 @@ foreach($regions as $region_object){
 		</select>
 		<span class="field_desc">Select the region that these inputs were delivered</span>
 	</p>
-
 	<p>
 		<label for="delivery_note_number">Delivery Note Number: </label>
 		<input id="delivery_note_number" name="delivery_note_number" type="text" value="<?php echo $delivery_note_number;?>" class="validate[required]" />
 		<span class="field_desc">Enter the <b>Delivery Note Number</b> for this transaction</span>
+	</p>
+	<p>
+		<label for="date">Transaction Date: </label>
+		<input class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>"/>
+		<span class="field_desc">Enter the <b>Date</b> for this transaction</span>
 	</p>
 	<table class="normal" id="inputs_table" style="margin:0 auto;">
 		<caption>
@@ -171,8 +159,6 @@ foreach($regions as $region_object){
 		</caption>
 		<thead>
 			<tr>
-				
-				<th>Date</th>
 				<th>Input Name</th>
 				<th>Quantity</th>
 				<th>Total Value</th>
@@ -183,9 +169,6 @@ foreach($regions as $region_object){
 		<tbody>
 			<tr input_row="1">
 				<td>
-				<input class="date validate[required]" id="date" name="date[]" type="text" value="<?php echo $date;?>" style="width: 100px; padding:2px;"/>
-				</td>
-				<td>
 				<select name="farm_input[]" id="farm_input" class="dropdown farm_input validate[required]" style="width: 70px; padding:2px;">
 					<option></option>
 					<?php
@@ -195,7 +178,7 @@ foreach($farm_inputs as $farm_input_object){
 					foreach ($farm_input_object->Prices as $price) {echo $price -> Price . ',';
 					}
 					?>" price_dates="<?php
-					foreach ($farm_input_object->Prices as $price) {echo date('d/m/Y', $price -> Timestamp) . ',';
+					foreach ($farm_input_object->Prices as $price) {echo date('m/d/Y', $price -> Timestamp) . ',';
 					}
 					?>"
 					value="<?php echo $farm_input_object -> id;?>" <?php

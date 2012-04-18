@@ -55,7 +55,7 @@ class Agent_Input_Issue_Management extends MY_Controller {
 		if ($valid) {
 			$editing = $this -> input -> post("editing_id");
 			$delivery_note_number = $this -> input -> post("delivery_note_number");
-			$dates = $this -> input -> post("date");
+			$date = $this -> input -> post("date");
 			$farm_inputs = $this -> input -> post("farm_input");
 			$quantities = $this -> input -> post("quantity");
 			$total_values = $this -> input -> post("total_value");
@@ -68,7 +68,7 @@ class Agent_Input_Issue_Management extends MY_Controller {
 				$issue = new Agent_Input_Issue();
 			}
 			$issue -> Delivery_Note_Number = $delivery_note_number;
-			$issue -> Date = $dates[0];
+			$issue -> Date = $date;
 			$issue -> Farm_Input = $farm_inputs[0];
 			$issue -> Quantity = $quantities[0];
 			$issue -> Total_Value = $total_values[0];
@@ -79,10 +79,10 @@ class Agent_Input_Issue_Management extends MY_Controller {
 			$issue -> save();
 
 			//Loop through the rest of the disbursements
-			for ($x = 1; $x < sizeof($dates); $x++) {
+			for ($x = 1; $x < sizeof($farm_inputs); $x++) {
 				$issue = new Agent_Input_Issue();
 				$issue -> Delivery_Note_Number = $delivery_note_number;
-				$issue -> Date = $dates[$x];
+				$issue -> Date = $date;
 				$issue -> Farm_Input = $farm_inputs[$x];
 				$issue -> Quantity = $quantities[$x];
 				$issue -> Total_Value = $total_values[$x];

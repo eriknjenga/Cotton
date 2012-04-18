@@ -35,10 +35,8 @@
 			<th>Date</th>
 			<th>FBG</th>
 			<th>Buyer</th>
-			<th>Depot</th>
 			<th>Quantity</th>
 			<th>Unit Price</th>
-			<th>Gross Value</th>
 			<th>Cash Payed</th>
 			<th>Action</th>
 		</tr>
@@ -69,16 +67,10 @@ $class = "odd";
 		<?php echo $purchase -> Buyer_Object->Name;?>
 		</td>
 		<td>
-		<?php echo $purchase -> Depot_Object->Depot_Name;?>
-		</td>
-		<td>
 		<?php echo $purchase -> Quantity;?>
 		</td>
 				<td>
 		<?php echo $purchase -> Unit_Price;?>
-		</td>
-		<td>
-		<?php echo $purchase -> Gross_Value;?>
 		</td>
 		<td>
 		<?php echo $purchase -> Net_Value;?>

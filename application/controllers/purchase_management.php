@@ -43,9 +43,19 @@ class Purchase_Management extends MY_Controller {
 		$this -> base_params($data);
 	}
 
+	public function search_fbg() {
+		$data['content_view'] = "search_fbg_v";
+		$data['link'] = "purchase_management";
+		$data['quick_link'] = "search_fbg";
+		$data['search_title'] = "Search For an FBG to Purchase From";
+		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['styles'] = array("validator.css");
+		$this -> load -> view("demo_template", $data);
+	}
+
 	public function edit_purchase($id) {
 		$purchase = Purchase::getPurchase($id);
-		$fbg = $purchase->FBG;
+		$fbg = $purchase -> FBG;
 		$recipient = FBG::getFbg($fbg);
 		$data['disbursements'] = Disbursement::getFBGDisbursements($fbg);
 		$data['purchase'] = $purchase;

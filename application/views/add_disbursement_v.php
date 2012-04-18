@@ -173,7 +173,7 @@ foreach($farm_inputs as $farm_input_object){
 					foreach ($farm_input_object->Prices as $price) {echo $price -> Price . ',';
 					}
 					?>" price_dates="<?php
-					foreach ($farm_input_object->Prices as $price) {echo date('d/m/Y', $price -> Timestamp) . ',';
+					foreach ($farm_input_object->Prices as $price) {echo date('m/d/Y', $price -> Timestamp) . ',';
 					}
 					?>"
 					value="<?php echo $farm_input_object -> id;?>" <?php
