@@ -69,6 +69,7 @@ class Disbursement_Management extends MY_Controller {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
 		if ($valid) {
+			$log = new System_Log();
 			$editing = $this -> input -> post("editing_id");
 			$invoice = $this -> input -> post("invoice_number");
 			$date = $this -> input -> post("date");
@@ -80,11 +81,21 @@ class Disbursement_Management extends MY_Controller {
 			$id_batches = $this -> input -> post("id_batch");
 			$fbg = $this -> input -> post("fbg");
 			$agent = $this -> input -> post("agent");
+
+			$temp_disbursement = new Disbursement();
+			$temp_disbursement -> FBG = $fbg;
+			$temp_disbursement -> Farm_Input = $farm_inputs[0];
+			$temp_disbursement -> Agent = $agent;
+			$details_desc = "{FGB: '" . $temp_disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $invoice . "' Date: '" . $date . "' Farm Input: '" . $temp_disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $quantities[0] . "' Total Value: '" . $total_values[0] . "' Season: '" . $seasons[0] . "' GD Batch: '" . $gd_batches[0] . "' ID Batch: '" . $id_batches[0] . "' Agent: '" . $temp_disbursement -> Agent_Object -> First_Name . " " . $temp_disbursement -> Agent_Object -> Surname . "'}";
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$disbursement = Disbursement::getDisbursement($editing);
+				$log -> Log_Type = "2";
+				$log -> Log_Message = "Edited Input Disbursement Record From {FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $disbursement -> Invoice_Number . "' Date: '" . $disbursement -> Date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $disbursement -> Quantity . "' Total Value: '" . $disbursement -> Total_Value . "' Season: '" . $disbursement -> Season . "' GD Batch: '" . $disbursement -> GD_Batch . "' ID Batch: '" . $disbursement -> ID_Batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'} to " . $details_desc;
 			} else {
 				$disbursement = new Disbursement();
+				$log -> Log_Type = "1";
+				$log -> Log_Message = "Created Input Disbursement Record " . $details_desc;
 			}
 			$disbursement -> FBG = $fbg;
 			$disbursement -> Invoice_Number = $invoice;
@@ -97,9 +108,10 @@ class Disbursement_Management extends MY_Controller {
 			$disbursement -> ID_Batch = $id_batches[0];
 			$disbursement -> Timestamp = date('U');
 			$disbursement -> Agent = $agent;
-
 			$disbursement -> save();
-
+			$log -> User = $this -> session -> userdata('user_id');
+			$log -> Timestamp = date('U');
+			$log -> save();
 			//Loop through the rest of the disbursements
 			for ($x = 1; $x < sizeof($farm_inputs); $x++) {
 				$disbursement = new Disbursement();
@@ -114,7 +126,14 @@ class Disbursement_Management extends MY_Controller {
 				$disbursement -> ID_Batch = $id_batches[$x];
 				$disbursement -> Timestamp = date('U');
 				$disbursement -> Agent = $agent;
+				$details_desc = "{FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $invoice . "' Date: '" . $date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $quantities[$x] . "' Total Value: '" . $total_values[$x] . "' Season: '" . $seasons[$x] . "' GD Batch: '" . $gd_batches[$x] . "' ID Batch: '" . $id_batches[$x] . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'}";
+				$log = new System_Log();
+				$log -> Log_Type = "1";
+				$log -> Log_Message = "Created  Input Disbursement Record " . $details_desc;
 				$disbursement -> save();
+				$log -> User = $this -> session -> userdata('user_id');
+				$log -> Timestamp = date('U');
+				$log -> save();
 			}
 			$submit_button = $this -> input -> post("submit");
 			if ($submit_button == "Save & Add New") {
@@ -131,6 +150,12 @@ class Disbursement_Management extends MY_Controller {
 	public function delete_disbursement($id) {
 		$disbursement = Disbursement::getDisbursement($id);
 		$disbursement -> delete();
+		$log = new System_Log();
+		$log -> Log_Type = "3";
+		$log -> Log_Message = "Deleted Input Disbursement Record {FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $disbursement -> Invoice_Number . "' Date: '" . $disbursement -> Date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $disbursement -> Quantity . "' Total Value: '" . $disbursement -> Total_Value . "' Season: '" . $disbursement -> Season . "' GD Batch: '" . $disbursement -> GD_Batch . "' ID Batch: '" . $disbursement -> ID_Batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'}";
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> save();
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
 	}

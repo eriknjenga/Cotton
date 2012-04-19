@@ -53,18 +53,30 @@ class Depot_Management extends MY_Controller {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
 		if ($valid) {
+			$log = new System_Log();
+			$temp_depot = new Depot();
+			$temp_depot -> Buyer = $this -> input -> post("buyer");
+			$temp_depot -> Region = $this -> input -> post("region");
+			$details_desc = "{Depot Code: '" . $this -> input -> post("depot_code") . "' Depot Name: '" . $this -> input -> post("depot_name") . "' Buyer: '" . $temp_depot -> Buyer_Object -> Name . "' Region: '" . $temp_depot -> Region_Object -> Region_Name . "'}";
 			$editing = $this -> input -> post("editing_id");
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$depot = Depot::getDepot($editing);
+				$log -> Log_Type = "2";
+				$log -> Log_Message = "Edited Depot Record From {Depot Code: '" . $depot -> Depot_Code . "' Depot Name: '" . $depot -> Depot_Name . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Region: '" . $depot -> Region_Object -> Region_Name . "'} to " . $details_desc;
 			} else {
 				$depot = new Depot();
+				$log -> Log_Type = "1";
+				$log -> Log_Message = "Created Depot Record " . $details_desc;
 			}
 			$depot -> Depot_Code = $this -> input -> post("depot_code");
 			$depot -> Depot_Name = $this -> input -> post("depot_name");
 			$depot -> Buyer = $this -> input -> post("buyer");
 			$depot -> Region = $this -> input -> post("region");
 			$depot -> save();
+			$log -> User = $this -> session -> userdata('user_id');
+			$log -> Timestamp = date('U');
+			$log -> save();
 			redirect("depot_management/listing");
 		} else {
 			$this -> new_depot();
@@ -73,7 +85,15 @@ class Depot_Management extends MY_Controller {
 
 	public function delete_depot($id) {
 		$depot = Depot::getDepot($id);
-		$depot -> delete();
+		$depot -> Deleted = '1';
+		$depot -> save();
+		$log = new System_Log();
+		$log -> Log_Type = "3";
+		$log -> Log_Message = "Deleted Depot Record {Depot Code: '" . $depot -> Depot_Code . "' Depot Name: '" . $depot -> Depot_Name . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Region: '" . $depot -> Region_Object -> Region_Name . "'}";
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> save();
+
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
 	}

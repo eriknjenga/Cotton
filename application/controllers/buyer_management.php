@@ -33,7 +33,7 @@ class Buyer_Management extends MY_Controller {
 	public function new_buyer($data = null) {
 		if ($data == null) {
 			$data = array();
-		} 
+		}
 		$data['content_view'] = "add_buyer_v";
 		$data['quick_link'] = "add_buyer";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
@@ -51,18 +51,27 @@ class Buyer_Management extends MY_Controller {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
 		if ($valid) {
+			$log = new System_Log();
 			$editing = $this -> input -> post("editing_id");
+			$details_desc = "{Code: '" . $this -> input -> post("buyer_code") . "' Name: '" . $this -> input -> post("name") . "' Phone Number: '" . $this -> input -> post("phone_number") . "' National ID: '" . $this -> input -> post("national_id") . "'}";
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$buyer = Buyer::getBuyer($editing);
+				$log -> Log_Type = "2";
+				$log -> Log_Message = "Edited Buyer Record From {Code: '" . $buyer -> Buyer_Code . "' Name: '" . $buyer -> Name . "' Phone Number: '" . $buyer -> Phone_Number . "' National ID: '" . $buyer -> National_Id . "'} to " . $details_desc;
 			} else {
 				$buyer = new Buyer();
+				$log -> Log_Type = "1";
+				$log -> Log_Message = "Created Buyer Record " . $details_desc;
 			}
 			$buyer -> Buyer_Code = $this -> input -> post("buyer_code");
 			$buyer -> National_Id = $this -> input -> post("national_id");
 			$buyer -> Phone_Number = $this -> input -> post("phone_number");
 			$buyer -> Name = $this -> input -> post("name");
 			$buyer -> save();
+			$log -> User = $this -> session -> userdata('user_id');
+			$log -> Timestamp = date('U');
+			$log -> save();
 			redirect("buyer_management/listing");
 		} else {
 			$this -> new_buyer();
@@ -71,7 +80,15 @@ class Buyer_Management extends MY_Controller {
 
 	public function delete_buyer($id) {
 		$buyer = Buyer::getBuyer($id);
-		$buyer -> delete();
+		$buyer -> Deleted = '1';
+		$buyer -> save();
+		$log = new System_Log();
+		$log -> Log_Type = "3";
+		$log -> Log_Message = "Deleted Buyer Record {Code: '" . $buyer -> Buyer_Code . "' Name: '" . $buyer -> Name . "' Phone Number: '" . $buyer -> Phone_Number . "' National ID: '" . $buyer -> National_Id . "'}";
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> save();
+
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
 	}

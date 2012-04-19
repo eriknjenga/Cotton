@@ -1,5 +1,5 @@
 <?php
-class Users extends Doctrine_Record {
+class User extends Doctrine_Record {
 
 	public function setTableDefinition() {
 		$this -> hasColumn('Name', 'varchar', 100);
@@ -14,10 +14,10 @@ class Users extends Doctrine_Record {
 	}
 
 	public function setUp() {
-		$this -> setTableName('users');
+		$this -> setTableName('user');
 		$this -> hasMutator('Password', '_encrypt_password');
 		$this -> hasOne('Access_Level as Access', array('local' => 'Access_Level', 'foreign' => 'id'));
-		$this -> hasOne('Users as Creator', array('local' => 'Added_By', 'foreign' => 'id'));
+		$this -> hasOne('User as Creator', array('local' => 'Added_By', 'foreign' => 'id'));
 	}
 
 	protected function _encrypt_password($value) {
@@ -26,11 +26,11 @@ class Users extends Doctrine_Record {
 
 	public function login($username, $password) {
 
-		$query = Doctrine_Query::create() -> select("*") -> from("Users") -> where("Username = '" . $username . "'");
+		$query = Doctrine_Query::create() -> select("*") -> from("User") -> where("Username = '" . $username . "' and Active = '1'");
 		$user = $query -> fetchOne();
 		if ($user) {
 
-			$user2 = new Users();
+			$user2 = new User();
 			$user2 -> Password = $password;
 
 			if ($user -> Password == $user2 -> Password) {
@@ -44,25 +44,22 @@ class Users extends Doctrine_Record {
 
 	}
 
-	//added by dave
-	public function getAccessLevels() {
-		$levelquery = Doctrine_Query::create() -> select("id,access,level") -> from("Access_Level");
-		$accesslevels = $levelquery -> execute();
-		return $accesslevels;
+	
+	public function getTotalUsers() {
+		$query = Doctrine_Query::create() -> select("count(*) as Total_Users") -> from("User")->where("Active = '1'");
+		$total = $query -> execute();
+		return $total[0]['Total_Users'];
 	}
 
-	//facilities...
-	public function getFacilityData() {
-		$facilityquery = Doctrine_Query::create() -> select("facilitycode,name") -> from("facilities");
-		$accesslevels = $query -> execute();
-		return $accesslevels;
-	}
-
-	//get all users
-	public function getAll() {
-		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator") -> from("Users u") -> leftJoin('u.Access a, u.Creator b');
-		$users = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+	public function getPagedUsers($offset, $items) {
+		$query = Doctrine_Query::create() -> select("*") -> from("User")->where("Active = '1'") -> offset($offset) -> limit($items)->orderBy("id Desc");
+		$users = $query -> execute(array());
 		return $users;
 	}
 
+	public function getUser($id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("User") -> where("id = '$id'");
+		$user = $query -> execute();
+		return $user[0];
+	}
 }

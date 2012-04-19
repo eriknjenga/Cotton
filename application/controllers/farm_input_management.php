@@ -65,15 +65,15 @@ class Farm_Input_Management extends MY_Controller {
 			if (strlen($date) > 1) {
 				if ($prices[$counter]) {
 					$input_price = new Input_Price();
-					$input_price->Timestamp = strtotime($dates[$counter]);
-					$input_price->Price = $prices[$counter];
-					$input_price->Farm_Input = $input;
-					$input_price->save(); 
+					$input_price -> Timestamp = strtotime($dates[$counter]);
+					$input_price -> Price = $prices[$counter];
+					$input_price -> Farm_Input = $input;
+					$input_price -> save();
 				}
 
 				$counter++;
 			} else {
-				 
+
 				continue;
 			}
 
@@ -91,22 +91,38 @@ class Farm_Input_Management extends MY_Controller {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
 		if ($valid) {
+			$log = new System_Log();
 			$editing = $this -> input -> post("editing_id");
+			$details_desc = "{Product Code: '" . $this -> input -> post("product_code") . "' Product Name: '" . $this -> input -> post("product_name") . "' Product Description: '" . $this -> input -> post("product_desc") . "'}";
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$input = Farm_Input::getInput($editing);
+				$log -> Log_Type = "2";
+				$log -> Log_Message = "Edited Farm Input Record From {Product Code: '" . $input -> Product_Code . "' Product Name: '" . $input -> Product_Name . "' Description: '" . $input -> Product_Description . "'} to " . $details_desc;
 			} else {
 				$input = new Farm_Input();
+				$log -> Log_Type = "1";
+				$log -> Log_Message = "Created Farm Input Record " . $details_desc;
 			}
 			$input -> Product_Code = $this -> input -> post("product_code");
 			$input -> Product_Name = $this -> input -> post("product_name");
 			$input -> Product_Description = $this -> input -> post("product_desc");
 			$input -> save();
+			$log -> User = $this -> session -> userdata('user_id');
+			$log -> Timestamp = date('U');
+			$log -> save();
+
+			$log = new System_Log();
+			$log -> Log_Type = "1";
+			$log -> Log_Message = "Created Input Price Record {Farm Input: '" . $input -> Product_Name . "' Price '" . $this -> input -> post("unit_price") . "'}";
 			$input_price = new Input_Price();
 			$input_price -> Farm_Input = $input -> id;
 			$input_price -> Timestamp = date('U');
 			$input_price -> Price = $this -> input -> post("unit_price");
 			$input_price -> save();
+			$log -> User = $this -> session -> userdata('user_id');
+			$log -> Timestamp = date('U');
+			$log -> save();
 			redirect("farm_input_management/listing");
 		} else {
 			$this -> new_input();
@@ -115,7 +131,14 @@ class Farm_Input_Management extends MY_Controller {
 
 	public function delete_input($id) {
 		$input = Farm_Input::getInput($id);
-		$input -> delete();
+		$input -> Deleted = '1';
+		$input -> save();
+		$log = new System_Log();
+		$log -> Log_Type = "3";
+		$log -> Log_Message = "Deleted Farm Input Record {Product Code: '" . $input -> Product_Code . "' Product Name: '" . $input -> Product_Name . "' Description: '" . $input -> Product_Description . "'}";
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> save();
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
 	}
@@ -134,6 +157,7 @@ class Farm_Input_Management extends MY_Controller {
 
 		$this -> load -> view("demo_template", $data);
 	}
+
 	public function get_loan_movement_graph_data() {
 		echo '<chart caption="Total Loans Outstanding" xAxisName="Month" yAxisName="Total Value (Millions)" showValues="0" decimals="0" formatNumberScale="0">
 <set label="Jan" value="462"/>

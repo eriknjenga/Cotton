@@ -52,18 +52,29 @@ class Cash_Management extends MY_Controller {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
 		if ($valid) {
+			$log = new System_Log();
 			$editing = $this -> input -> post("editing_id");
+			$temp_disb = new Cash_Disbursement();
+			$temp_disb -> Field_Cashier = $this -> input -> post("field_cashier");
+			$details_desc = "{Field Cashier: '" . $temp_disb -> Field_Cashier_Object -> Field_Cashier_Name . "' Amount: '" . $this -> input -> post("amount") . "' CIH(c) Voucher: '" . $this -> input -> post("cih") . "' Date: '" . $this -> input -> post("date") . "'}";
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$disbursement = Cash_Disbursement::getDisbursement($editing);
+				$log -> Log_Type = "2";
+				$log -> Log_Message = "Edited Cash Disbursement Record From {Field Cashier: '" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "' Amount: '" . $disbursement -> Amount . "' CIH(c) Voucher: '" . $disbursement -> CIH . "' Date: '" . $disbursement -> Date . "'} to " . $details_desc;
 			} else {
 				$disbursement = new Cash_Disbursement();
+				$log -> Log_Type = "1";
+				$log -> Log_Message = "Created Cash Disbursement Record " . $details_desc;
 			}
 			$disbursement -> Field_Cashier = $this -> input -> post("field_cashier");
 			$disbursement -> Amount = $this -> input -> post("amount");
 			$disbursement -> CIH = $this -> input -> post("cih");
 			$disbursement -> Date = $this -> input -> post("date");
 			$disbursement -> save();
+			$log -> User = $this -> session -> userdata('user_id');
+			$log -> Timestamp = date('U');
+			$log -> save();
 			redirect("cash_management/listing");
 		} else {
 			$this -> issue_cash();
@@ -73,6 +84,12 @@ class Cash_Management extends MY_Controller {
 	public function delete_disbursement($id) {
 		$disbursement = Cash_Disbursement::getDisbursement($id);
 		$disbursement -> delete();
+		$log = new System_Log();
+		$log -> Log_Type = "3";
+		$log -> Log_Message = "Deleted Cash Disbursement Record {Field Cashier: '" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "' Amount: '" . $disbursement -> Amount . "' CIH(c) Voucher: '" . $disbursement -> CIH . "' Date: '" . $disbursement -> Date . "'}";
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> save();
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
 	}

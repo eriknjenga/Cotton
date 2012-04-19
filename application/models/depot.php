@@ -5,6 +5,7 @@ class Depot extends Doctrine_Record {
 		$this -> hasColumn('Depot_Name', 'varchar', 100);
 		$this -> hasColumn('Buyer', 'varchar', 10);
 		$this -> hasColumn('Region', 'varchar', 10);
+		$this -> hasColumn('Deleted', 'varchar', 1);
 	}
 
 	public function setUp() {
@@ -14,13 +15,13 @@ class Depot extends Doctrine_Record {
 	}
 
 	public function getTotalDepots() {
-		$query = Doctrine_Query::create() -> select("count(*) as Total_Depots") -> from("Depot");
+		$query = Doctrine_Query::create() -> select("count(*) as Total_Depots") -> from("Depot") -> where("Deleted = '0'");
 		$total = $query -> execute();
 		return $total[0]['Total_Depots'];
 	}
 
 	public function getPagedDepots($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Depot") -> offset($offset) -> limit($items)->orderBy("id Desc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Depot") -> where("Deleted = '0'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$depots = $query -> execute(array());
 		return $depots;
 	}
@@ -32,7 +33,7 @@ class Depot extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Depot");
+		$query = Doctrine_Query::create() -> select("*") -> from("Depot")-> where("Deleted = '0'");
 		$depots = $query -> execute();
 		return $depots;
 	}
