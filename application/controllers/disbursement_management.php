@@ -36,6 +36,8 @@ class Disbursement_Management extends MY_Controller {
 		}
 		$data['farm_inputs'] = Farm_Input::getAll();
 		$data['agents'] = Agent::getAll();
+		$user = $this -> session -> userdata('user_id');
+		$data['batches'] = Transaction_Batch::getActiveUserBatches($user,'0');
 		$data['content_view'] = "add_disbursement_v";
 		$data['quick_link'] = "add_disbursement";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");

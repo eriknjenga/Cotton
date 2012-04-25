@@ -15,6 +15,7 @@ class Purchase extends Doctrine_Record {
 		$this -> hasColumn('Other_Recoveries', 'varchar', 20);
 		$this -> hasColumn('Buyer', 'varchar', 10);
 		$this -> hasColumn('Timestamp', 'varchar', 32); 
+		$this -> hasColumn('Batch', 'varchar', 20);
 
 	}
 

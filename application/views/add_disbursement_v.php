@@ -6,7 +6,7 @@
 			changeYear : true,
 			changeMonth : true
 		});
-		$(".farm_input").change(function() { 
+		$(".farm_input").change(function() {
 			updateInputPrice($(this));
 		});
 		$(".quantity").keyup(function() {
@@ -15,17 +15,16 @@
 		});
 		$(".date").change(function() {
 			var farm_input = $(this).closest("tr").find(".farm_input");
-			$.each($(".farm_input"),function(){ 
+			$.each($(".farm_input"), function() {
 				updateInputPrice($(this));
 			});
-			
 		});
 		$(".add").click(function() {
 			var cloned_object = $('#inputs_table tr:last').clone(true);
 			var input_row = cloned_object.attr("input_row");
 			var next_input_row = parseInt(input_row) + 1;
 			cloned_object.attr("input_row", next_input_row);
-			var invoice_id = "invoice_number_" + next_input_row; 
+			var invoice_id = "invoice_number_" + next_input_row;
 			var farm_input_id = "farm_input_" + next_input_row;
 			var quantity_id = "quantity_" + next_input_row;
 			var total_value_id = "total_value_" + next_input_row;
@@ -36,17 +35,16 @@
 			cloned_object.find(".total_value").attr("id", total_value_id);
 			cloned_object.find(".quantity").attr("value", "");
 			cloned_object.find(".total_value").attr("value", "");
-			cloned_object.find(".season").attr("id", season_id); 
-			cloned_object.insertAfter('#inputs_table tr:last'); 
+			cloned_object.find(".season").attr("id", season_id);
+			cloned_object.insertAfter('#inputs_table tr:last');
 			return false;
 		});
 	});
-
 	function updateInputPrice(input_object) {
 		var date_object = $("#date");
 		var prices = input_object.find(":selected").attr("prices");
 		var price_dates = input_object.find(":selected").attr("price_dates");
-		if(prices == null || price_dates == null){
+		if(prices == null || price_dates == null) {
 			return;
 		}
 		var price_dates_array = price_dates.split(",");
@@ -66,7 +64,7 @@
 				}
 			}
 			counter++;
-		}); 
+		});
 		//Clear out the 'total value' field
 		input_object.closest("tr").find(".total_value").attr("value", "");
 		var quantity = input_object.closest("tr").find(".quantity").attr("value");
@@ -79,8 +77,8 @@
 </script>
 <?php
 if (isset($disbursement)) {
-	$fbg_id = $disbursement -> FBG; 
-	$fbg_name = $disbursement -> FBG_Object->Group_Name; 
+	$fbg_id = $disbursement -> FBG;
+	$fbg_name = $disbursement -> FBG_Object -> Group_Name;
 	$invoice_number = $disbursement -> Invoice_Number;
 	$date = $disbursement -> Date;
 	$farm_input = $disbursement -> Farm_Input;
@@ -93,8 +91,8 @@ if (isset($disbursement)) {
 	$agent = $disbursement -> Agent;
 
 } else {
-	$fbg_name = $fbg->Group_Name; 
-	$fbg_id = $fbg->id;
+	$fbg_name = $fbg -> Group_Name;
+	$fbg_id = $fbg -> id;
 	$invoice_number = "";
 	$date = "";
 	$farm_input = "";
@@ -112,7 +110,7 @@ echo form_open('disbursement_management/save', $attributes);
 echo validation_errors('
 <p class="form_error">', '</p>
 ');
-?> 
+?>
 <!-- End of fieldset -->
 <!-- Fieldset -->
 <fieldset>
@@ -136,12 +134,12 @@ foreach($agents as $agent_object){
 		</select>
 		<span class="field_desc">Select the agent who delivered inputs to this FBG</span>
 	</p>
-		<p>
+	<p>
 		<label for="invoice_number">Invoice Number </label>
 		<input id="invoice_number" name="invoice_number" type="text" value="<?php echo $invoice_number;?>" class="validate[required]" />
 		<span class="field_desc">Enter the <b>Invoice Number</b> for this transaction</span>
 	</p>
-			<p>
+	<p>
 		<label for="date">Transaction Date</label>
 		<input class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>"/>
 		<span class="field_desc">Enter the <b>Date</b> for this transaction</span>
@@ -151,7 +149,7 @@ foreach($agents as $agent_object){
 			Farm Inputs Loaned
 		</caption>
 		<thead>
-			<tr>  
+			<tr>
 				<th>Input Name</th>
 				<th>Quantity</th>
 				<th>Total Value</th>
@@ -162,7 +160,7 @@ foreach($agents as $agent_object){
 			</tr>
 		</thead>
 		<tbody>
-			<tr input_row="1"> 
+			<tr input_row="1">
 				<td>
 				<select name="farm_input[]" id="farm_input" class="dropdown farm_input validate[required]" style="width: 70px; padding:2px;">
 					<option></option>
@@ -195,7 +193,18 @@ foreach($farm_inputs as $farm_input_object){
 				<input class="gd_batch" name="gd_batch[]" id="gd_batch" type="text" value="<?php echo $gd_batch;?>" style="width: 60px; padding:2px;"/>
 				</td>
 				<td>
-				<input class="id_batch" name="id_batch[]" id="id_batch" type="text" value="<?php echo $id_batch;?>" style="width: 60px; padding:2px;"/>
+				<select name="id_batch[]" id="id_batch" class="dropdown id_batch validate[required]" style="width: 70px; padding:2px;">
+					<option></option>
+					<?php
+foreach($batches as $batch_object){
+					?>
+					<option
+					value="<?php echo $batch_object -> id;?>" <?php
+					if ($batch_object -> id == $id_batch) {echo "selected";
+					}
+					?> ><?php echo $batch_object -> id;?></option>
+					<?php }?>
+				</select> 
 				</td>
 				<td>
 				<input  class="add button"   value="+" style="width:20px; text-align: center"/>
@@ -207,7 +216,6 @@ foreach($farm_inputs as $farm_input_object){
 		<input class="button" type="reset" value="Reset">
 		<input class="button" type="submit" value="Save & Add New" name="submit">
 		<input class="button" type="submit" value="Save & View List" name="submit">
-		
 	</p>
 </fieldset>
 <!-- End of fieldset -->

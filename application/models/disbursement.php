@@ -29,7 +29,7 @@ class Disbursement extends Doctrine_Record {
 	}
 
 	public function getPagedDisbursements($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> offset($offset) -> limit($items)->orderBy("id Desc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$disbursements = $query -> execute(array());
 		return $disbursements;
 	}
@@ -45,9 +45,17 @@ class Disbursement extends Doctrine_Record {
 		$disbursement = $query -> execute();
 		return $disbursement;
 	}
+
+	public function getBatchDisbursements($batch_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement")->where("ID_Batch = '$batch_id'");
+		$disbursements = $query -> execute();
+		return $disbursements;
+	}
+
 	public function getFBGDisbursements($fbg) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> where("fbg = '$fbg'");
 		$disbursements = $query -> execute();
 		return $disbursements;
 	}
+
 }

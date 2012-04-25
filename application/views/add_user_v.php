@@ -70,7 +70,7 @@ foreach($access_levels as $level_object){
 	</p>
 	<p>
 		<label for="email">Email Address: </label>
-		<input id="email" name="email" type="text" value="<?php echo $email_address;?>" class="validate[required,custom[email]]"/>
+		<input id="email" name="email" type="text" value="<?php echo $email_address;?>" class="validate[custom[email]]"/>
 		<span class="field_desc">Enter the email address for this User</span>
 	</p>
 	<p>
