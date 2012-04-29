@@ -37,7 +37,7 @@ class Disbursement_Management extends MY_Controller {
 		$data['farm_inputs'] = Farm_Input::getAll();
 		$data['agents'] = Agent::getAll();
 		$user = $this -> session -> userdata('user_id');
-		$data['batches'] = Transaction_Batch::getActiveUserBatches($user,'0');
+		$data['batches'] = Transaction_Batch::getOpenUserBatches($user,'input_disbursements');
 		$data['content_view'] = "add_disbursement_v";
 		$data['quick_link'] = "add_disbursement";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
@@ -78,8 +78,7 @@ class Disbursement_Management extends MY_Controller {
 			$farm_inputs = $this -> input -> post("farm_input");
 			$quantities = $this -> input -> post("quantity");
 			$total_values = $this -> input -> post("total_value");
-			$seasons = $this -> input -> post("season");
-			$gd_batches = $this -> input -> post("gd_batch");
+			$seasons = $this -> input -> post("season"); 
 			$id_batches = $this -> input -> post("id_batch");
 			$fbg = $this -> input -> post("fbg");
 			$agent = $this -> input -> post("agent");
@@ -105,8 +104,7 @@ class Disbursement_Management extends MY_Controller {
 			$disbursement -> Farm_Input = $farm_inputs[0];
 			$disbursement -> Quantity = $quantities[0];
 			$disbursement -> Total_Value = $total_values[0];
-			$disbursement -> Season = $seasons[0];
-			$disbursement -> GD_Batch = $gd_batches[0];
+			$disbursement -> Season = $seasons[0]; 
 			$disbursement -> ID_Batch = $id_batches[0];
 			$disbursement -> Timestamp = date('U');
 			$disbursement -> Agent = $agent;
@@ -123,8 +121,7 @@ class Disbursement_Management extends MY_Controller {
 				$disbursement -> Farm_Input = $farm_inputs[$x];
 				$disbursement -> Quantity = $quantities[$x];
 				$disbursement -> Total_Value = $total_values[$x];
-				$disbursement -> Season = $seasons[$x];
-				$disbursement -> GD_Batch = $gd_batches[$x];
+				$disbursement -> Season = $seasons[$x]; 
 				$disbursement -> ID_Batch = $id_batches[$x];
 				$disbursement -> Timestamp = date('U');
 				$disbursement -> Agent = $agent;

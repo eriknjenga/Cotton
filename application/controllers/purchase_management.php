@@ -30,24 +30,32 @@ class Purchase_Management extends MY_Controller {
 
 	}
 
+	public function record_purchase($depot) {
+		$depot_object = Depot::getDepot($depot);
+		$data['depot'] = $depot_object;
+		$this -> session -> set_userdata(array('saved_depot'=>$depot));
+		$this -> new_purchase($data);
+	}
+
 	public function new_purchase($data = null) {
 		if ($data == null) {
 			$data = array();
 		}
-		$data['depots'] = Depot::getAll();
+		$user = $this -> session -> userdata('user_id');
+		$data['batches'] = Transaction_Batch::getOpenUserBatches($user,'purchases');
 		$data['prices'] = Cotton_Price::getCottonPrices();
 		$data['content_view'] = "add_purchase_v";
 		$data['quick_link'] = "add_purchase";
-		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['scripts'] = array("validationEngine-en.js", "validator.js","jquery.ui.autocomplete.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
 
-	public function search_fbg() {
-		$data['content_view'] = "search_fbg_v";
+	public function search_depot() {
+		$data['content_view'] = "search_depot_v";
 		$data['link'] = "purchase_management";
-		$data['quick_link'] = "search_fbg";
-		$data['search_title'] = "Search For an FBG to Purchase From";
+		$data['quick_link'] = "search_depot";
+		$data['search_title'] = "Search For an Depot to Record Purchases For";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$this -> load -> view("demo_template", $data);
@@ -62,13 +70,6 @@ class Purchase_Management extends MY_Controller {
 		$this -> new_purchase($data);
 	}
 
-	public function purchase_produce($fbg) {
-		$recipient = FBG::getFbg($fbg);
-		$data['disbursements'] = Disbursement::getFBGDisbursements($fbg);
-		$data['fbg'] = $recipient;
-		$this -> new_purchase($data);
-	}
-
 	public function save() {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
@@ -79,7 +80,7 @@ class Purchase_Management extends MY_Controller {
 			$quantity = $this -> input -> post("quantity");
 			$total_value = $this -> input -> post("purchased_value");
 			$season = $this -> input -> post("season");
-			$fbg = $this -> input -> post("fbg");
+			$fbg = $this -> input -> post("fbg_id");
 			$depot = $this -> input -> post("depot");
 			$loan_recovery = $this -> input -> post("loan_recovery");
 			$farmer_registration = $this -> input -> post("farmer_registration");
@@ -87,6 +88,7 @@ class Purchase_Management extends MY_Controller {
 			$buyer = $this -> input -> post("buyer");
 			$net_value = $this -> input -> post("net_value");
 			$price = $this -> input -> post("price");
+			$batch = $this -> input -> post("batch");
 
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
@@ -107,11 +109,19 @@ class Purchase_Management extends MY_Controller {
 			$purchase -> Farmer_Reg_Fee = $farmer_registration;
 			$purchase -> Other_Recoveries = $other_recoveries;
 			$purchase -> Buyer = $buyer;
+			$purchase -> Batch = $batch;
 			$purchase -> Timestamp = date('U');
 			$purchase -> save();
-			redirect("purchase_management/listing");
+			$submit_button = $this -> input -> post("submit");
+			if ($submit_button == "Save & Add New From Buyer") {
+				$saved_depot = $this -> session -> userdata('saved_depot');
+				$url = "purchase_management/record_purchase/".$saved_depot;
+				redirect($url);
+			} else if ($submit_button == "Save & View List") {
+				redirect("purchase_management/listing");
+			}
 		} else {
-			$this -> new_disbursement();
+			echo "Could not save. Error occured!";
 		}
 	}
 

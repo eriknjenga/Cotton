@@ -84,8 +84,7 @@ if (isset($disbursement)) {
 	$farm_input = $disbursement -> Farm_Input;
 	$quantity = $disbursement -> Quantity;
 	$total_value = $disbursement -> Total_Value;
-	$season = $disbursement -> Season;
-	$gd_batch = $disbursement -> GD_Batch;
+	$season = $disbursement -> Season; 
 	$id_batch = $disbursement -> ID_Batch;
 	$disbursement_id = $disbursement -> id;
 	$agent = $disbursement -> Agent;
@@ -98,8 +97,7 @@ if (isset($disbursement)) {
 	$farm_input = "";
 	$quantity = "";
 	$total_value = "";
-	$season = "";
-	$gd_batch = "";
+	$season = ""; 
 	$id_batch = "";
 	$disbursement_id = "";
 	$agent = "";
@@ -153,8 +151,7 @@ foreach($agents as $agent_object){
 				<th>Input Name</th>
 				<th>Quantity</th>
 				<th>Total Value</th>
-				<th>Season</th>
-				<th>GD Batch</th>
+				<th>Season</th> 
 				<th>ID Batch</th>
 				<th></th>
 			</tr>
@@ -188,13 +185,9 @@ foreach($farm_inputs as $farm_input_object){
 				</td>
 				<td>
 				<input class="season validate[required]" name="season[]" id="season" type="text" value="<?php echo $season;?>" style="width: 60px; padding:2px;"/>
-				</td>
+				</td> 
 				<td>
-				<input class="gd_batch" name="gd_batch[]" id="gd_batch" type="text" value="<?php echo $gd_batch;?>" style="width: 60px; padding:2px;"/>
-				</td>
-				<td>
-				<select name="id_batch[]" id="id_batch" class="dropdown id_batch validate[required]" style="width: 70px; padding:2px;">
-					<option></option>
+				<select name="id_batch[]" id="id_batch" class="dropdown id_batch validate[required]" style="width: 70px; padding:2px;"> 
 					<?php
 foreach($batches as $batch_object){
 					?>

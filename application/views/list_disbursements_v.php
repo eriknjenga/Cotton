@@ -75,7 +75,7 @@ $class = "odd";
 		<td>
 		<?php echo $disbursement -> Season;?>
 		</td>
-		<td><a href="<?php echo base_url()."disbursement_management/edit_disbursement/".$disbursement->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" disbursement = "<?php echo $disbursement -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		<td><?php if($disbursement->Batch_Status == 0){?><a href="<?php echo base_url()."disbursement_management/edit_disbursement/".$disbursement->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" disbursement = "<?php echo $disbursement -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><?php } else {echo "Closed/Posted Transaction";}?></td>
 		</tr>
 		<?php
 

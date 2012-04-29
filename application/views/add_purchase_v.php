@@ -1,83 +1,110 @@
+	<style>
+		.ui-autocomplete {
+			overflow-y: auto;
+			/* prevent horizontal scrollbar */
+			overflow-x: hidden;
+			/* add padding to account for vertical scrollbar */
+			padding-right: 20px;
+			max-width: 200px;
+			font-size: 14px;
+		}
+		/* IE 6 doesn't support max-height
+		 * we use height instead, but this forces the menu to always be this tall
+		 */
+		* html .ui-autocomplete {
+			width: 200px;
+		}
+	</style>
 <script type="text/javascript">
-	$(function() {
+			$(function() {
 		$("#purchase_form").validationEngine();
-		$("#date").datepicker({
-			defaultDate : new Date(),
-			changeYear : true,
-			changeMonth : true
-		});
-		$(".quantity").keyup(function() {
-			var date_object = $("#date");
-			updateCottonPrice(date_object);
-			updateNetCalculations();
-		});
-		$("#date").change(function() {
-			updateCottonPrice($(this));
-		});
-		$(".depot").change(function() {
-			$("#buyer").attr("value", "");
-			$("#buyer_id").attr("value", "");
-			$("#buyer").attr("value", $(this).find(":selected").attr("buyer"));
-			$("#buyer_id").attr("value", $(this).find(":selected").attr("buyer_id"));
-		});
+		$("#fbg").autocomplete({
+			source : "<?php echo base_url();?>fbg_management/autocomplete_fbg",
+				minLength : 1,
+				select: function( event, ui ) {
+				$( "#fbg" ).val( ui.item.label );
+				$( "#fbg_id" ).val( ui.item.value );
+				return false;
+				}
+				});
+				$("#date").datepicker({
+				defaultDate : new Date(),
+				changeYear : true,
+				changeMonth : true
+				});
+				$(".quantity").keyup(function() {
+				var date_object = $("#date");
+				updateCottonPrice(date_object);
+				updateNetCalculations();
+				});
+				$("#date").change(function() {
+				updateCottonPrice($(this));
+				});
+				$(".depot").change(function() {
+				$("#buyer").attr("value", "");
+				$("#buyer_id").attr("value", "");
+				$("#buyer").attr("value", $(this).find(":selected").attr("buyer"));
+				$("#buyer_id").attr("value", $(this).find(":selected").attr("buyer_id"));
+				});
 
-		$("#loan_recovery").keyup(function() {
-			updateNetCalculations();
-		});
-		$("#farmer_registration").keyup(function() {
-			updateNetCalculations();
-		});
-		$("#other_recoveries").keyup(function() {
-			updateNetCalculations();
-		});
-	});
-	function updateNetCalculations() {
-		var gross_total = $("#purchased_value").attr("value");
-		var total_deductions = parseInt($("#loan_recovery").attr("value")) + parseInt($("#farmer_registration").attr("value")) + parseInt($("#other_recoveries").attr("value"));
-		$("#total_deductions").attr("value", total_deductions);
-		$("#net_value").attr("value", parseInt(gross_total) - parseInt(total_deductions));
+				$("#loan_recovery").keyup(function() {
+				updateNetCalculations();
+				});
+				$("#farmer_registration").keyup(function() {
+				updateNetCalculations();
+				});
+				$("#other_recoveries").keyup(function() {
+				updateNetCalculations();
+				});
+				});
+				function updateNetCalculations() {
+				var gross_total = $("#purchased_value").attr("value");
+				var total_deductions = parseInt($("#loan_recovery").attr("value")) + parseInt($("#farmer_registration").attr("value")) + parseInt($("#other_recoveries").attr("value"));
+				$("#total_deductions").attr("value", total_deductions);
+				$("#net_value").attr("value", parseInt(gross_total) - parseInt(total_deductions));
 
-	}
+				}
 
-	function updateCottonPrice(date_object) {
-		var prices = $("#cotton_prices").attr("prices");
-		var price_dates = $("#cotton_prices").attr("price_dates");
-		var price_dates_array = price_dates.split(",");
-		var prices_array = prices.split(",");
-		var selected_date_value = date_object.attr("value");
-		var selected_date = new Date(selected_date_value);
-		var difference = 0;
-		var most_current_price = 0;
-		var counter = 0;
-		$.each(price_dates_array, function() {
-			if(this.length > 0 && selected_date_value.length > 0) {
+				function updateCottonPrice(date_object) {
+				var prices = $("#cotton_prices").attr("prices");
+				var price_dates = $("#cotton_prices").attr("price_dates");
+				var price_dates_array = price_dates.split(",");
+				var prices_array = prices.split(",");
+				var selected_date_value = date_object.attr("value");
+				var selected_date = new Date(selected_date_value);
+				var difference = 0;
+				var most_current_price = 0;
+				var counter = 0;
+				$.each(price_dates_array, function() {
+				if(this.length > 0 && selected_date_value.length > 0) {
 				var price_date = new Date(this);
 				var day_difference = Math.floor((selected_date - price_date) / 86400000);
 				if(day_difference >= 0 && (difference == 0 || day_difference < difference)) {
-					difference = day_difference;
-					most_current_price = prices_array[counter];
+				difference = day_difference;
+				most_current_price = prices_array[counter];
 				}
-			}
-			counter++;
-		});
-		$("#price").attr("value", most_current_price);
-		//Clear out the 'total value' field
-		$("#purchased_value").attr("value", "");
-		var quantity = $("#quantity").attr("value");
-		var total_value = 0;
-		if(parseInt(quantity) >= 0 && parseInt(most_current_price) > 0) {
-			total_value = quantity * most_current_price;
-			$("#purchased_value").attr("value", total_value);
-		}
-	}
+				}
+				counter++;
+				});
+				$("#price").attr("value", most_current_price);
+				//Clear out the 'total value' field
+				$("#purchased_value").attr("value", "");
+				var quantity = $("#quantity").attr("value");
+				var total_value = 0;
+				if(parseInt(quantity) >= 0 && parseInt(most_current_price) > 0) {
+				total_value = quantity * most_current_price;
+				$("#purchased_value").attr("value", total_value);
+				}
+				}
 </script>
 <?php
 if (isset($purchase)) {
-	$fbg_id = $purchase -> FBG;
-	$fbg = $purchase -> FBG_Object;
+	$depot = $purchase -> Depot_Object;
+	$fbg = $purchase -> FBG;
+	$fbg_name = $purchase -> FBG_Object -> Group_Name;
 	$dpn = $purchase -> DPN;
 	$date = $purchase -> Date;
-	$depot = $purchase -> Depot;
+	$depot_id = $purchase -> Depot;
 	$quantity = $purchase -> Quantity;
 	$total_value = $purchase -> Gross_Value;
 	$season = $purchase -> Season;
@@ -88,12 +115,14 @@ if (isset($purchase)) {
 	$price = $purchase -> Unit_Price;
 	$buyer_id = $purchase -> Buyer;
 	$buyer = $purchase -> Buyer_Object -> Name;
+	$batch = $purchase -> Batch;
 
 } else {
-	$fbg_id = $fbg->id;
+	$fbg = "";
+	$fbg_name = "";
 	$dpn = "";
 	$date = "";
-	$depot = "";
+	$depot_id = $depot -> id;
 	$quantity = "";
 	$price = "";
 	$total_value = "0";
@@ -102,8 +131,9 @@ if (isset($purchase)) {
 	$farmer_registration = "0";
 	$other_recoveries = "0";
 	$purchase_id = "";
-	$buyer = "";
-	$buyer_id = "";
+	$buyer = $depot -> Buyer_Object -> Name;
+	$buyer_id = $depot -> Buyer;
+	$batch = "";
 
 }
 $total_deductions = $loan_recovery + $farmer_registration + $other_recoveries;
@@ -116,19 +146,33 @@ echo validation_errors('
 ?>
 </p>
 <input type="hidden" name="editing_id" value="<?php echo $purchase_id;?>" />
-	<input type="hidden" name="fbg" value="<?php echo $fbg_id;?>" />
-	<input type="hidden" id="cotton_prices" prices="<?php
-	foreach ($prices as $price_object) {
-		echo $price_object -> Price . ',';
-	}
-	?>"
-	price_dates="<?php
-	foreach ($prices as $price_object) {
-		echo $price_object -> Date . ',';
-	}
-	?>" />
-	<input type="hidden" value="" id="product_price"/>
-	
+<input type="hidden" name="depot" value="<?php echo $depot_id;?>" />
+<input type="hidden" name="fbg_id" id="fbg_id" value="<?php echo $fbg;?>" />
+<input type="hidden" id="cotton_prices" prices="<?php
+foreach ($prices as $price_object) {
+	echo $price_object -> Price . ',';
+}
+?>"
+price_dates="<?php
+foreach ($prices as $price_object) {
+	echo $price_object -> Date . ',';
+}
+?>" />
+<input type="hidden" value="" id="product_price"/>
+<fieldset>
+	<legend>
+		Recording Purchases For <b><?php echo $depot -> Depot_Name . " (" . $depot -> Region_Object -> Region_Name . ")";?></b>
+	</legend>
+	<p>
+		<label><b>Buyer at Site</b> </label>
+		<label><?php echo $depot -> Buyer_Object -> Name . " (" . $depot -> Buyer_Object -> Buyer_Code . ")";?></label>
+	</p>
+</fieldset>
+<p>
+	<label for="fbg">FBG</label>
+	<input id="fbg" name="fbg" type="text" value="<?php echo $fbg_name;?>" class="fbg validate[required]"/>
+	<span class="field_desc">Enter the relevant <b>FBG</b> for this transaction</span>
+</p>
 <p>
 	<label for="dpn">DPN</label>
 	<input id="dpn" name="dpn" type="text" value="<?php echo $dpn;?>" class="dpn validate[required]"/>
@@ -140,21 +184,21 @@ echo validation_errors('
 	<span class="field_desc">Enter the <b>Date</b> for this transaction</span>
 </p>
 <p>
-	<label for="depot">Depot</label>
-	<select name="depot" id="depot" class="dropdown depot validate[required]">
-		<option></option>
-		<?php
-foreach($depots as $depot_object){
-		?>
-		<option buyer = "<?php echo $depot_object -> Buyer_Object -> Name;?>" buyer_id = "<?php echo $depot_object -> Buyer_Object -> id;?>"
-		value="<?php echo $depot_object -> id;?>" <?php
-		if ($depot_object -> id == $depot) {echo "selected";
-		}
-		?> ><?php echo $depot_object -> Depot_Name;?></option>
-		<?php }?>
-	</select>
-	<span class="field_desc">Enter the <b>Depot</b> where transaction took place</span>
+	<label for="date">Transaction Batch</label>
+				<select name="batch" id="batch" class="dropdown batch validate[required]" style="width: 70px; padding:2px;"> 
+					<?php
+foreach($batches as $batch_object){
+					?>
+					<option
+					value="<?php echo $batch_object -> id;?>" <?php
+					if ($batch_object -> id == $batch) {echo "selected";
+					}
+					?> ><?php echo $batch_object -> id;?></option>
+					<?php }?>
+				</select> 
+				<span class="field_desc">Select the <b>Batch</b> for this transaction</span>
 </p>
+
 <p>
 	<label for="quantity">Quantity</label>
 	<input class="quantity validate[required,number]" name="quantity" id="quantity"  type="text" value="<?php echo $quantity;?>"/>
@@ -197,8 +241,9 @@ foreach($depots as $depot_object){
 	<input class="net_value" name="net_value" id="net_value" type="text" value="<?php echo $net_value;?>" style="width:100px;"/>
 </p>
 <p>
-	<input class="button" type="submit" value="Submit">
 	<input class="button" type="reset" value="Reset">
+	<input class="button" type="submit" value="Save & Add New From Buyer" name="submit">
+	<input class="button" type="submit" value="Save & View List" name="submit">
 </p>
 </fieldset> <!-- End of fieldset -->
 </form>

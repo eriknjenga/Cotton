@@ -2,8 +2,7 @@
 class Transaction_Batch extends Doctrine_Record {
 	public function setTableDefinition() {
 		/*
-		 * Status: 0 - Active, 1 - Closed
-		 * Transaction Types: 0 - Input Disbursements, 1 - Purchases
+		 * Status: 0 - Open, 1 - Closed, 2 - Posted
 		 */
 		$this -> hasColumn('Transaction_Type', 'varchar', 10);
 		$this -> hasColumn('User', 'varchar', 10);
@@ -15,10 +14,13 @@ class Transaction_Batch extends Doctrine_Record {
 	public function setUp() {
 		$this -> setTableName('transaction_batch');
 		$this -> hasOne('User as User_Object', array('local' => 'User', 'foreign' => 'id'));
+		$this -> hasOne('User as Validator_Object', array('local' => 'Validated_By', 'foreign' => 'id'));
+		$this -> hasOne('Transaction_Type as Transaction_Type_Object', array('local' => 'Transaction_Type', 'foreign' => 'id'));
 		$this -> hasMany('Disbursement as Disbursements', array('local' => 'id', 'foreign' => 'ID_Batch'));
 		$this -> hasMany('Purchase as Purchases', array('local' => 'id', 'foreign' => 'Batch'));
 	}
 
+	//For the data entry clerk
 	public function getTotalBatches($user) {
 		$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch") -> where("User = '$user'");
 		$total = $query -> execute();
@@ -27,6 +29,19 @@ class Transaction_Batch extends Doctrine_Record {
 
 	public function getPagedBatches($offset, $items, $user) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("User = '$user'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+		$batches = $query -> execute(array());
+		return $batches;
+	}
+
+	//For the general supervisor. Get batches that are not open
+	public function getTotalClosedBatches() {
+		$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch") -> where("Status != '0'");
+		$total = $query -> execute();
+		return $total[0]['Total_Batches'];
+	}
+
+	public function getPagedClosedBatches($offset, $items) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("Status != '0'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$batches = $query -> execute(array());
 		return $batches;
 	}
@@ -43,8 +58,9 @@ class Transaction_Batch extends Doctrine_Record {
 		return $batches;
 	}
 
-	public function getActiveUserBatches($user,$type) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch")->where("User = '$user' and Status = '0' and Transaction_Type = '$type'");
+	public function getOpenUserBatches($user, $type) {
+		$transaction_type = Transaction_Type::getTypeId($type);
+		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("User = '$user' and Status = '0' and Transaction_Type = '$transaction_type'");
 		$batches = $query -> execute();
 		return $batches;
 	}

@@ -1,6 +1,9 @@
 <?php
 class Purchase extends Doctrine_Record {
 	public function setTableDefinition() {
+		/*
+		 * Posted: 0 - Not Posted, 1 - Posted
+		 */
 		$this -> hasColumn('FBG', 'varchar', 10);
 		$this -> hasColumn('DPN', 'varchar', 20);
 		$this -> hasColumn('Date', 'varchar', 20);
@@ -14,8 +17,9 @@ class Purchase extends Doctrine_Record {
 		$this -> hasColumn('Farmer_Reg_Fee', 'varchar', 20);
 		$this -> hasColumn('Other_Recoveries', 'varchar', 20);
 		$this -> hasColumn('Buyer', 'varchar', 10);
-		$this -> hasColumn('Timestamp', 'varchar', 32); 
+		$this -> hasColumn('Timestamp', 'varchar', 32);
 		$this -> hasColumn('Batch', 'varchar', 20);
+		$this -> hasColumn('Batch_Status', 'varchar', 2);
 
 	}
 
@@ -33,7 +37,7 @@ class Purchase extends Doctrine_Record {
 	}
 
 	public function getPagedPurchases($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Purchase") -> offset($offset) -> limit($items)->orderBy("id Desc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Purchase") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$purchases = $query -> execute(array());
 		return $purchases;
 	}
@@ -49,9 +53,17 @@ class Purchase extends Doctrine_Record {
 		$purchase = $query -> execute();
 		return $purchase;
 	}
+
 	public function getFBGPurchases($fbg) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Purchase") -> where("fbg = '$fbg'");
 		$purchases = $query -> execute();
 		return $purchases;
 	}
+
+	public function getBatchPurchases($batch_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Purchase") -> where("Batch = '$batch_id'");
+		$purchases = $query -> execute();
+		return $purchases;
+	}
+
 }

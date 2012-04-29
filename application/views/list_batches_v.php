@@ -31,9 +31,10 @@
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Batch ID</th>
-			<th>Created On</th> 
-			<th>Number of Transactions</th> 
+			<th>ID</th>
+			<th>Transaction Type</th>
+			<th>Timestamp</th>
+			<th>Entries</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -48,18 +49,22 @@ $class = "even";
 } else {
 $class = "odd";
 }
+$statuses = array("Open","Closed","Posted"); 
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
 		<?php echo $batch -> id;?>
 		</td>
 		<td>
-		<?php echo date("d-m-Y H:i:s",$batch -> Timestamp);?>
-		</td> 
-				<td>
+		<?php echo $batch -> Transaction_Type_Object->Name." (".$statuses[$batch->Status].")";?>
+		</td>
+		<td>
+		<?php echo date("d/m/y H:i:s", $batch -> Timestamp);?>
+		</td>
+		<td>
 		<?php echo sizeof($batch -> Purchases) + sizeof($batch -> Disbursements);?>
-		</td> 
-		<td><a href="<?php echo base_url()."batch_management/print_batch/".$batch->id?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a><a href="#" class="button delete" batch = "<?php echo $batch -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		</td>
+		<td><a href="<?php echo base_url()."batch_management/print_batch/".$batch->id?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a><?php if($batch->Status == 1){?><a href="<?php echo base_url()."batch_management/open_batch/".$batch->id?>" class="button" style="background: none; background-color: green; border-color: green;"><span class="ui-icon ui-icon-folder-open"></span>Open</a><?php } if($batch->Status == 0){?><a href="<?php echo base_url()."batch_management/close_batch/".$batch->id?>" class="button" style="background: none; background-color: #E01B1B; border-color: #E01B1B;"><span class="ui-icon ui-icon-folder-collapsed"></span>Close</a><?php } else if($batch->Status == 2){echo "Already Posted! ";}?><?php if($batch->Status != 2){?><a href="#" class="button delete" batch = "<?php echo $batch -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><?php }?></td>
 		</tr>
 		<?php
 

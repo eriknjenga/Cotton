@@ -8,11 +8,10 @@ class Disbursement extends Doctrine_Record {
 		$this -> hasColumn('Quantity', 'varchar', 20);
 		$this -> hasColumn('Total_Value', 'varchar', 20);
 		$this -> hasColumn('Season', 'varchar', 20);
-		$this -> hasColumn('GD_Batch', 'varchar', 20);
 		$this -> hasColumn('ID_Batch', 'varchar', 20);
 		$this -> hasColumn('Timestamp', 'varchar', 32);
 		$this -> hasColumn('Agent', 'varchar', 10);
-
+		$this -> hasColumn('Batch_Status', 'varchar', 5);
 	}
 
 	public function setUp() {

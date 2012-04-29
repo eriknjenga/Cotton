@@ -63,7 +63,16 @@ $class = "odd";
 		<td>
 		<?php echo $depot -> Buyer_Object -> Name;?>
 		</td>
-		<td><a href="<?php echo base_url()."depot_management/edit_depot/".$depot->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" depot = "<?php echo $depot -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		<td>
+			<?php
+			if($this -> session -> userdata('user_indicator') == "system_administrator"){?>
+			<a href="<?php echo base_url()."depot_management/edit_depot/".$depot->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" depot = "<?php echo $depot -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a>	
+			<?php }
+			else{?>
+				<a href="<?php echo base_url()."purchase_management/record_purchase/".$depot->id?>" class="button"><span class="ui-icon ui-icon-clipboard"></span>Record Purchases</a>
+			<?php }
+			?>
+			</td>
 		</tr>
 		<?php
 

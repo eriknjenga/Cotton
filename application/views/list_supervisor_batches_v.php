@@ -18,8 +18,8 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'purchase_management/delete_purchase/'?>
-		" +$(this).attr("purchase");
+	url = "<?php echo base_url().'batch_management/delete_batch/'?>
+		" +$(this).attr("batch");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -27,55 +27,52 @@
 		window.location = url;
 		}
 </script>
-<h1>Produce Purchases Listing</h1>
+<h1>Batch Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>DPN No.</th>
-			<th>Date</th>
-			<th>FBG</th>
-			<th>Buyer</th>
-			<th>Quantity</th>
-			<th>Unit Price</th>
-			<th>Cash Payed</th>
+			<th>ID</th>
+			<th>Transaction Type</th>
+			<th>Started On</th>
+			<th>Opened By</th>
+			<th>Entries</th>
+			<th>Posted By</th>
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-if (isset($purchases[0])) {
+if (isset($batches[0])) {
 $counter = 1;
-foreach ($purchases as $purchase) {
+foreach ($batches as $batch) {
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
 } else {
 $class = "odd";
 }
+$statuses = array("Open","Closed","Posted");
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $purchase -> DPN;?>
+		<?php echo $batch -> id;?>
 		</td>
 		<td>
-		<?php echo $purchase -> Date;?>
+		<?php echo $batch -> Transaction_Type_Object -> Name;?>
 		</td>
 		<td>
-		<?php echo $purchase -> FBG_Object->Group_Name;?>
+		<?php echo date("d/m/y H:i:s", $batch -> Timestamp);?>
 		</td>
 		<td>
-		<?php echo $purchase -> Buyer_Object->Name;?>
+		<?php echo $batch -> User_Object -> Name;?>
 		</td>
 		<td>
-		<?php echo $purchase -> Quantity;?>
-		</td>
-				<td>
-		<?php echo $purchase -> Unit_Price;?>
+		<?php echo sizeof($batch -> Purchases) + sizeof($batch -> Disbursements);?>
 		</td>
 		<td>
-		<?php echo $purchase -> Net_Value;?>
+		<?php echo $batch -> Validator_Object -> Name;?>
 		</td>
-		<td><?php if($purchase->Batch_Status == 0){?><a href="<?php echo base_url()."purchase_management/edit_purchase/".$purchase->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" purchase = "<?php echo $purchase -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><?php } else {echo "Closed/Posted Transaction";}?></td>
+		<td><a href="<?php echo base_url()."batch_management/print_batch/".$batch->id?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a><?php if($batch->Status != "2"){?><a href="<?php echo base_url()."batch_management/post_batch/".$batch->id?>" class="button" style="background: none; background-color: green; border-color: green;"><span class="ui-icon ui-icon-locked"></span>Post</a><?php } else {echo "Posted!";}?></td>
 		</tr>
 		<?php
 

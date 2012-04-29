@@ -30,6 +30,42 @@ class Depot_Management extends MY_Controller {
 
 	}
 
+	public function search_depot() {
+		$data['content_view'] = "search_depot_v";
+		$data['quick_link'] = "search_depot";
+		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['styles'] = array("validator.css");
+		$data['search_title'] = "Search For a Depot";
+		$this -> base_params($data);
+	}
+
+	public function search($search_term = '', $offset = 0) {
+		if ($search_term == '') {
+			$search_term = $this -> input -> post("search_value");
+		}
+		if (strlen($search_term) == 0) {
+			redirect("depot_management/search_depot");
+		}
+		$items_per_page = 10;
+		$number_of_depots = Depot::getTotalSearchedDepots($search_term);
+		$depots = Depot::getPagedSearchedDepots($search_term, $offset, $items_per_page);
+		if ($number_of_depots > $items_per_page) {
+			$config['base_url'] = base_url() . "depot_management/search/" . $search_term . "/";
+			$config['total_rows'] = $number_of_depots;
+			$config['per_page'] = $items_per_page;
+			$config['uri_segment'] = 4;
+			$config['num_links'] = 5;
+			$this -> pagination -> initialize($config);
+			$data['pagination'] = $this -> pagination -> create_links();
+		}
+		$data['depots'] = $depots;
+		$data['listing_title'] = "Depot Search Results For '$search_term'";
+		$data['title'] = "Cotton Depots";
+		$data['content_view'] = "list_depots_v";
+		$data['styles'] = array("pagination.css");
+		$this -> base_params($data);
+	}
+
 	public function new_depot($data = null) {
 		if ($data == null) {
 			$data = array();

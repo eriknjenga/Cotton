@@ -31,18 +31,18 @@ class FBG_Management extends MY_Controller {
 
 	}
 
-	public function search($search_term ='', $offset = 0) {
-		if($search_term == ''){
-			$search_term = $this->input->post("search_value");
+	public function search($search_term = '', $offset = 0) {
+		if ($search_term == '') {
+			$search_term = $this -> input -> post("search_value");
 		}
-		if(strlen($search_term) == 0){
+		if (strlen($search_term) == 0) {
 			redirect("fbg_management/search_fbg");
 		}
 		$items_per_page = 10;
 		$number_of_fbgs = FBG::getTotalSearchedFbgs($search_term);
-		$fbgs = FBG::getPagedSearchedFbgs($search_term,$offset, $items_per_page);
+		$fbgs = FBG::getPagedSearchedFbgs($search_term, $offset, $items_per_page);
 		if ($number_of_fbgs > $items_per_page) {
-			$config['base_url'] = base_url() . "fbg_management/search/".$search_term."/";
+			$config['base_url'] = base_url() . "fbg_management/search/" . $search_term . "/";
 			$config['total_rows'] = $number_of_fbgs;
 			$config['per_page'] = $items_per_page;
 			$config['uri_segment'] = 4;
@@ -77,6 +77,22 @@ class FBG_Management extends MY_Controller {
 		$data['styles'] = array("validator.css");
 		$data['search_title'] = "Search For an FBG";
 		$this -> base_params($data);
+	}
+
+	public function autocomplete_fbg() {
+		$search_term = $this -> input -> post("term");
+		if (strlen($search_term) == 0) {
+			redirect("fbg_management/search_fbg");
+		}
+		//Limit search results to 10
+		$fbgs = FBG::getPagedSearchedFbgs($search_term, 0, 10);
+		$final_results = array();
+		$counter = 0;
+		foreach ($fbgs as $fbg) {
+			$final_results [$counter] =  array("value"=>$fbg -> id,"label"=>$fbg->Group_Name);
+			$counter++;
+		} 
+		echo json_encode($final_results);
 	}
 
 	public function edit_fbg($id) {
