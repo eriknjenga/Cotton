@@ -59,7 +59,7 @@ $class = "odd";
 		<td>
 		<?php echo $fbg -> Hectares_Available;?>
 		</td>
-		<td><a href="<?php echo base_url()."fbg_management/edit_fbg/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" fbg = "<?php echo $fbg -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><a href="<?php echo base_url()."disbursement_management/disburse_inputs/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-suitcase"></span>Disburse</a><a href="<?php echo base_url()."purchase_management/purchase_produce/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-cart"></span>Purchase</a></td>
+		<td><a href="<?php echo base_url()."fbg_management/edit_fbg/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" fbg = "<?php echo $fbg -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><a href="<?php echo base_url()."disbursement_management/disburse_inputs/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-suitcase"></span>Disburse</a></td>
 		</tr>
 		<?php
 		$counter++;

@@ -27,6 +27,12 @@
 		window.location = url;
 		}
 </script>
+<div class="message information close">
+	<h2>Batch Information</h2>
+	<p>
+		You are viewing records for batch number: <b><?php echo $batch;?></b>
+	</p>
+</div>
 <h1>Farmer Input Loans Listing</h1>
 <table class="fullwidth">
 	<thead>
@@ -61,10 +67,10 @@ $class = "odd";
 		<?php echo $disbursement -> Date;?>
 		</td>
 		<td>
-		<?php echo $disbursement -> FBG_Object->Group_Name;?>
+		<?php echo $disbursement -> FBG_Object -> Group_Name;?>
 		</td>
 		<td>
-		<?php echo $disbursement -> Farm_Input_Object->Product_Name;?>
+		<?php echo $disbursement -> Farm_Input_Object -> Product_Name;?>
 		</td>
 		<td>
 		<?php echo $disbursement -> Quantity;?>

@@ -21,14 +21,14 @@ class Disbursement extends Doctrine_Record {
 		$this -> hasOne('Farm_Input as Farm_Input_Object', array('local' => 'Farm_Input', 'foreign' => 'id'));
 	}
 
-	public function getTotalDisbursements() {
-		$query = Doctrine_Query::create() -> select("count(*) as Total_Disbursements") -> from("Disbursement");
+	public function getTotalDisbursements($batch) {
+		$query = Doctrine_Query::create() -> select("count(*) as Total_Disbursements") -> from("Disbursement")->where("ID_Batch = '$batch'");
 		$total = $query -> execute();
 		return $total[0]['Total_Disbursements'];
 	}
 
-	public function getPagedDisbursements($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+	public function getPagedDisbursements($batch,$offset, $items) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement")->where("ID_Batch = '$batch'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$disbursements = $query -> execute(array());
 		return $disbursements;
 	}

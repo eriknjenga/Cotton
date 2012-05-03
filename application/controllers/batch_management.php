@@ -9,6 +9,18 @@ class Batch_Management extends MY_Controller {
 		$this -> listing();
 	}
 
+	public function enter_batch($batch) {
+		$batch_object = Transaction_Batch::getBatch($batch);
+		if ($batch_object -> Transaction_Type_Object -> Indicator == "purchases") {
+			//load purchases for this batch
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "input_disbursements") {
+			$this->session->set_userdata(array("input_disbursement_batch"=>$batch));
+			//load input disbursements for this batch
+			$url = "disbursement_management/listing/".$batch;
+			redirect($url);
+		}
+	}
+
 	public function listing($offset = 0) {
 		$items_per_page = 20;
 		$user = $this -> session -> userdata('user_id');

@@ -9,19 +9,20 @@ class Disbursement_Management extends MY_Controller {
 		$this -> listing();
 	}
 
-	public function listing($offset = 0) {
+	public function listing($batch, $offset = 0) {
 		$items_per_page = 20;
-		$number_of_disbursements = Disbursement::getTotalDisbursements();
-		$disbursements = Disbursement::getPagedDisbursements($offset, $items_per_page);
+		$number_of_disbursements = Disbursement::getTotalDisbursements($batch);
+		$disbursements = Disbursement::getPagedDisbursements($batch, $offset, $items_per_page);
 		if ($number_of_disbursements > $items_per_page) {
-			$config['base_url'] = base_url() . "disbursement_management/listing/";
+			$config['base_url'] = base_url() . "disbursement_management/listing/" . $batch . "/";
 			$config['total_rows'] = $number_of_disbursements;
 			$config['per_page'] = $items_per_page;
-			$config['uri_segment'] = 3;
+			$config['uri_segment'] = 4;
 			$config['num_links'] = 5;
 			$this -> pagination -> initialize($config);
 			$data['pagination'] = $this -> pagination -> create_links();
 		}
+		$data['batch'] = $batch;
 		$data['disbursements'] = $disbursements;
 		$data['title'] = "Input Disbursements";
 		$data['content_view'] = "list_disbursements_v";
@@ -37,9 +38,10 @@ class Disbursement_Management extends MY_Controller {
 		$data['farm_inputs'] = Farm_Input::getAll();
 		$data['agents'] = Agent::getAll();
 		$user = $this -> session -> userdata('user_id');
-		$data['batches'] = Transaction_Batch::getOpenUserBatches($user,'input_disbursements');
+		$data['batches'] = Transaction_Batch::getOpenUserBatches($user, 'input_disbursements');
 		$data['content_view'] = "add_disbursement_v";
 		$data['quick_link'] = "add_disbursement";
+		$data['batch_information'] = "You are entering records into batch number: <b>" . $this -> session -> userdata('input_disbursement_batch') . "</b>";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
@@ -68,6 +70,8 @@ class Disbursement_Management extends MY_Controller {
 	}
 
 	public function save() {
+		var_dump($this -> input -> post());
+
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
 		if ($valid) {
@@ -78,21 +82,25 @@ class Disbursement_Management extends MY_Controller {
 			$farm_inputs = $this -> input -> post("farm_input");
 			$quantities = $this -> input -> post("quantity");
 			$total_values = $this -> input -> post("total_value");
-			$seasons = $this -> input -> post("season"); 
-			$id_batches = $this -> input -> post("id_batch");
+			$seasons = $this -> input -> post("season");
+			$id_batch = $this -> session -> userdata('input_disbursement_batch');
 			$fbg = $this -> input -> post("fbg");
 			$agent = $this -> input -> post("agent");
+			$farmers = $this -> input -> post("farmer");
+			$farmer_inputs = $this -> input -> post("farmer_farm_input");
+			$farmer_quantities = $this -> input -> post("farmer_quantity");
+			$farmer_total_values = $this -> input -> post("farmer_total_value"); 
 
 			$temp_disbursement = new Disbursement();
 			$temp_disbursement -> FBG = $fbg;
 			$temp_disbursement -> Farm_Input = $farm_inputs[0];
 			$temp_disbursement -> Agent = $agent;
-			$details_desc = "{FGB: '" . $temp_disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $invoice . "' Date: '" . $date . "' Farm Input: '" . $temp_disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $quantities[0] . "' Total Value: '" . $total_values[0] . "' Season: '" . $seasons[0] . "' GD Batch: '" . $gd_batches[0] . "' ID Batch: '" . $id_batches[0] . "' Agent: '" . $temp_disbursement -> Agent_Object -> First_Name . " " . $temp_disbursement -> Agent_Object -> Surname . "'}";
+			$details_desc = "{FGB: '" . $temp_disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $invoice . "' Date: '" . $date . "' Farm Input: '" . $temp_disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $quantities[0] . "' Total Value: '" . $total_values[0] . "' Season: '" . $seasons[0] . "' ID Batch: '" . $id_batches[0] . "' Agent: '" . $temp_disbursement -> Agent_Object -> First_Name . " " . $temp_disbursement -> Agent_Object -> Surname . "'}";
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$disbursement = Disbursement::getDisbursement($editing);
 				$log -> Log_Type = "2";
-				$log -> Log_Message = "Edited Input Disbursement Record From {FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $disbursement -> Invoice_Number . "' Date: '" . $disbursement -> Date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $disbursement -> Quantity . "' Total Value: '" . $disbursement -> Total_Value . "' Season: '" . $disbursement -> Season . "' GD Batch: '" . $disbursement -> GD_Batch . "' ID Batch: '" . $disbursement -> ID_Batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'} to " . $details_desc;
+				$log -> Log_Message = "Edited Input Disbursement Record From {FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $disbursement -> Invoice_Number . "' Date: '" . $disbursement -> Date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $disbursement -> Quantity . "' Total Value: '" . $disbursement -> Total_Value . "' Season: '" . $disbursement -> Season . "' ID Batch: '" . $disbursement -> ID_Batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'} to " . $details_desc;
 			} else {
 				$disbursement = new Disbursement();
 				$log -> Log_Type = "1";
@@ -104,8 +112,8 @@ class Disbursement_Management extends MY_Controller {
 			$disbursement -> Farm_Input = $farm_inputs[0];
 			$disbursement -> Quantity = $quantities[0];
 			$disbursement -> Total_Value = $total_values[0];
-			$disbursement -> Season = $seasons[0]; 
-			$disbursement -> ID_Batch = $id_batches[0];
+			$disbursement -> Season = $seasons[0];
+			$disbursement -> ID_Batch = $id_batch;
 			$disbursement -> Timestamp = date('U');
 			$disbursement -> Agent = $agent;
 			$disbursement -> save();
@@ -121,11 +129,11 @@ class Disbursement_Management extends MY_Controller {
 				$disbursement -> Farm_Input = $farm_inputs[$x];
 				$disbursement -> Quantity = $quantities[$x];
 				$disbursement -> Total_Value = $total_values[$x];
-				$disbursement -> Season = $seasons[$x]; 
-				$disbursement -> ID_Batch = $id_batches[$x];
+				$disbursement -> Season = $seasons[$x];
+				$disbursement -> ID_Batch = $id_batch;
 				$disbursement -> Timestamp = date('U');
 				$disbursement -> Agent = $agent;
-				$details_desc = "{FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $invoice . "' Date: '" . $date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $quantities[$x] . "' Total Value: '" . $total_values[$x] . "' Season: '" . $seasons[$x] . "' GD Batch: '" . $gd_batches[$x] . "' ID Batch: '" . $id_batches[$x] . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'}";
+				$details_desc = "{FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $invoice . "' Date: '" . $date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $quantities[$x] . "' Total Value: '" . $total_values[$x] . "' Season: '" . $seasons[$x] . "' ID Batch: '" . $id_batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'}";
 				$log = new System_Log();
 				$log -> Log_Type = "1";
 				$log -> Log_Message = "Created  Input Disbursement Record " . $details_desc;

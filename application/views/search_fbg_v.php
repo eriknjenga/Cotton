@@ -12,6 +12,7 @@ echo validation_errors('
 ');
 ?>
 <!-- Fieldset -->
+
 <fieldset>
 	<legend>
 		<?php echo $search_title;?>
