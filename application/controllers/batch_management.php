@@ -14,9 +14,9 @@ class Batch_Management extends MY_Controller {
 		if ($batch_object -> Transaction_Type_Object -> Indicator == "purchases") {
 			//load purchases for this batch
 		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "input_disbursements") {
-			$this->session->set_userdata(array("input_disbursement_batch"=>$batch));
+			$this -> session -> set_userdata(array("input_disbursement_batch" => $batch));
 			//load input disbursements for this batch
-			$url = "disbursement_management/listing/".$batch;
+			$url = "disbursement_management/listing/" . $batch;
 			redirect($url);
 		}
 	}
@@ -29,6 +29,12 @@ class Batch_Management extends MY_Controller {
 			$number_of_batches = Transaction_Batch::getTotalClosedBatches();
 			$batches = Transaction_Batch::getPagedClosedBatches($offset, $items_per_page);
 			$data['content_view'] = "list_supervisor_batches_v";
+		}
+		if ($user_indicator == "system_administrator") {
+			$number_of_batches = Transaction_Batch::getTotalSystemBatches();
+			$batches = Transaction_Batch::getPagedSystemBatches($offset, $items_per_page);
+			$data['clerks'] = User::getActiveDataClerks();
+			$data['content_view'] = "list_admin_batches_v";
 		} else if ($user_indicator == "cash_supervisor") {
 			$data['content_view'] = "list_supervisor_batches_v";
 		} else if ($user_indicator == "purchases_supervisor") {
@@ -55,7 +61,29 @@ class Batch_Management extends MY_Controller {
 
 		$data['styles'] = array("pagination.css");
 		$this -> base_params($data);
+	}
 
+	public function change_ownership($batch, $new_owner) {
+		$batch_object = Transaction_Batch::getBatch($batch);
+		$status = $batch_object -> Status;
+		//Check if this batch has already been posted. If so then just return the user to the batch listing
+		if ($status == "2") {
+			redirect("batch_management");
+		}
+		//change ownership
+		$old_owner = $batch_object->User_Object->Name;
+		$batch_object -> User = $new_owner;		
+		$batch_object -> save(); 
+		$new_owner_object = User::getUser($new_owner);
+		$log = new System_Log();
+		$details_desc = "{Transaction Type: '" . $batch_object -> Transaction_Type_Object -> Name . "', Batch ID '" . $batch . "', Old Owner: '".$old_owner."', New Owner: '".$new_owner_object->Name."'}";
+		$log -> Log_Message = "Changed Batch Ownership " . $details_desc;
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> Log_Type = "2";
+		$log -> save();
+		$previous_page = $this -> session -> userdata('old_url');
+		redirect($previous_page);
 	}
 
 	public function new_batch($data = null) {

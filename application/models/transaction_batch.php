@@ -46,6 +46,19 @@ class Transaction_Batch extends Doctrine_Record {
 		return $batches;
 	}
 
+	//For the super administrator
+	public function getTotalSystemBatches() {
+		$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch");
+		$total = $query -> execute();
+		return $total[0]['Total_Batches'];
+	}
+
+	public function getPagedSystemBatches($offset, $items) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch")-> offset($offset) -> limit($items) -> orderBy("id Desc");
+		$batches = $query -> execute(array());
+		return $batches;
+	}
+
 	public function getBatch($id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("id = '$id'");
 		$batch = $query -> execute();

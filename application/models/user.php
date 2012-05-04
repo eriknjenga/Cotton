@@ -5,10 +5,10 @@ class User extends Doctrine_Record {
 		$this -> hasColumn('Name', 'varchar', 100);
 		$this -> hasColumn('Username', 'varchar', 12);
 		$this -> hasColumn('Password', 'varchar', 32);
-		$this -> hasColumn('Access_Level', 'varchar', 10); 
+		$this -> hasColumn('Access_Level', 'varchar', 10);
 		$this -> hasColumn('Phone_Number', 'varchar', 50);
 		$this -> hasColumn('Created_By', 'varchar', 10);
-		$this -> hasColumn('Email_Address', 'varchar', 50); 
+		$this -> hasColumn('Email_Address', 'varchar', 50);
 		$this -> hasColumn('Time_Created', 'varchar', 32);
 		$this -> hasColumn('Active', 'varchar', 2);
 	}
@@ -44,15 +44,14 @@ class User extends Doctrine_Record {
 
 	}
 
-	
 	public function getTotalUsers() {
-		$query = Doctrine_Query::create() -> select("count(*) as Total_Users") -> from("User")->where("Active = '1'");
+		$query = Doctrine_Query::create() -> select("count(*) as Total_Users") -> from("User") -> where("Active = '1'");
 		$total = $query -> execute();
 		return $total[0]['Total_Users'];
 	}
 
 	public function getPagedUsers($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("User")->where("Active = '1'") -> offset($offset) -> limit($items)->orderBy("id Desc");
+		$query = Doctrine_Query::create() -> select("*") -> from("User") -> where("Active = '1'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$users = $query -> execute(array());
 		return $users;
 	}
@@ -62,4 +61,11 @@ class User extends Doctrine_Record {
 		$user = $query -> execute();
 		return $user[0];
 	}
+
+	public function getActiveDataClerks() {
+		$query = Doctrine_Query::create() -> select("*") -> from("User u") -> where("u.Access.Indicator = 'data_entry' and Active = '1'");
+		$clerks = $query -> execute();
+		return $clerks;
+	}
+
 }
