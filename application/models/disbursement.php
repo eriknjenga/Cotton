@@ -22,13 +22,13 @@ class Disbursement extends Doctrine_Record {
 	}
 
 	public function getTotalDisbursements($batch) {
-		$query = Doctrine_Query::create() -> select("count(*) as Total_Disbursements") -> from("Disbursement")->where("ID_Batch = '$batch'");
+		$query = Doctrine_Query::create() -> select("count(distinct Invoice_Number) as Total_Disbursements") -> from("Disbursement") -> where("ID_Batch = '$batch'");
 		$total = $query -> execute();
 		return $total[0]['Total_Disbursements'];
 	}
 
-	public function getPagedDisbursements($batch,$offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement")->where("ID_Batch = '$batch'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+	public function getPagedDisbursements($batch, $offset, $items) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> where("ID_Batch = '$batch'") -> offset($offset) -> limit($items) -> orderBy("id Desc") -> groupBy("Invoice_Number");
 		$disbursements = $query -> execute(array());
 		return $disbursements;
 	}
@@ -46,9 +46,21 @@ class Disbursement extends Doctrine_Record {
 	}
 
 	public function getBatchDisbursements($batch_id) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement")->where("ID_Batch = '$batch_id'");
+		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> where("ID_Batch = '$batch_id'");
 		$disbursements = $query -> execute();
 		return $disbursements;
+	}
+
+	public function getInvoiceDisbursements($invoice) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> where("Invoice_Number = '$invoice'");
+		$disbursements = $query -> execute();
+		return $disbursements;
+	}
+
+	public function getInvoiceInputs($invoice) {
+		$query = Doctrine_Query::create() -> select("Farm_Input") -> from("Disbursement") -> where("Invoice_Number = '$invoice'")->groupBy("Farm_Input");
+		$inputs = $query -> execute();
+		return $inputs;
 	}
 
 	public function getFBGDisbursements($fbg) {

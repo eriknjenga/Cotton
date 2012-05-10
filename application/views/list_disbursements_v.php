@@ -33,16 +33,13 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
-<h1>Farmer Input Loans Listing</h1>
+<h1>Input Disbursements Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
 			<th>Invoice No.</th>
 			<th>Date</th>
-			<th>FBG Name</th>
-			<th>Input</th>
-			<th>Quantity</th>
-			<th>Total Value</th>
+			<th>FBG Name</th> 
 			<th>Season</th>
 			<th>Action</th>
 		</tr>
@@ -68,15 +65,6 @@ $class = "odd";
 		</td>
 		<td>
 		<?php echo $disbursement -> FBG_Object -> Group_Name;?>
-		</td>
-		<td>
-		<?php echo $disbursement -> Farm_Input_Object -> Product_Name;?>
-		</td>
-		<td>
-		<?php echo $disbursement -> Quantity;?>
-		</td>
-		<td>
-		<?php echo $disbursement -> Total_Value;?>
 		</td>
 		<td>
 		<?php echo $disbursement -> Season;?>

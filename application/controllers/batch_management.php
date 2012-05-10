@@ -71,12 +71,12 @@ class Batch_Management extends MY_Controller {
 			redirect("batch_management");
 		}
 		//change ownership
-		$old_owner = $batch_object->User_Object->Name;
-		$batch_object -> User = $new_owner;		
-		$batch_object -> save(); 
+		$old_owner = $batch_object -> User_Object -> Name;
+		$batch_object -> User = $new_owner;
+		$batch_object -> save();
 		$new_owner_object = User::getUser($new_owner);
 		$log = new System_Log();
-		$details_desc = "{Transaction Type: '" . $batch_object -> Transaction_Type_Object -> Name . "', Batch ID '" . $batch . "', Old Owner: '".$old_owner."', New Owner: '".$new_owner_object->Name."'}";
+		$details_desc = "{Transaction Type: '" . $batch_object -> Transaction_Type_Object -> Name . "', Batch ID '" . $batch . "', Old Owner: '" . $old_owner . "', New Owner: '" . $new_owner_object -> Name . "'}";
 		$log -> Log_Message = "Changed Batch Ownership " . $details_desc;
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
@@ -93,6 +93,14 @@ class Batch_Management extends MY_Controller {
 		$data['transaction_types'] = Transaction_Type::getAll();
 		$data['content_view'] = "add_batch_v";
 		$data['quick_link'] = "new_batch";
+		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['styles'] = array("validator.css");
+		$this -> base_params($data);
+	}
+
+	public function no_batch() {
+		$data = array();
+		$data['content_view'] = "no_batch_v";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);

@@ -48,6 +48,11 @@ class Disbursement_Management extends MY_Controller {
 	}
 
 	public function search_fbg() {
+		$batch = $this -> session -> userdata('input_disbursement_batch');
+		if (strlen($batch) == 0) {
+			echo "No batch selected";
+			redirect("batch_management/no_batch");
+		}
 		$data['content_view'] = "search_fbg_v";
 		$data['link'] = "disbursement_management";
 		$data['quick_link'] = "search_fbg";
@@ -59,8 +64,12 @@ class Disbursement_Management extends MY_Controller {
 
 	public function edit_disbursement($id) {
 		$disbursement = Disbursement::getDisbursement($id);
-		$data['disbursement'] = $disbursement;
+		$invoice =  $disbursement->Invoice_Number;
+		$data['fbg_disbursement'] = Disbursement::getInvoiceDisbursements($invoice);
+		$data['farmer_disbursements'] = Farmer_Input::getInvoiceDisbursements($invoice);
+		$data['issued_inputs'] = Disbursement::getInvoiceInputs($invoice);
 		$this -> new_disbursement($data);
+		
 	}
 
 	public function disburse_inputs($fbg) {
@@ -89,65 +98,96 @@ class Disbursement_Management extends MY_Controller {
 			$farmers = $this -> input -> post("farmer");
 			$farmer_inputs = $this -> input -> post("farmer_farm_input");
 			$farmer_quantities = $this -> input -> post("farmer_quantity");
-			$farmer_total_values = $this -> input -> post("farmer_total_value"); 
-
-			$temp_disbursement = new Disbursement();
-			$temp_disbursement -> FBG = $fbg;
-			$temp_disbursement -> Farm_Input = $farm_inputs[0];
-			$temp_disbursement -> Agent = $agent;
-			$details_desc = "{FGB: '" . $temp_disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $invoice . "' Date: '" . $date . "' Farm Input: '" . $temp_disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $quantities[0] . "' Total Value: '" . $total_values[0] . "' Season: '" . $seasons[0] . "' ID Batch: '" . $id_batches[0] . "' Agent: '" . $temp_disbursement -> Agent_Object -> First_Name . " " . $temp_disbursement -> Agent_Object -> Surname . "'}";
-			//Check if we are editing the record first
-			if (strlen($editing) > 0) {
-				$disbursement = Disbursement::getDisbursement($editing);
-				$log -> Log_Type = "2";
-				$log -> Log_Message = "Edited Input Disbursement Record From {FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $disbursement -> Invoice_Number . "' Date: '" . $disbursement -> Date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $disbursement -> Quantity . "' Total Value: '" . $disbursement -> Total_Value . "' Season: '" . $disbursement -> Season . "' ID Batch: '" . $disbursement -> ID_Batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'} to " . $details_desc;
-			} else {
-				$disbursement = new Disbursement();
-				$log -> Log_Type = "1";
-				$log -> Log_Message = "Created Input Disbursement Record " . $details_desc;
-			}
-			$disbursement -> FBG = $fbg;
-			$disbursement -> Invoice_Number = $invoice;
-			$disbursement -> Date = $date;
-			$disbursement -> Farm_Input = $farm_inputs[0];
-			$disbursement -> Quantity = $quantities[0];
-			$disbursement -> Total_Value = $total_values[0];
-			$disbursement -> Season = $seasons[0];
-			$disbursement -> ID_Batch = $id_batch;
-			$disbursement -> Timestamp = date('U');
-			$disbursement -> Agent = $agent;
-			$disbursement -> save();
-			$log -> User = $this -> session -> userdata('user_id');
-			$log -> Timestamp = date('U');
-			$log -> save();
-			//Loop through the rest of the disbursements
-			for ($x = 1; $x < sizeof($farm_inputs); $x++) {
+			$farmer_total_values = $this -> input -> post("farmer_total_value");
+			$input_counter = 0;
+			$farmer_counter = 0;
+			foreach ($farm_inputs as $input) {
 				$disbursement = new Disbursement();
 				$disbursement -> FBG = $fbg;
 				$disbursement -> Invoice_Number = $invoice;
 				$disbursement -> Date = $date;
-				$disbursement -> Farm_Input = $farm_inputs[$x];
-				$disbursement -> Quantity = $quantities[$x];
-				$disbursement -> Total_Value = $total_values[$x];
-				$disbursement -> Season = $seasons[$x];
+				$disbursement -> Farm_Input = $farm_inputs[$input_counter];
+				$disbursement -> Quantity = $quantities[$input_counter];
+				$disbursement -> Total_Value = $total_values[$input_counter];
+				$disbursement -> Season = $seasons[$input_counter];
 				$disbursement -> ID_Batch = $id_batch;
 				$disbursement -> Timestamp = date('U');
 				$disbursement -> Agent = $agent;
-				$details_desc = "{FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $invoice . "' Date: '" . $date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $quantities[$x] . "' Total Value: '" . $total_values[$x] . "' Season: '" . $seasons[$x] . "' ID Batch: '" . $id_batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'}";
-				$log = new System_Log();
-				$log -> Log_Type = "1";
-				$log -> Log_Message = "Created  Input Disbursement Record " . $details_desc;
 				$disbursement -> save();
-				$log -> User = $this -> session -> userdata('user_id');
-				$log -> Timestamp = date('U');
-				$log -> save();
+				$input_counter++;
 			}
-			$submit_button = $this -> input -> post("submit");
-			if ($submit_button == "Save & Add New") {
-				redirect("disbursement_management/search_fbg");
-			} else if ($submit_button == "Save & View List") {
-				redirect("disbursement_management/listing");
+			foreach ($farmer_inputs as $input) {
+				$farmer_input = new Farmer_Input();
+				$farmer_input -> FBG = $fbg;
+				$farmer_input -> Invoice_Number = $invoice;
+				$farmer_input -> Date = $date;
+				$farmer_input -> Farmer = $farmers[$farmer_counter];
+				$farmer_input -> Farm_Input = $farmer_inputs[$farmer_counter];
+				$farmer_input -> Quantity = $farmer_quantities[$farmer_counter];
+				$farmer_input -> Total_Value = $farmer_total_values[$farmer_counter]; 
+				$farmer_input -> Batch_Id = $id_batch;
+				$farmer_input -> Timestamp = date('U'); 
+				$farmer_input -> save();
+				$farmer_counter++;
 			}
+			/*
+			 $temp_disbursement = new Disbursement();
+			 $temp_disbursement -> FBG = $fbg;
+			 $temp_disbursement -> Farm_Input = $farm_inputs[0];
+			 $temp_disbursement -> Agent = $agent;
+			 $details_desc = "{FGB: '" . $temp_disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $invoice . "' Date: '" . $date . "' Farm Input: '" . $temp_disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $quantities[0] . "' Total Value: '" . $total_values[0] . "' Season: '" . $seasons[0] . "' ID Batch: '" . $id_batches[0] . "' Agent: '" . $temp_disbursement -> Agent_Object -> First_Name . " " . $temp_disbursement -> Agent_Object -> Surname . "'}";
+			 //Check if we are editing the record first
+			 if (strlen($editing) > 0) {
+			 $disbursement = Disbursement::getDisbursement($editing);
+			 $log -> Log_Type = "2";
+			 $log -> Log_Message = "Edited Input Disbursement Record From {FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $disbursement -> Invoice_Number . "' Date: '" . $disbursement -> Date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $disbursement -> Quantity . "' Total Value: '" . $disbursement -> Total_Value . "' Season: '" . $disbursement -> Season . "' ID Batch: '" . $disbursement -> ID_Batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'} to " . $details_desc;
+			 } else {
+			 $disbursement = new Disbursement();
+			 $log -> Log_Type = "1";
+			 $log -> Log_Message = "Created Input Disbursement Record " . $details_desc;
+			 }
+			 $disbursement -> FBG = $fbg;
+			 $disbursement -> Invoice_Number = $invoice;
+			 $disbursement -> Date = $date;
+			 $disbursement -> Farm_Input = $farm_inputs[0];
+			 $disbursement -> Quantity = $quantities[0];
+			 $disbursement -> Total_Value = $total_values[0];
+			 $disbursement -> Season = $seasons[0];
+			 $disbursement -> ID_Batch = $id_batch;
+			 $disbursement -> Timestamp = date('U');
+			 $disbursement -> Agent = $agent;
+			 $disbursement -> save();
+			 $log -> User = $this -> session -> userdata('user_id');
+			 $log -> Timestamp = date('U');
+			 $log -> save();
+			 //Loop through the rest of the disbursements
+			 for ($x = 1; $x < sizeof($farm_inputs); $x++) {
+			 $disbursement = new Disbursement();
+			 $disbursement -> FBG = $fbg;
+			 $disbursement -> Invoice_Number = $invoice;
+			 $disbursement -> Date = $date;
+			 $disbursement -> Farm_Input = $farm_inputs[$x];
+			 $disbursement -> Quantity = $quantities[$x];
+			 $disbursement -> Total_Value = $total_values[$x];
+			 $disbursement -> Season = $seasons[$x];
+			 $disbursement -> ID_Batch = $id_batch;
+			 $disbursement -> Timestamp = date('U');
+			 $disbursement -> Agent = $agent;
+			 $details_desc = "{FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $invoice . "' Date: '" . $date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $quantities[$x] . "' Total Value: '" . $total_values[$x] . "' Season: '" . $seasons[$x] . "' ID Batch: '" . $id_batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'}";
+			 $log = new System_Log();
+			 $log -> Log_Type = "1";
+			 $log -> Log_Message = "Created  Input Disbursement Record " . $details_desc;
+			 $disbursement -> save();
+			 $log -> User = $this -> session -> userdata('user_id');
+			 $log -> Timestamp = date('U');
+			 $log -> save();
+			 }
+			 $submit_button = $this -> input -> post("submit");
+			 if ($submit_button == "Save & Add New") {
+			 redirect("disbursement_management/search_fbg");
+			 } else if ($submit_button == "Save & View List") {
+			 redirect("disbursement_management/listing");
+			 }*/
 
 		} else {
 			$this -> new_disbursement();
