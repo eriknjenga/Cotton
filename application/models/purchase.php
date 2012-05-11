@@ -30,14 +30,14 @@ class Purchase extends Doctrine_Record {
 		$this -> hasOne('Depot as Depot_Object', array('local' => 'Depot', 'foreign' => 'id'));
 	}
 
-	public function getTotalPurchases() {
-		$query = Doctrine_Query::create() -> select("count(*) as Total_Purchases") -> from("Purchase");
+	public function getTotalPurchases($batch) {
+		$query = Doctrine_Query::create() -> select("count(*) as Total_Purchases") -> from("Purchase")->where("Batch = '$batch'");
 		$total = $query -> execute();
 		return $total[0]['Total_Purchases'];
 	}
 
-	public function getPagedPurchases($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Purchase") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+	public function getPagedPurchases($batch,$offset, $items) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Purchase") ->where("Batch = '$batch'")-> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$purchases = $query -> execute(array());
 		return $purchases;
 	}

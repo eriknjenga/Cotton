@@ -13,6 +13,10 @@ class Batch_Management extends MY_Controller {
 		$batch_object = Transaction_Batch::getBatch($batch);
 		if ($batch_object -> Transaction_Type_Object -> Indicator == "purchases") {
 			//load purchases for this batch
+			$this -> session -> set_userdata(array("purchases_batch" => $batch));
+			//load input disbursements for this batch
+			$url = "purchase_management/listing/" . $batch;
+			redirect($url);
 		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "input_disbursements") {
 			$this -> session -> set_userdata(array("input_disbursement_batch" => $batch));
 			//load input disbursements for this batch
@@ -245,32 +249,34 @@ class Batch_Management extends MY_Controller {
 		if ($transaction_type == "input_disbursements") {
 			$total_inputs_value = 0;
 			$disbursements = Disbursement::getBatchDisbursements($batch_id);
-			$data_buffer .= "<tr><th>FGB</th><th>Invoice</th><th>Date</th><th>Farm Input</th><th>Quantity</th><th>Total Value</th><th>Season</th><th>Agent</th><th>Timestamp</th></tr>";
+			$data_buffer .= "<tr><th>FGB</th><th>Invoice</th><th>Date</th><th>Farm Input</th><th>Quantity</th><th>Total Value</th><th>Agent</th><th>Timestamp</th></tr>";
 			foreach ($disbursements as $disbursement) {
-				$data_buffer .= "<tr><td>" . $disbursement -> FBG_Object -> Group_Name . "</td><td>" . $disbursement -> Invoice_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td>" . $disbursement -> Quantity . "</td><td>" . $disbursement -> Total_Value . "</td><td>" . $disbursement -> Season . "</td><td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
+				$data_buffer .= "<tr><td>" . $disbursement -> FBG_Object -> Group_Name . "</td><td>" . $disbursement -> Invoice_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td>" . $disbursement -> Quantity . "</td><td>" . $disbursement -> Total_Value . "</td> <td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
 				$total_inputs_value += $disbursement -> Total_Value;
 			}
-			$report_footer = "<div style='border-top:2px solid black;'><span><b>Total Value of Transactions: " . $batch_total . " </b></span></div>";
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_inputs_value . "</b></td><td>-</td><td>-</td></tr>";
 		}
 		if ($transaction_type == "purchases") {
 			$batch_gross_total = 0;
-			$batch_net_total = 0;
-			$batch_recoveries = 0;
+			$batch_net_total = 0; 
+			$farmer_reg_total = 0;
+			$other_recovery_total = 0;
+			$loan_recovery_total = 0;
+			$quantity_total = 0;
 			$purchases = Purchase::getBatchPurchases($batch_id);
-			$data_buffer .= "<tr><th>FGB</th><th>DPN</th><th>Date</th><th>Depot</th><th>Quantity</th><th>Unit Price</th><th>Season</th><th>Loan Recovery</th><th>Farmer Reg. Fee</th><th>Other Recoveries</th><th>Buyer</th><th>Gross Value</th><th>Net Value</th></tr>";
+			$data_buffer .= "<tr><th>FGB</th><th>DPN</th><th>Date</th><th>Depot</th><th>Quantity</th><th>Unit Price</th><th>Loan Recovery</th><th>Farmer Reg. Fee</th><th>Other Recoveries</th><th>Buyer</th><th>Gross Value</th><th>Net Value</th></tr>";
 			foreach ($purchases as $purchase) {
-				$data_buffer .= "<tr><td>" . $purchase -> FBG_Object -> Group_Name . "</td><td>" . $purchase -> DPN . "</td><td>" . $purchase -> Date . "</td><td>" . $purchase -> Depot_Object -> Depot_Name . "</td><td>" . $purchase -> Quantity . "</td><td>" . $purchase -> Unit_Price . "</td><td>" . $purchase -> Season . "</td><td>" . $purchase -> Loan_Recovery . "</td><td>" . $purchase -> Farmer_Reg_Fee . "</td><td>" . $purchase -> Other_Recoveries . "</td><td>" . $purchase -> Buyer_Object -> Name . "</td><td>" . $purchase -> Gross_Value . "</td><td>" . $purchase -> Net_Value . "</td></tr>";
+				$data_buffer .= "<tr><td>" . $purchase -> FBG_Object -> Group_Name . "</td><td>" . $purchase -> DPN . "</td><td>" . $purchase -> Date . "</td><td>" . $purchase -> Depot_Object -> Depot_Name . "</td><td>" . $purchase -> Quantity . "</td><td>" . $purchase -> Unit_Price . "</td><td>" . $purchase -> Loan_Recovery . "</td><td>" . $purchase -> Farmer_Reg_Fee . "</td><td>" . $purchase -> Other_Recoveries . "</td><td>" . $purchase -> Buyer_Object -> Name . "</td><td>" . $purchase -> Gross_Value . "</td><td>" . $purchase -> Net_Value . "</td></tr>";
 				$batch_gross_total += $purchase -> Gross_Value;
 				$batch_net_total += $purchase -> Net_Value;
-				$batch_recoveries += $purchase -> Loan_Recovery + $purchase -> Farmer_Reg_Fee + $purchase -> Other_Recoveries;
+				$farmer_reg_total += $purchase -> Farmer_Reg_Fee;
+				$other_recovery_total += $purchase -> Other_Recoveries;
+				$loan_recovery_total += $purchase -> Loan_Recovery;
+				$quantity_total += $purchase -> Quantity;
 			}
-			$report_footer = "<div style='border-top:2px solid black;'><span><b>Gross Value of Transactions: " . $batch_gross_total . " </b></span></div>";
-			$report_footer .= "<div style='border-top:2px solid black;'><span><b>Total Recoveries: " . $batch_recoveries . " </b></span></div>";
-			$report_footer .= "<div style='border-top:2px solid black;'><span><b>Net Value of Transactions: " . $batch_net_total . " </b></span></div>";
+			$data_buffer .= "<tr><td><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $quantity_total . "</b></td><td>-</td><td style='border-top:2px solid black;'><b>" . $loan_recovery_total . "</b></td><td style='border-top:2px solid black;'><b>" . $farmer_reg_total . "</b></td><td style='border-top:2px solid black;'><b>" . $other_recovery_total . "</b></td><td>-</td><td style='border-top:2px solid black;'><b>" . $batch_gross_total . "</b></td><td style='border-top:2px solid black;'><b>" . $batch_net_total . "</b></td></tr>";
 		}
 		$data_buffer .= "</table>";
-		$data_buffer .= $report_footer;
-		//echo $data_buffer;
 		$this -> generatePDF($data_buffer, $batch);
 
 	}

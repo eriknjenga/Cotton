@@ -215,7 +215,7 @@ foreach($agents as $agent_object){
 			</tr>
 		</thead>
 		<tbody>
-			<?php if(isset($fbg_disbursement)){
+			<?php if(isset($fbg_disbursement[0])){
 foreach($fbg_disbursement as $disbursement){
 			?>
 			<tr input_row="<?php echo $input_row?>">
@@ -307,19 +307,39 @@ foreach($farm_inputs as $farm_input_object){
 		<tbody>
 			<?php
 //Check if we are editing and if so, add the relevant rows
-if(isset($farmer_disbursements)){
+if(isset($farmer_disbursements[0])){
 foreach($farmer_disbursements as $disbursement){
 			?>
 			<tr farmer_row="<?php echo $farmer_row;?>">
 				<td>
-				<input class="farmer validate[required]" name="farmer[]" id="farmer" type="text" value="<?php echo $disbursement->Farmer;?>"/>
+				<input class="farmer" name="farmer[]" id="farmer" type="text" value="<?php echo $disbursement->Farmer;?>"/>
+				</td>
+				<td><select name="farmer_farm_input[]" id="farmer_farm_input" class="dropdown farmer_farm_input" style="width: 70px; padding:2px;">
+					<option></option>
+					<?php
+foreach($issued_inputs as $farm_input){
+	$farm_input_object = $farm_input->Farm_Input_Object;
+	
+					?>
+					<option prices="<?php
+					foreach ($farm_input_object->Prices as $price) {echo $price -> Price . ',';
+					}
+					?>" price_dates="<?php
+					foreach ($farm_input_object->Prices as $price) {echo date('m/d/Y', $price -> Timestamp) . ',';
+					}
+					?>"
+					value="<?php echo $farm_input_object -> id;?>"
+					<?php
+					if ($farm_input_object -> id == $disbursement -> Farm_Input) {echo "selected";
+					}
+						?>
+						><?php echo $farm_input_object -> Product_Name;?></option>
+					<?php }?>
+				</select>
+				
 				</td>
 				<td>
-				<select name="farmer_farm_input[]" id="farmer_farm_input" class="dropdown farmer_farm_input validate[required]" style="width: 70px; padding:2px;">
-					<option></option>
-				</select></td>
-				<td>
-				<input class="farmer_quantity validate[required,number]" name="farmer_quantity[]" id="farmer_quantity"  type="text" value="<?php echo $disbursement->Quantity;?>" style="width: 60px; padding:2px;"/>
+				<input class="farmer_quantity " name="farmer_quantity[]" id="farmer_quantity"  type="text" value="<?php echo $disbursement->Quantity;?>" style="width: 60px; padding:2px;"/>
 				</td>
 				<td>
 				<input readonly="" class="farmer_total_value" name="farmer_total_value[]" id="farmer_total_value" type="text" value="<?php echo $disbursement->Total_Value;?>" style="width: 60px; padding:2px;"/>
@@ -333,18 +353,18 @@ foreach($farmer_disbursements as $disbursement){
 			$farmer_row++;
 			}
 			}
-else{
+else{ 
 			?>
 			<tr farmer_row="<?php echo $farmer_row;?>">
 				<td>
-				<input class="farmer validate[required]" name="farmer[]" id="farmer" type="text" value=""/>
+				<input class="farmer" name="farmer[]" id="farmer" type="text" value=""/>
 				</td>
 				<td>
-				<select name="farmer_farm_input[]" id="farmer_farm_input" class="dropdown farmer_farm_input validate[required]" style="width: 70px; padding:2px;">
+				<select name="farmer_farm_input[]" id="farmer_farm_input" class="dropdown farmer_farm_input" style="width: 70px; padding:2px;">
 					<option></option>
 				</select></td>
 				<td>
-				<input class="farmer_quantity validate[required,number]" name="farmer_quantity[]" id="farmer_quantity"  type="text" value="" style="width: 60px; padding:2px;"/>
+				<input class="farmer_quantity" name="farmer_quantity[]" id="farmer_quantity"  type="text" value="" style="width: 60px; padding:2px;"/>
 				</td>
 				<td>
 				<input readonly="" class="farmer_total_value" name="farmer_total_value[]" id="farmer_total_value" type="text" value="" style="width: 60px; padding:2px;"/>

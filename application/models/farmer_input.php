@@ -23,4 +23,10 @@ class Farmer_Input extends Doctrine_Record {
 		return $disbursements;
 	}
 
+	public function getDisbursement($id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Farmer_Input") -> where("id = '$id'");
+		$farmer_inputs = $query -> execute();
+		return $farmer_inputs[0];
+	}
+
 }

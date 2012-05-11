@@ -16,7 +16,7 @@
 		}
 	</style>
 <script type="text/javascript">
-			$(function() {
+					$(function() {
 		$("#purchase_form").validationEngine();
 		$("#fbg").autocomplete({
 			source : "<?php echo base_url();?>fbg_management/autocomplete_fbg",
@@ -143,7 +143,16 @@ echo form_open('purchase_management/save', $attributes);
 echo validation_errors('
 <p class="form_error">', '</p>
 ');
+if(isset($batch_information)){
 ?>
+<div class="message information close">
+	<h2>Batch Information</h2>
+	<p>
+		<?php echo $batch_information;?>
+	</p>
+</div>
+<?php }?>
+
 </p>
 <input type="hidden" name="editing_id" value="<?php echo $purchase_id;?>" />
 <input type="hidden" name="depot" value="<?php echo $depot_id;?>" />
@@ -182,21 +191,6 @@ foreach ($prices as $price_object) {
 	<label for="date">Transaction Date</label>
 	<input class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>"/>
 	<span class="field_desc">Enter the <b>Date</b> for this transaction</span>
-</p>
-<p>
-	<label for="date">Transaction Batch</label>
-				<select name="batch" id="batch" class="dropdown batch validate[required]" style="width: 70px; padding:2px;"> 
-					<?php
-foreach($batches as $batch_object){
-					?>
-					<option
-					value="<?php echo $batch_object -> id;?>" <?php
-					if ($batch_object -> id == $batch) {echo "selected";
-					}
-					?> ><?php echo $batch_object -> id;?></option>
-					<?php }?>
-				</select> 
-				<span class="field_desc">Select the <b>Batch</b> for this transaction</span>
 </p>
 
 <p>
@@ -242,7 +236,7 @@ foreach($batches as $batch_object){
 </p>
 <p>
 	<input class="button" type="reset" value="Reset">
-	<input class="button" type="submit" value="Save & Add New From Buyer" name="submit">
+	<input class="button" type="submit" value="Save & Add New From Depot" name="submit">
 	<input class="button" type="submit" value="Save & View List" name="submit">
 </p>
 </fieldset> <!-- End of fieldset -->
