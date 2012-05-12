@@ -15,11 +15,11 @@
 			var input_object = $(this).closest("tr").find(".farm_input");
 			updateInputPrice(input_object, date_object);
 		});
-		$("#date").change(function() { 
+		$("#date").change(function() {
 			var date_object = $(this);
 			$.each($(".farm_input"), function() {
-				updateInputPrice($(this),date_object);
-			}); 
+				updateInputPrice($(this), date_object);
+			});
 		});
 		$(".add").click(function() {
 			var cloned_object = $('#inputs_table tr:last').clone(true);
@@ -44,7 +44,7 @@
 	});
 	function updateInputPrice(input_object, date_object) {
 		var prices = input_object.find(":selected").attr("prices");
-		var price_dates = input_object.find(":selected").attr("price_dates"); 
+		var price_dates = input_object.find(":selected").attr("price_dates");
 		if(prices == null || price_dates == null) {
 			return;
 		}
@@ -58,14 +58,14 @@
 		$.each(price_dates_array, function() {
 			if(this.length > 0 && selected_date_value.length > 0) {
 				var price_date = new Date(this);
-				var day_difference = Math.floor((selected_date - price_date) / 86400000); 
+				var day_difference = Math.floor((selected_date - price_date) / 86400000);
 				if(day_difference >= 0 && (difference == 0 || day_difference < difference)) {
 					difference = day_difference;
 					most_current_price = prices_array[counter];
 				}
 			}
 			counter++;
-		}); 
+		});
 		//Clear out the 'total value' field
 		input_object.closest("tr").find(".total_value").attr("value", "");
 		var quantity = input_object.closest("tr").find(".quantity").attr("value");
@@ -78,26 +78,26 @@
 </script>
 <?php
 if (isset($issue)) {
-	$delivery_note_number = $issue -> Delivery_Note_Number;
-	$date = $issue -> Date;
-	$farm_input = $issue -> Farm_Input;
-	$quantity = $issue -> Quantity;
-	$total_value = $issue -> Total_Value;
-	$season = $issue -> Season;
-	$issue_id = $issue -> id;
-	$agent = $issue -> Agent;
-	$region = $issue -> Region;
+$delivery_note_number = $issue -> Delivery_Note_Number;
+$date = $issue -> Date;
+$farm_input = $issue -> Farm_Input;
+$quantity = $issue -> Quantity;
+$total_value = $issue -> Total_Value;
+$season = $issue -> Season;
+$issue_id = $issue -> id;
+$agent = $issue -> Agent;
+$region = $issue -> Region;
 
 } else {
-	$delivery_note_number = "";
-	$date = "";
-	$farm_input = "";
-	$quantity = "";
-	$total_value = "";
-	$season = "";
-	$issue_id = "";
-	$agent = "";
-	$region = "";
+$delivery_note_number = "";
+$date = "";
+$farm_input = "";
+$quantity = "";
+$total_value = "";
+$season = "";
+$issue_id = "";
+$agent = "";
+$region = "";
 
 }
 $attributes = array("method" => "post", "id" => "disbursement_form");
@@ -105,7 +105,15 @@ echo form_open('region_input_issue_management/save', $attributes);
 echo validation_errors('
 <p class="form_error">', '</p>
 ');
+if(isset($batch_information)){
 ?>
+<div class="message information close">
+	<h2>Batch Information</h2>
+	<p>
+		<?php echo $batch_information;?>
+	</p>
+</div>
+<?php }?>
 <!-- End of fieldset -->
 <!-- Fieldset -->
 <fieldset>
@@ -203,8 +211,9 @@ foreach($farm_inputs as $farm_input_object){
 		</tbody>
 	</table>
 	<p>
-		<input class="button" type="submit" value="Submit">
 		<input class="button" type="reset" value="Reset">
+		<input class="button" type="submit" value="Save & Add New" name="submit">
+		<input class="button" type="submit" value="Save & View List" name="submit">
 	</p>
 </fieldset>
 <!-- End of fieldset -->

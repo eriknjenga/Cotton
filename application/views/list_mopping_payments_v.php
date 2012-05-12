@@ -18,8 +18,8 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'region_input_issue_management/delete_issue/'?>
-		" +$(this).attr("issue");
+	url = "<?php echo base_url().'mopping_payment_management/delete_payment/'?>
+		" +$(this).attr("payment");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -33,24 +33,22 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
-<h1>Region Input-Transfers Listing</h1>
+<h1>Mopping Payments Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Delivery Note No.</th>
+			<th>Voucher No.</th>
 			<th>Date</th>
-			<th>Region</th>
-			<th>Input</th>
-			<th>Quantity</th>
-			<th>Total Value</th>
+			<th>Depot</th>
+			<th>Amount</th> 
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-if (isset($issues[0])) {
+if (isset($payments[0])) {
 $counter = 1;
-foreach ($issues as $issue) {
+foreach ($payments as $payment) {
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
@@ -60,25 +58,18 @@ $class = "odd";
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $issue -> Delivery_Note_Number;?>
+		<?php echo $payment -> Voucher_Number;?>
 		</td>
 		<td>
-		<?php echo $issue -> Date;?>
-		</td>
-
-		<td>
-		<?php echo $issue -> Region_Object -> Region_Name;?>
+		<?php echo $payment -> Date;?>
 		</td>
 		<td>
-		<?php echo $issue -> Farm_Input_Object -> Product_Name;?>
-		</td>
+		<?php echo $payment -> Depot_Object->Depot_Name;?>
+		</td> 
 		<td>
-		<?php echo $issue -> Quantity;?>
-		</td>
-		<td>
-		<?php echo $issue -> Total_Value;?>
-		</td>
-		<td><a href="<?php echo base_url()."region_input_issue_management/edit_issue/".$issue->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" issue = "<?php echo $issue -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		<?php echo $payment -> Amount;?>
+		</td> 
+		<td><a href="<?php echo base_url()."mopping_payment_management/edit_payment/".$payment->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" payment = "<?php echo $payment -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
 		<?php
 

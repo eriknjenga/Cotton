@@ -11,30 +11,56 @@ class Batch_Management extends MY_Controller {
 
 	public function enter_batch($batch) {
 		$batch_object = Transaction_Batch::getBatch($batch);
+		$this -> open_batch($batch);
 		if ($batch_object -> Transaction_Type_Object -> Indicator == "purchases") {
-			//load purchases for this batch
 			$this -> session -> set_userdata(array("purchases_batch" => $batch));
-			//load input disbursements for this batch
 			$url = "purchase_management/listing/" . $batch;
 			redirect($url);
 		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "input_disbursements") {
 			$this -> session -> set_userdata(array("input_disbursement_batch" => $batch));
-			//load input disbursements for this batch
 			$url = "disbursement_management/listing/" . $batch;
+			redirect($url);
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "agent_input_disbursements") {
+			$this -> session -> set_userdata(array("agent_input_disbursement_batch" => $batch));
+			$url = "agent_input_issue_management/listing/" . $batch;
+			redirect($url);
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "buying_center_receipts") {
+			$this -> session -> set_userdata(array("buying_center_receipt_batch" => $batch));
+			$url = "buying_center_receipt_management/listing/" . $batch;
+			redirect($url);
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "cash_receipts") {
+			$this -> session -> set_userdata(array("cash_receipt_batch" => $batch));
+			$url = "cash_receipt_management/listing/" . $batch;
+			redirect($url);
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "cihc") {
+			$this -> session -> set_userdata(array("cihc_batch" => $batch));
+			$url = "cash_management/listing/" . $batch;
+			redirect($url);
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "cihb") {
+			$this -> session -> set_userdata(array("cihb_batch" => $batch));
+			$url = "field_cash_management/listing/" . $batch;
+			redirect($url);
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "input_transfers") {
+			$this -> session -> set_userdata(array("input_transfer_batch" => $batch));
+			$url = "region_input_issue_management/listing/" . $batch;
+			redirect($url);
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "mopping_payments") {
+			$this -> session -> set_userdata(array("mopping_payment_batch" => $batch));
+			$url = "mopping_payment_management/listing/" . $batch;
 			redirect($url);
 		}
 	}
 
 	public function listing($offset = 0) {
-		$items_per_page = 20;
+		$items_per_page = 10;
 		$user = $this -> session -> userdata('user_id');
 		$user_indicator = $this -> session -> userdata('user_indicator');
+
 		if ($user_indicator == "general_supervisor") {
 			$number_of_batches = Transaction_Batch::getTotalClosedBatches();
 			$batches = Transaction_Batch::getPagedClosedBatches($offset, $items_per_page);
 			$data['content_view'] = "list_supervisor_batches_v";
-		}
-		if ($user_indicator == "system_administrator") {
+		} else if ($user_indicator == "system_administrator") {
 			$number_of_batches = Transaction_Batch::getTotalSystemBatches();
 			$batches = Transaction_Batch::getPagedSystemBatches($offset, $items_per_page);
 			$data['clerks'] = User::getActiveDataClerks();
@@ -45,7 +71,7 @@ class Batch_Management extends MY_Controller {
 			$data['content_view'] = "list_supervisor_batches_v";
 		} else if ($user_indicator == "inputs_supervisor") {
 			$data['content_view'] = "list_supervisor_batches_v";
-		} else {
+		} else { 
 			$number_of_batches = Transaction_Batch::getTotalBatches($user);
 			$batches = Transaction_Batch::getPagedBatches($offset, $items_per_page, $user);
 			$data['content_view'] = "list_batches_v";
@@ -121,15 +147,6 @@ class Batch_Management extends MY_Controller {
 		$batch_object -> Status = "0";
 		$batch_object -> save();
 		$this -> apply_to_transactions($batch, "0");
-		$log = new System_Log();
-		$details_desc = "{Transaction Type: '" . $batch_object -> Transaction_Type_Object -> Name . "'Batch ID '" . $batch . "'}";
-		$log -> Log_Message = "Opened Batch Record " . $details_desc;
-		$log -> User = $this -> session -> userdata('user_id');
-		$log -> Timestamp = date('U');
-		$log -> Log_Type = "2";
-		$log -> save();
-		$previous_page = $this -> session -> userdata('old_url');
-		redirect($previous_page);
 	}
 
 	public function close_batch($batch) {
@@ -185,6 +202,53 @@ class Batch_Management extends MY_Controller {
 				$disbursement -> Batch_Status = $status;
 				$disbursement -> save();
 			}
+			$farmer_disbursements = Farmer_Input::getBatchDisbursements($batch);
+			foreach ($farmer_disbursements as $farmer_disbursement) {
+				$farmer_disbursement -> Batch_Status = $status;
+				$farmer_disbursement -> save();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "agent_input_disbursements") {
+			$disbursements = Agent_Input_Issue::getBatchDisbursements($batch);
+			foreach ($disbursements as $disbursement) {
+				$disbursement -> Batch_Status = $status;
+				$disbursement -> save();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "buying_center_receipts") {
+			$receipts = Buying_Center_Receipt::getBatchReceipts($batch);
+			foreach ($receipts as $receipt) {
+				$receipt -> Batch_Status = $status;
+				$receipt -> save();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "cash_receipts") {
+			$receipts = Cash_Receipt::getBatchReceipts($batch);
+			foreach ($receipts as $receipt) {
+				$receipt -> Batch_Status = $status;
+				$receipt -> save();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "cihc") {
+			$disbursements = Cash_Disbursement::getBatchDisbursements($batch);
+			foreach ($disbursements as $disbursement) {
+				$disbursement -> Batch_Status = $status;
+				$disbursement -> save();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "cihb") {
+			$disbursements = Field_Cash_Disbursement::getBatchDisbursements($batch);
+			foreach ($disbursements as $disbursement) {
+				$disbursement -> Batch_Status = $status;
+				$disbursement -> save();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "input_transfers") {
+			$disbursements = Region_Input_Issue::getBatchDisbursements($batch);
+			foreach ($disbursements as $disbursement) {
+				$disbursement -> Batch_Status = $status;
+				$disbursement -> save();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "mopping_payments") {
+			$payments = Mopping_Payment::getBatchPayments($batch);
+			foreach ($payments as $payment) {
+				$payment -> Batch_Status = $status;
+				$payment -> save();
+			}
 		}
 
 	}
@@ -212,8 +276,8 @@ class Batch_Management extends MY_Controller {
 		}
 	}
 
-	public function delete_batch($id) {
-		$batch_object = Transaction_Batch::getBatch($id);
+	public function delete_batch($batch) {
+		$batch_object = Transaction_Batch::getBatch($batch);
 		if ($batch_object -> Transaction_Type_Object -> Indicator == "purchases") {
 			$purchases = Purchase::getBatchPurchases($batch);
 			foreach ($purchases as $purchase) {
@@ -223,6 +287,45 @@ class Batch_Management extends MY_Controller {
 			$disbursements = Disbursement::getBatchDisbursements($batch);
 			foreach ($disbursements as $disbursement) {
 				$disbursement -> delete();
+			}
+			$farmer_disbursements = Farmer_Input::getBatchDisbursements($batch);
+			foreach ($farmer_disbursements as $farmer_disbursement) {
+				$farmer_disbursement -> delete();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "agent_input_disbursements") {
+			$disbursements = Agent_Input_Issue::getBatchDisbursements($batch);
+			foreach ($disbursements as $disbursement) {
+				$disbursement -> delete();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "buying_center_receipts") {
+			$receipts = Buying_Center_Receipt::getBatchReceipts($batch);
+			foreach ($receipts as $receipt) {
+				$receipt -> delete();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "cash_receipts") {
+			$receipts = Cash_Receipt::getBatchReceipts($batch);
+			foreach ($receipts as $receipt) {
+				$receipt -> delete();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "cihc") {
+			$disbursements = Cash_Disbursement::getBatchDisbursements($batch);
+			foreach ($disbursements as $disbursement) {
+				$disbursement -> delete();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "cihb") {
+			$disbursements = Field_Cash_Disbursement::getBatchDisbursements($batch);
+			foreach ($disbursements as $disbursement) {
+				$disbursement -> delete();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "input_transfers") {
+			$disbursements = Region_Input_Issue::getBatchDisbursements($batch);
+			foreach ($disbursements as $disbursement) {
+				$disbursement -> delete();
+			}
+		} else if ($batch_object -> Transaction_Type_Object -> Indicator == "mopping_payments") {
+			$payments = Mopping_Payment::getBatchPayments($batch);
+			foreach ($payments as $payment) {
+				$payment -> delete();
 			}
 		}
 		$log = new System_Log();
@@ -258,7 +361,7 @@ class Batch_Management extends MY_Controller {
 		}
 		if ($transaction_type == "purchases") {
 			$batch_gross_total = 0;
-			$batch_net_total = 0; 
+			$batch_net_total = 0;
 			$farmer_reg_total = 0;
 			$other_recovery_total = 0;
 			$loan_recovery_total = 0;
@@ -276,7 +379,78 @@ class Batch_Management extends MY_Controller {
 			}
 			$data_buffer .= "<tr><td><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $quantity_total . "</b></td><td>-</td><td style='border-top:2px solid black;'><b>" . $loan_recovery_total . "</b></td><td style='border-top:2px solid black;'><b>" . $farmer_reg_total . "</b></td><td style='border-top:2px solid black;'><b>" . $other_recovery_total . "</b></td><td>-</td><td style='border-top:2px solid black;'><b>" . $batch_gross_total . "</b></td><td style='border-top:2px solid black;'><b>" . $batch_net_total . "</b></td></tr>";
 		}
+		if ($transaction_type == "agent_input_disbursements") {
+			$total_inputs_value = 0;
+			$disbursements = Agent_Input_Issue::getBatchDisbursements($batch_id);
+			$data_buffer .= "<tr><th>Agent</th><th>Delivery Note Number</th><th>Date</th><th>Farm Input</th><th>Quantity</th><th>Total Value</th><th>Timestamp</th></tr>";
+			foreach ($disbursements as $disbursement) {
+				$data_buffer .= "<tr><td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . $disbursement -> Delivery_Note_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td>" . $disbursement -> Quantity . "</td><td>" . $disbursement -> Total_Value . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
+				$total_inputs_value += $disbursement -> Total_Value;
+			}
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_inputs_value . "</b></td><td>-</td></tr>";
+		}
+		if ($transaction_type == "buying_center_receipts") {
+			$total_receipts_value = 0;
+			$receipts = Buying_Center_Receipt::getBatchReceipts($batch_id);
+			$data_buffer .= "<tr><th>Buyer</th><th>Receipt Number</th><th>Date</th><th>Amount</th><th>Timestamp</th></tr>";
+			foreach ($receipts as $receipt) {
+				$data_buffer .= "<tr><td>" . $receipt -> Buyer_Object -> Name . "</td><td>" . $receipt -> Receipt_Number . "</td><td>" . $receipt -> Date . "</td><td>" . $receipt -> Amount . "</td><td>" . date("d/m/Y H:i:s", $receipt -> Timestamp) . "</td></tr>";
+				$total_receipts_value += $receipt -> Amount;
+			}
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_receipts_value . "</b></td><td>-</td></tr>";
+		}
+		if ($transaction_type == "cash_receipts") {
+			$total_receipts_value = 0;
+			$receipts = Cash_Receipt::getBatchReceipts($batch_id);
+			$data_buffer .= "<tr><th>Field Cashier</th><th>Receipt Number</th><th>Date</th><th>Amount</th><th>Timestamp</th></tr>";
+			foreach ($receipts as $receipt) {
+				$data_buffer .= "<tr><td>" . $receipt -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $receipt -> Receipt_Number . "</td><td>" . $receipt -> Date . "</td><td>" . $receipt -> Amount . "</td><td>" . date("d/m/Y H:i:s", $receipt -> Timestamp) . "</td></tr>";
+				$total_receipts_value += $receipt -> Amount;
+			}
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_receipts_value . "</b></td><td>-</td></tr>";
+		}
+		if ($transaction_type == "cihc") {
+			$total_disbursements_value = 0;
+			$disbursements = Cash_Disbursement::getBatchDisbursements($batch_id);
+			$data_buffer .= "<tr><th>Field Cashier</th><th>CIH(c) Number</th><th>Date</th><th>Amount</th></tr>";
+			foreach ($disbursements as $disbursement) {
+				$data_buffer .= "<tr><td>" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $disbursement -> CIH . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Amount . "</td></tr>";
+				$total_disbursements_value += $disbursement -> Amount;
+			}
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_disbursements_value . "</b></td></tr>";
+		}
+		if ($transaction_type == "cihb") {
+			$total_disbursements_value = 0;
+			$disbursements = Field_Cash_Disbursement::getBatchDisbursements($batch_id);
+			$data_buffer .= "<tr><th>Buyer</th><th>Field Cashier</th><th>CIH(b) Number</th><th>Receipt</th><th>Date</th><th>Amount</th></tr>";
+			foreach ($disbursements as $disbursement) {
+				$data_buffer .= "<tr><td>" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $disbursement -> Buyer_Object -> Name . "</td><td>" . $disbursement -> CIH . "</td><td>" . $disbursement -> Receipt . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Amount . "</td></tr>";
+				$total_disbursements_value += $disbursement -> Amount;
+			}
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_disbursements_value . "</b></td></tr>";
+		}
+		if ($transaction_type == "input_transfers") {
+			$total_inputs_value = 0;
+			$disbursements = Region_Input_Issue::getBatchDisbursements($batch_id);
+			$data_buffer .= "<tr><th>Region</th><th>Agent</th><th>Delivery Note Number</th><th>Date</th><th>Farm Input</th><th>Quantity</th><th>Total Value</th><th>Timestamp</th></tr>";
+			foreach ($disbursements as $disbursement) {
+				$data_buffer .= "<tr><td>" . $disbursement -> Region_Object -> Region_Name . "</td><td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . $disbursement -> Delivery_Note_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td>" . $disbursement -> Quantity . "</td><td>" . $disbursement -> Total_Value . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
+				$total_inputs_value += $disbursement -> Total_Value;
+			}
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_inputs_value . "</b></td><td>-</td></tr>";
+		}
+		if ($transaction_type == "mopping_payments") {
+			$total_amount = 0;
+			$payments = Mopping_Payment::getBatchPayments($batch_id);
+			$data_buffer .= "<tr><th>Voucher Number</th><th>Depot</th><th>Date</th><th>Amount</th></tr>";
+			foreach ($payments as $payment) {
+				$data_buffer .= "<tr><td>" . $payment -> Voucher_Number . "</td><td>" . $payment -> Depot_Object -> Depot_Name . "</td><td> " . $payment -> Date . "</td><td>" . $payment -> Amount . "</td></tr>";
+				$total_amount += $payment -> Amount;
+			}
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_amount . "</b></td></tr>";
+		}
 		$data_buffer .= "</table>";
+		//echo $data_buffer;
 		$this -> generatePDF($data_buffer, $batch);
 
 	}

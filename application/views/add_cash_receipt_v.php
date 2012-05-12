@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	$(function() {
-		$("#disburse_cash_input").validationEngine();
+		$("#cash_receipt_input").validationEngine();
 		$("#date").datepicker({
 			defaultDate : new Date(),
 			changeYear : true,
@@ -10,22 +10,22 @@
 
 </script>
 <?php
-if (isset($disbursement)) {
-	$amount = $disbursement -> Amount;
-	$field_cashier = $disbursement -> Field_Cashier;
-	$cih = $disbursement -> CIH;
-	$disbursement_id = $disbursement -> id;
-	$date = $disbursement -> Date;
+if (isset($receipt)) {
+	$amount = $receipt -> Amount;
+	$receipt_number = $receipt -> Receipt_Number;
+	$field_cashier = $receipt -> Field_Cashier;
+	$receipt_id = $receipt -> id;
+	$date = $receipt -> Date;
 } else {
 	$amount = "";
+	$receipt_id = "";
+	$receipt_number = "";
 	$field_cashier = "";
-	$cih = "";
-	$disbursement_id = "";
 	$date = "";
 
 }
-$attributes = array("method" => "post", "id" => "disburse_cash_input");
-echo form_open('cash_management/save', $attributes);
+$attributes = array("method" => "post", "id" => "cash_receipt_input");
+echo form_open('cash_receipt_management/save', $attributes);
 echo validation_errors('
 <p class="form_error">', '</p>
 ');
@@ -42,13 +42,13 @@ if(isset($batch_information)){
 <!-- Fieldset -->
 <fieldset>
 	<legend>
-		Disburse Cash
+		New Field Cash Receipt
 	</legend>
-	<input type="hidden" name="editing_id" value="<?php echo $disbursement_id;?>" />
+	<input type="hidden" name="editing_id" value="<?php echo $receipt_id;?>" />
 	<p>
-		<label for="cih">CIH(c) Voucher Number: </label>
-		<input id="cih"  name="cih" type="text"  value="<?php echo $cih;?>" class="validate[required]"/>
-		<span class="field_desc">Enter the CIH(c) Voucher Number for this transaction</span>
+		<label for="receipt">Receipt Number: </label>
+		<input id="receipt_number"  name="receipt_number" type="text"  value="<?php echo $receipt_number;?>" class="validate[required]"/>
+		<span class="field_desc">Enter the Buying Center Receipt Number for this transaction</span>
 	</p>
 	<p>
 		<label for="date">Transaction Date: </label>
@@ -68,12 +68,12 @@ foreach($field_cashiers as $field_cashier_object){
 			?>><?php echo $field_cashier_object -> Field_Cashier_Name;?></option>
 			<?php }?>
 		</select>
-		<span class="field_desc">Select the recipient of the cash</span>
+		<span class="field_desc">Select the origin of the cash</span>
 	</p>
 	<p>
-		<label for="amount">Amount Issued: </label>
+		<label for="amount">Amount Returned: </label>
 		<input id="amount" name="amount" type="text" value="<?php echo $amount;?>" class="validate[required,custom[integer]]"/>
-		<span class="field_desc">Enter the amount issued</span>
+		<span class="field_desc">Enter the amount returned</span>
 	</p>
 	<p>
 		<input class="button" type="reset" value="Reset">

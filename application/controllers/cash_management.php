@@ -9,19 +9,20 @@ class Cash_Management extends MY_Controller {
 		$this -> listing();
 	}
 
-	public function listing($offset = 0) {
+	public function listing($batch, $offset = 0) {
 		$items_per_page = 20;
-		$number_of_disbursements = Cash_Disbursement::getTotalDisbursements();
-		$disbursements = Cash_Disbursement::getPagedDisbursements($offset, $items_per_page);
+		$number_of_disbursements = Cash_Disbursement::getTotalDisbursements($batch);
+		$disbursements = Cash_Disbursement::getPagedDisbursements($batch, $offset, $items_per_page);
 		if ($number_of_disbursements > $items_per_page) {
-			$config['base_url'] = base_url() . "cash_management/listing/";
+			$config['base_url'] = base_url() . "cash_management/listing/" . $batch . "/";
 			$config['total_rows'] = $number_of_disbursements;
 			$config['per_page'] = $items_per_page;
-			$config['uri_segment'] = 3;
+			$config['uri_segment'] = 4;
 			$config['num_links'] = 5;
 			$this -> pagination -> initialize($config);
 			$data['pagination'] = $this -> pagination -> create_links();
 		}
+		$data['batch'] = $batch;
 		$data['disbursements'] = $disbursements;
 		$data['title'] = "Cash Disbursements";
 		$data['content_view'] = "list_cash_disbursements_v";
@@ -31,12 +32,18 @@ class Cash_Management extends MY_Controller {
 	}
 
 	public function issue_cash($data = null) {
+		$batch = $this -> session -> userdata('cihc_batch');
+		if (strlen($batch) == 0) {
+			echo "No batch selected";
+			redirect("batch_management/no_batch");
+		}
 		if ($data == null) {
 			$data = array();
 		}
 		$data['field_cashiers'] = Field_Cashier::getAll();
 		$data['content_view'] = "add_cash_disbursement_v";
 		$data['quick_link'] = "issue_cash";
+		$data['batch_information'] = "You are entering records into batch number: <b>" . $this -> session -> userdata('cihc_batch') . "</b>";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
@@ -71,11 +78,19 @@ class Cash_Management extends MY_Controller {
 			$disbursement -> Amount = $this -> input -> post("amount");
 			$disbursement -> CIH = $this -> input -> post("cih");
 			$disbursement -> Date = $this -> input -> post("date");
+			$disbursement -> Batch = $this -> session -> userdata('cihc_batch');
 			$disbursement -> save();
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
 			$log -> save();
-			redirect("cash_management/listing");
+			$submit_button = $this -> input -> post("submit");
+			if ($submit_button == "Save & Add New") {
+				redirect("cash_management/issue_cash");
+			} else if ($submit_button == "Save & View List") {
+				$batch = $this -> session -> userdata('cihc_batch');
+				$link = "cash_management/listing/" . $batch;
+				redirect($link);
+			}
 		} else {
 			$this -> issue_cash();
 		}

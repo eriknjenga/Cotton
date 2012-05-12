@@ -27,7 +27,13 @@
 		window.location = url;
 		}
 </script>
-<h1>Cash Disbursement Listing</h1>
+<div class="message information close">
+	<h2>Batch Information</h2>
+	<p>
+		You are viewing records for batch number: <b><?php echo $batch;?></b>
+	</p>
+</div>
+<h1>Field Cash Disbursement Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>

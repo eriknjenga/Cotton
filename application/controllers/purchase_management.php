@@ -14,10 +14,10 @@ class Purchase_Management extends MY_Controller {
 		$number_of_purchases = Purchase::getTotalPurchases($batch);
 		$purchases = Purchase::getPagedPurchases($batch, $offset, $items_per_page);
 		if ($number_of_purchases > $items_per_page) {
-			$config['base_url'] = base_url() . "purchase_management/listing/";
+			$config['base_url'] = base_url() . "purchase_management/listing/" . $batch . "/";
 			$config['total_rows'] = $number_of_purchases;
 			$config['per_page'] = $items_per_page;
-			$config['uri_segment'] = 3;
+			$config['uri_segment'] = 4;
 			$config['num_links'] = 5;
 			$this -> pagination -> initialize($config);
 			$data['pagination'] = $this -> pagination -> create_links();
@@ -39,6 +39,11 @@ class Purchase_Management extends MY_Controller {
 	}
 
 	public function new_purchase($data = null) {
+		$batch = $this -> session -> userdata('purchases_batch');
+		if (strlen($batch) == 0) {
+			echo "No batch selected";
+			redirect("batch_management/no_batch");
+		}
 		if ($data == null) {
 			$data = array();
 		}

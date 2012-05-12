@@ -18,6 +18,13 @@ class Transaction_Batch extends Doctrine_Record {
 		$this -> hasOne('Transaction_Type as Transaction_Type_Object', array('local' => 'Transaction_Type', 'foreign' => 'id'));
 		$this -> hasMany('Disbursement as Disbursements', array('local' => 'id', 'foreign' => 'ID_Batch'));
 		$this -> hasMany('Purchase as Purchases', array('local' => 'id', 'foreign' => 'Batch'));
+		$this -> hasMany('Agent_Input_Issue as Agent_Disbursements', array('local' => 'id', 'foreign' => 'Batch'));
+		$this -> hasMany('Buying_Center_Receipt as Buying_Center_Receipts', array('local' => 'id', 'foreign' => 'Batch'));
+		$this -> hasMany('Cash_Receipt as Cash_Receipts', array('local' => 'id', 'foreign' => 'Batch'));
+		$this -> hasMany('Cash_Disbursement as Cash_Disbursements', array('local' => 'id', 'foreign' => 'Batch'));
+		$this -> hasMany('Field_Cash_Disbursement as Field_Cash_Disbursements', array('local' => 'id', 'foreign' => 'Batch'));
+		$this -> hasMany('Region_Input_Issue as Region_Disbursements', array('local' => 'id', 'foreign' => 'Batch'));
+		$this -> hasMany('Mopping_Payment as Mopping_Payments', array('local' => 'id', 'foreign' => 'Batch'));
 	}
 
 	//For the data entry clerk
@@ -36,6 +43,7 @@ class Transaction_Batch extends Doctrine_Record {
 	//For the general supervisor. Get batches that are not open
 	public function getTotalClosedBatches() {
 		$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch") -> where("Status != '0'");
+		
 		$total = $query -> execute();
 		return $total[0]['Total_Batches'];
 	}

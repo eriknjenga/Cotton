@@ -23,6 +23,12 @@ class Farmer_Input extends Doctrine_Record {
 		return $disbursements;
 	}
 
+	public function getBatchDisbursements($batch) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Farmer_Input") -> where("Batch_Id = '$batch'");
+		$disbursements = $query -> execute();
+		return $disbursements;
+	}
+
 	public function getDisbursement($id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Farmer_Input") -> where("id = '$id'");
 		$farmer_inputs = $query -> execute();

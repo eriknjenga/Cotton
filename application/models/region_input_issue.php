@@ -10,7 +10,8 @@ class Region_Input_Issue extends Doctrine_Record {
 		$this -> hasColumn('Timestamp', 'varchar', 32);
 		$this -> hasColumn('Agent', 'varchar', 10);
 		$this -> hasColumn('Region', 'varchar', 10);
-
+		$this -> hasColumn('Batch', 'varchar', 10);
+		$this -> hasColumn('Batch_Status', 'varchar', 5);
 	}
 
 	public function setUp() {
@@ -20,14 +21,14 @@ class Region_Input_Issue extends Doctrine_Record {
 		$this -> hasOne('Farm_Input as Farm_Input_Object', array('local' => 'Farm_Input', 'foreign' => 'id'));
 	}
 
-	public function getTotalIssues() {
-		$query = Doctrine_Query::create() -> select("count(*) as Total_Issues") -> from("Region_Input_Issue");
+	public function getTotalIssues($batch) {
+		$query = Doctrine_Query::create() -> select("count(*) as Total_Issues") -> from("Region_Input_Issue") -> where("Batch = '$batch'");
 		$total = $query -> execute();
 		return $total[0]['Total_Issues'];
 	}
 
-	public function getPagedIssues($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Region_Input_Issue") -> offset($offset) -> limit($items)->orderBy("id Desc");
+	public function getPagedIssues($batch,$offset, $items) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Region_Input_Issue") -> where("Batch = '$batch'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$issues = $query -> execute(array());
 		return $issues;
 	}
@@ -36,6 +37,12 @@ class Region_Input_Issue extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Region_Input_Issue") -> where("id = '$id'");
 		$issue = $query -> execute();
 		return $issue[0];
+	}
+
+	public function getBatchDisbursements($batch_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Region_Input_Issue") -> where("Batch = '$batch_id'");
+		$issues = $query -> execute(array());
+		return $issues;
 	}
 
 	public function getAll() {

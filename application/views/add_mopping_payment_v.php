@@ -1,35 +1,88 @@
-<form method="post" action="#">
-	<!-- Fieldset -->
-	<fieldset>
-		<legend>
-			New Mopping Payment
-		</legend>
-		<p>
-			<label for="batch_number">Voucher Number: </label>
-			<input class="batch_number" name="batch_number" type="text" value=" " />
-		</p>
-		<p>
-			<label for="date">Depot: </label>
-						<select name="depot[]" class="dropdown depot validate[required]" id="depot_<?php echo $counter;?>" >
-					<option></option>
-					<?php
+<script type="text/javascript">
+	$(function() {
+		$("#mopping_payment_input").validationEngine();
+		$("#date").datepicker({
+			defaultDate : new Date(),
+			changeYear : true,
+			changeMonth : true
+		});
+	});
+
+</script>
+<?php
+if (isset($payment)) {
+	$amount = $payment -> Amount;
+	$voucher_number = $payment -> Voucher_Number;
+	$depot = $payment -> Depot;
+	$payment_id = $payment -> id;
+	$date = $payment -> Date;
+} else {
+	$amount = "";
+	$payment_id = "";
+	$voucher_number = "";
+	$depot = "";
+	$date = "";
+
+}
+$attributes = array("method" => "post", "id" => "mopping_payment_input");
+echo form_open('mopping_payment_management/save', $attributes);
+echo validation_errors('
+<p class="form_error">', '</p>
+');
+if(isset($batch_information)){
+?>
+<div class="message information close">
+	<h2>Batch Information</h2>
+	<p>
+		<?php echo $batch_information;?>
+	</p>
+</div>
+<?php }?>
+
+<!-- Fieldset -->
+<fieldset>
+	<legend>
+		New Mopping Payment
+	</legend>
+	<input type="hidden" name="editing_id" value="<?php echo $payment_id;?>" />
+	<p>
+		<label for="voucher_number">Voucher Number: </label>
+		<input id="voucher_number"  name="voucher_number" type="text"  value="<?php echo $voucher_number;?>" class="validate[required]"/>
+		<span class="field_desc">Enter the Voucher Number for this transaction</span>
+	</p>
+	<p>
+		<label for="date">Transaction Date: </label>
+		<input id="date"  name="date" type="text"  value="<?php echo $date;?>" class="validate[required]"/>
+		<span class="field_desc">Enter the transaction date</span>
+	</p>
+	<p>
+		<label for="depot">Depot</label>
+		<select name="depot" class="dropdown depot validate[required]" id="depot" >
+			<option></option>
+			<?php
 foreach($depots as $depot_object){
-					?>
-					<option value="<?php echo $depot_object -> id;?>"><?php echo $depot_object -> Depot_Name;?></option>
-					<?php
-					$counter++;
-					}
-					?>
-				</select>
-		</p>
-				<p>
-			<label for="date">Amount: </label>
-			<input class="date" name="date" type="text" value=" " />
-		</p>
-		<p>
-			<input class="button" type="submit" value="Submit">
-			<input class="button" type="reset" value="Reset">
-		</p>
-	</fieldset>
-	<!-- End of fieldset -->
+			?>
+			<option value="<?php echo $depot_object -> id;?>" <?php
+			if ($depot_object -> id == $depot) {echo "selected";
+			}
+				?>><?php echo $depot_object -> Depot_Name;?></option>
+			<?php
+			$counter++;
+			}
+			?>
+		</select>
+		<span class="field_desc">Select the affected depot</span>
+	</p>
+	<p>
+		<label for="amount">Amount Used: </label>
+		<input id="amount" name="amount" type="text" value="<?php echo $amount;?>" class="validate[required,custom[integer]]"/>
+		<span class="field_desc">Enter the amount used</span>
+	</p>
+	<p>
+		<input class="button" type="reset" value="Reset">
+		<input class="button" type="submit" value="Save & Add New" name="submit">
+		<input class="button" type="submit" value="Save & View List" name="submit">
+	</p>
+</fieldset>
+<!-- End of fieldset -->
 </form>

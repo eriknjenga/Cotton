@@ -32,6 +32,11 @@ class Disbursement_Management extends MY_Controller {
 	}
 
 	public function new_disbursement($data = null) {
+		$batch = $this -> session -> userdata('input_disbursement_batch');
+		if (strlen($batch) == 0) {
+			echo "No batch selected";
+			redirect("batch_management/no_batch");
+		}
 		if ($data == null) {
 			$data = array();
 		}
@@ -105,13 +110,13 @@ class Disbursement_Management extends MY_Controller {
 				if (isset($edited_input_disbursements[$input_counter])) {
 					$log -> Log_Type = "2";
 					$disbursement = Disbursement::getDisbursement($edited_input_disbursements[$input_counter]);
-					$message = "Edited Input Disbursement Record From {FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $disbursement -> Invoice_Number . "' Date: '" . $disbursement -> Date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $disbursement -> Quantity . "' Total Value: '" . $disbursement -> Total_Value . "' Season: '" . $disbursement -> Season . "' ID Batch: '" . $disbursement -> ID_Batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'} to ";
+					$message = "Edited FBG Input Disbursement Record From {FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $disbursement -> Invoice_Number . "' Date: '" . $disbursement -> Date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $disbursement -> Quantity . "' Total Value: '" . $disbursement -> Total_Value . "' Season: '" . $disbursement -> Season . "' ID Batch: '" . $disbursement -> ID_Batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'} to ";
 				}
 				// else, create a new record
 				else {
 					$log -> Log_Type = "1";
 					$disbursement = new Disbursement();
-					$message = "Created New Disbursement Record ";
+					$message = "Created New FBG Input Disbursement Record ";
 				}
 				$disbursement -> clearRelated();
 				$disbursement -> FBG = $fbg;
@@ -178,13 +183,13 @@ class Disbursement_Management extends MY_Controller {
 			$disbursement -> delete();
 			$log = new System_Log();
 			$log -> Log_Type = "3";
-			$log -> Log_Message = "Deleted Input Disbursement Record {FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $disbursement -> Invoice_Number . "' Date: '" . $disbursement -> Date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $disbursement -> Quantity . "' Total Value: '" . $disbursement -> Total_Value . "' Season: '" . $disbursement -> Season . "' ID Batch: '" . $disbursement -> ID_Batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'}";
+			$log -> Log_Message = "Deleted FBG Input Disbursement Record {FGB: '" . $disbursement -> FBG_Object -> Group_Name . "' Invoice: '" . $disbursement -> Invoice_Number . "' Date: '" . $disbursement -> Date . "' Farm Input: '" . $disbursement -> Farm_Input_Object -> Product_Name . "' Quantity: '" . $disbursement -> Quantity . "' Total Value: '" . $disbursement -> Total_Value . "' Season: '" . $disbursement -> Season . "' ID Batch: '" . $disbursement -> ID_Batch . "' Agent: '" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "'}";
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
 			$log -> save();
 		}
-		foreach($farmer_disbursements as $farmer_disbursement){
-			$farmer_disbursement->delete();
+		foreach ($farmer_disbursements as $farmer_disbursement) {
+			$farmer_disbursement -> delete();
 		}
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);

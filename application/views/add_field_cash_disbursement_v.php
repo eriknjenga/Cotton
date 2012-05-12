@@ -33,7 +33,15 @@ echo form_open('field_cash_management/save', $attributes);
 echo validation_errors('
 <p class="form_error">', '</p>
 ');
+if(isset($batch_information)){
 ?>
+<div class="message information close">
+	<h2>Batch Information</h2>
+	<p>
+		<?php echo $batch_information;?>
+	</p>
+</div>
+<?php }?>
 <!-- Fieldset -->
 <fieldset>
 	<legend>
@@ -46,7 +54,7 @@ echo validation_errors('
 		<span class="field_desc">Enter the CIH(b) Voucher Number for this transaction</span>
 	</p>
 	<p>
-		<label for="receipt">Receipt Number: </label>
+		<label for="receipt">Buying Center Receipt Number: </label>
 		<input id="receipt"  name="receipt" type="text"  value="<?php echo $receipt;?>" class="validate[required]"/>
 		<span class="field_desc">Enter the Buying Center Receipt Number for this transaction</span>
 	</p>
@@ -90,9 +98,10 @@ foreach($buyers as $buyer_object){
 		<input id="amount" name="amount" type="text" value="<?php echo $amount;?>" class="validate[required,custom[integer]]"/>
 		<span class="field_desc">Enter the amount issued</span>
 	</p>
-	<p>
-		<input class="button" type="submit" value="Submit">
+	<p> 
 		<input class="button" type="reset" value="Reset">
+		<input class="button" type="submit" value="Save & Add New" name="submit">
+		<input class="button" type="submit" value="Save & View List" name="submit">
 	</p>
 </fieldset>
 <!-- End of fieldset -->

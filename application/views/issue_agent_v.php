@@ -104,7 +104,16 @@ echo form_open('agent_input_issue_management/save', $attributes);
 echo validation_errors('
 <p class="form_error">', '</p>
 ');
+if(isset($batch_information)){
 ?>
+<div class="message information close">
+	<h2>Batch Information</h2>
+	<p>
+		<?php echo $batch_information;?>
+	</p>
+</div>
+<?php }?>
+
 <!-- End of fieldset -->
 <!-- Fieldset -->
 <fieldset>
@@ -187,8 +196,10 @@ foreach($farm_inputs as $farm_input_object){
 		</tbody>
 	</table>
 	<p>
-		<input class="button" type="submit" value="Submit">
 		<input class="button" type="reset" value="Reset">
+		<input class="button" type="submit" value="Save & Add New" name="submit">
+		<input class="button" type="submit" value="Save & View List" name="submit">
+		
 	</p>
 </fieldset>
 <!-- End of fieldset -->

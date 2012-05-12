@@ -18,8 +18,8 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'region_input_issue_management/delete_issue/'?>
-		" +$(this).attr("issue");
+	url = "<?php echo base_url().'buying_center_receipt_management/delete_receipt/'?>
+		" +$(this).attr("receipt");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -33,24 +33,22 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
-<h1>Region Input-Transfers Listing</h1>
+<h1>Buying Center Receipts Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Delivery Note No.</th>
+			<th>Receipt No.</th>
 			<th>Date</th>
-			<th>Region</th>
-			<th>Input</th>
-			<th>Quantity</th>
-			<th>Total Value</th>
+			<th>Buyer</th>
+			<th>Amount</th> 
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-if (isset($issues[0])) {
+if (isset($receipts[0])) {
 $counter = 1;
-foreach ($issues as $issue) {
+foreach ($receipts as $receipt) {
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
@@ -60,25 +58,18 @@ $class = "odd";
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $issue -> Delivery_Note_Number;?>
+		<?php echo $receipt -> Receipt_Number;?>
 		</td>
 		<td>
-		<?php echo $issue -> Date;?>
-		</td>
-
-		<td>
-		<?php echo $issue -> Region_Object -> Region_Name;?>
+		<?php echo $receipt -> Date;?>
 		</td>
 		<td>
-		<?php echo $issue -> Farm_Input_Object -> Product_Name;?>
-		</td>
+		<?php echo $receipt -> Buyer_Object->Name;?>
+		</td> 
 		<td>
-		<?php echo $issue -> Quantity;?>
-		</td>
-		<td>
-		<?php echo $issue -> Total_Value;?>
-		</td>
-		<td><a href="<?php echo base_url()."region_input_issue_management/edit_issue/".$issue->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" issue = "<?php echo $issue -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		<?php echo $receipt -> Amount;?>
+		</td> 
+		<td><a href="<?php echo base_url()."buying_center_receipt_management/edit_receipt/".$receipt->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" receipt = "<?php echo $receipt -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
 		<?php
 

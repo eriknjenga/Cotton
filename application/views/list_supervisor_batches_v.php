@@ -44,7 +44,9 @@
 		<?php
 if (isset($batches[0])) {
 $counter = 1;
+
 foreach ($batches as $batch) {
+
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
@@ -67,7 +69,28 @@ $statuses = array("Open","Closed","Posted");
 		<?php echo $batch -> User_Object -> Name;?>
 		</td>
 		<td>
-		<?php echo sizeof($batch -> Purchases) + sizeof($batch -> Disbursements);?>
+		<?php
+		//Check type of batch and get total number of transactions
+		if ($batch -> Transaction_Type_Object -> Indicator == "purchases") {
+			echo sizeof($batch -> Purchases);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "input_disbursements") {
+			echo sizeof($batch -> Disbursements);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "agent_input_disbursements") {
+			echo sizeof($batch -> Agent_Disbursements);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "buying_center_receipts") {
+			echo sizeof($batch -> Buying_Center_Receipts);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "cash_receipts") {
+			echo sizeof($batch -> Cash_Receipts);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "cihc") {
+			echo sizeof($batch -> Cash_Disbursements);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "cihb") {
+			echo sizeof($batch -> Field_Cash_Disbursements);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "input_transfers") {
+			echo sizeof($batch -> Region_Disbursements);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "mopping_payments") {
+			echo sizeof($batch -> Mopping_Payments);
+		}
+		?>
 		</td>
 		<td>
 		<?php echo $batch -> Validator_Object -> Name;?>
@@ -83,7 +106,7 @@ $statuses = array("Open","Closed","Posted");
 	</tbody>
 </table>
 <div title="Confirm Delete!" id="confirm_delete" style="width: 300px; height: 150px; margin: 5px auto 5px auto;">
-	Are you sure you want to delete this record?
+	Are you sure you want to delete this batch plus all its transactions?
 </div>
 <?php if (isset($pagination)):
 ?>

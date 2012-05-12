@@ -27,6 +27,12 @@
 		window.location = url;
 		}
 </script>
+<div class="message information close">
+	<h2>Batch Information</h2>
+	<p>
+		You are viewing records for batch number: <b><?php echo $batch;?></b>
+	</p>
+</div>
 <h1>Agent Inputs Issued Listing</h1>
 <table class="fullwidth">
 	<thead>
