@@ -40,8 +40,7 @@ class Purchase_Management extends MY_Controller {
 
 	public function new_purchase($data = null) {
 		$batch = $this -> session -> userdata('purchases_batch');
-		if (strlen($batch) == 0) {
-			echo "No batch selected";
+		if (strlen($batch) == 0) { 
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {
@@ -58,8 +57,7 @@ class Purchase_Management extends MY_Controller {
 
 	public function search_depot() {
 		$batch = $this -> session -> userdata('purchases_batch');
-		if (strlen($batch) == 0) {
-			echo "No batch selected";
+		if (strlen($batch) == 0) { 
 			redirect("batch_management/no_batch");
 		}
 		$data['content_view'] = "search_depot_v";

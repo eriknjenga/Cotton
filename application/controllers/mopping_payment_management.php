@@ -31,8 +31,7 @@ class Mopping_Payment_Management extends MY_Controller {
 
 	public function new_payment($data = null) {
 		$batch = $this -> session -> userdata('mopping_payment_batch');
-		if (strlen($batch) == 0) {
-			echo "No batch selected";
+		if (strlen($batch) == 0) { 
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {

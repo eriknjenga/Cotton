@@ -12,7 +12,7 @@ class Buying_Center_Receipt extends Doctrine_Record {
 	}
 
 	public function setUp() {
-		$this -> setTableName('Buying_Center_Receipt');
+		$this -> setTableName('buying_center_receipt');
 		$this -> hasOne('Buyer as Buyer_Object', array('local' => 'Buyer', 'foreign' => 'id')); 
 	}
 

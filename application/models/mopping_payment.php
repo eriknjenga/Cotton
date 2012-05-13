@@ -11,7 +11,7 @@ class Mopping_Payment extends Doctrine_Record {
 	}
 
 	public function setUp() {
-		$this -> setTableName('Mopping_Payment');
+		$this -> setTableName('mopping_payment');
 		$this -> hasOne('Depot as Depot_Object', array('local' => 'Depot', 'foreign' => 'id')); 
 	}
 

@@ -31,8 +31,7 @@ class Cash_Receipt_Management extends MY_Controller {
 
 	public function new_receipt($data = null) {
 		$batch = $this -> session -> userdata('cash_receipt_batch');
-		if (strlen($batch) == 0) {
-			echo "No batch selected";
+		if (strlen($batch) == 0) { 
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {

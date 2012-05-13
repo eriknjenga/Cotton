@@ -270,6 +270,8 @@ class Batch_Management extends MY_Controller {
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
 			$log -> save();
+			//Open the batch
+			$this->enter_batch($transaction_batch->id);
 			redirect("batch_management/listing");
 		} else {
 			$this -> new_batch();

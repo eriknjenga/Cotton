@@ -12,7 +12,7 @@ class Cash_Receipt extends Doctrine_Record {
 	}
 
 	public function setUp() {
-		$this -> setTableName('Cash_Receipt');
+		$this -> setTableName('cash_receipt');
 		$this -> hasOne('Field_Cashier as Field_Cashier_Object', array('local' => 'Field_Cashier', 'foreign' => 'id')); 
 	}
 

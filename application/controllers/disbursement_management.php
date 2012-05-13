@@ -33,8 +33,7 @@ class Disbursement_Management extends MY_Controller {
 
 	public function new_disbursement($data = null) {
 		$batch = $this -> session -> userdata('input_disbursement_batch');
-		if (strlen($batch) == 0) {
-			echo "No batch selected";
+		if (strlen($batch) == 0) { 
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {
@@ -52,8 +51,7 @@ class Disbursement_Management extends MY_Controller {
 
 	public function search_fbg() {
 		$batch = $this -> session -> userdata('input_disbursement_batch');
-		if (strlen($batch) == 0) {
-			echo "No batch selected";
+		if (strlen($batch) == 0) { 
 			redirect("batch_management/no_batch");
 		}
 		$data['content_view'] = "search_fbg_v";

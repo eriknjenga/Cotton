@@ -33,8 +33,7 @@ class Region_Input_Issue_Management extends MY_Controller {
 
 	public function new_issue($data = null) {
 		$batch = $this -> session -> userdata('input_transfer_batch');
-		if (strlen($batch) == 0) {
-			echo "No batch selected";
+		if (strlen($batch) == 0) { 
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {
