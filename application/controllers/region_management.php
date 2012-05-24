@@ -75,8 +75,8 @@ class Region_Management extends MY_Controller {
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('region_code', 'Region Code', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('region_name', 'Region Name', 'trim|required|max_length[100]|xss_clean'); 
+		$this -> form_validation -> set_rules('region_code', 'Zone Code', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('region_name', 'Zone Name', 'trim|required|max_length[100]|xss_clean'); 
 		return $this -> form_validation -> run();
 	}
 

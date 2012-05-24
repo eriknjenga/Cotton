@@ -27,12 +27,12 @@
 		window.location = url;
 		}
 </script>
-<h1>Region Listing</h1>
+<h1>Zone Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Region Code</th>
-			<th>Region Name</th> 
+			<th>Code</th>
+			<th>Name</th> 
 			<th>Action</th>
 		</tr>
 	</thead>

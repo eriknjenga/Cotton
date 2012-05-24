@@ -42,7 +42,7 @@ if(isset($batch_information)){
 <!-- Fieldset -->
 <fieldset>
 	<legend>
-		New Mopping Payment
+		New Buying Center Expense
 	</legend>
 	<input type="hidden" name="editing_id" value="<?php echo $payment_id;?>" />
 	<p>
@@ -56,7 +56,7 @@ if(isset($batch_information)){
 		<span class="field_desc">Enter the transaction date</span>
 	</p>
 	<p>
-		<label for="depot">Depot</label>
+		<label for="depot">Buying Center</label>
 		<select name="depot" class="dropdown depot validate[required]" id="depot" >
 			<option></option>
 			<?php
@@ -71,7 +71,7 @@ foreach($depots as $depot_object){
 			}
 			?>
 		</select>
-		<span class="field_desc">Select the affected depot</span>
+		<span class="field_desc">Select the affected buying center</span>
 	</p>
 	<p>
 		<label for="amount">Amount Used: </label>

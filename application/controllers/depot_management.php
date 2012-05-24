@@ -93,22 +93,24 @@ class Depot_Management extends MY_Controller {
 			$temp_depot = new Depot();
 			$temp_depot -> Buyer = $this -> input -> post("buyer");
 			$temp_depot -> Region = $this -> input -> post("region");
-			$details_desc = "{Depot Code: '" . $this -> input -> post("depot_code") . "' Depot Name: '" . $this -> input -> post("depot_name") . "' Buyer: '" . $temp_depot -> Buyer_Object -> Name . "' Region: '" . $temp_depot -> Region_Object -> Region_Name . "'}";
+			$details_desc = "{Code: '" . $this -> input -> post("depot_code") . "' Name: '" . $this -> input -> post("depot_name") . "' Capacity: '" . $this -> input -> post("capacity") . "' Distance: '" . $this -> input -> post("distance") . "' Buyer: '" . $temp_depot -> Buyer_Object -> Name . "' Region: '" . $temp_depot -> Region_Object -> Region_Name . "'}";
 			$editing = $this -> input -> post("editing_id");
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$depot = Depot::getDepot($editing);
 				$log -> Log_Type = "2";
-				$log -> Log_Message = "Edited Depot Record From {Depot Code: '" . $depot -> Depot_Code . "' Depot Name: '" . $depot -> Depot_Name . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Region: '" . $depot -> Region_Object -> Region_Name . "'} to " . $details_desc;
+				$log -> Log_Message = "Edited Buying Center Record From {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . $depot -> Distance . "'  Buyer: '" . $depot -> Buyer_Object -> Name . "' Region: '" . $depot -> Region_Object -> Region_Name . "'} to " . $details_desc;
 			} else {
 				$depot = new Depot();
 				$log -> Log_Type = "1";
-				$log -> Log_Message = "Created Depot Record " . $details_desc;
+				$log -> Log_Message = "Created Buying Center Record " . $details_desc;
 			}
 			$depot -> Depot_Code = $this -> input -> post("depot_code");
 			$depot -> Depot_Name = $this -> input -> post("depot_name");
 			$depot -> Buyer = $this -> input -> post("buyer");
 			$depot -> Region = $this -> input -> post("region");
+			$depot -> Capacity = $this -> input -> post("capacity");
+			$depot -> Distance = $this -> input -> post("distance");
 			$depot -> save();
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
@@ -125,24 +127,23 @@ class Depot_Management extends MY_Controller {
 		$depot -> save();
 		$log = new System_Log();
 		$log -> Log_Type = "3";
-		$log -> Log_Message = "Deleted Depot Record {Depot Code: '" . $depot -> Depot_Code . "' Depot Name: '" . $depot -> Depot_Name . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Region: '" . $depot -> Region_Object -> Region_Name . "'}";
+		$log -> Log_Message = "Deleted Buying Center Record {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . $depot -> Distance . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Region: '" . $depot -> Region_Object -> Region_Name . "'}";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
-
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('depot_code', 'Depot Code', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('depot_name', 'Depot Name', 'trim|required|max_length[100]|xss_clean');
+		$this -> form_validation -> set_rules('depot_code', 'Buying Center Code', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('depot_name', 'Buying Center Name', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('buyer', 'Buyer', 'trim|required|xss_clean');
 		return $this -> form_validation -> run();
 	}
 
 	public function base_params($data) {
-		$data['title'] = "Depot Management";
+		$data['title'] = "Buying Center Management";
 		$data['link'] = "depot_management";
 
 		$this -> load -> view("demo_template", $data);

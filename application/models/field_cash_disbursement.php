@@ -3,18 +3,19 @@ class Field_Cash_Disbursement extends Doctrine_Record {
 	public function setTableDefinition() {
 		$this -> hasColumn('CIH', 'varchar', 20);
 		$this -> hasColumn('Receipt', 'varchar', 20);
-		$this -> hasColumn('Buyer', 'varchar', 10);
+		$this -> hasColumn('Depot', 'varchar', 10);
 		$this -> hasColumn('Field_Cashier', 'varchar', 10);
 		$this -> hasColumn('Amount', 'varchar', 20);
 		$this -> hasColumn('Date', 'varchar', 20);
+		$this -> hasColumn('Details', 'text');
 		$this -> hasColumn('Batch', 'varchar', 10);
 		$this -> hasColumn('Batch_Status', 'varchar', 5);
 	}
 
 	public function setUp() {
 		$this -> setTableName('field_cash_disbursement');
-		$this -> hasOne('Field_Cashier as Field_Cashier_Object', array('local' => 'Field_Cashier', 'foreign' => 'id'));
-		$this -> hasOne('Buyer as Buyer_Object', array('local' => 'Buyer', 'foreign' => 'id'));
+		$this -> hasOne('Field_Cashier as Field_Cashier_Object', array('local' => 'Field_Cashier', 'foreign' => 'id')); 
+		$this -> hasOne('Depot as Depot_Object', array('local' => 'Depot', 'foreign' => 'id'));
 	}
 
 	public function getTotalDisbursements($batch) {

@@ -47,7 +47,7 @@ echo validation_errors('
 		<span class="field_desc">Enter the National ID Number for this officer</span>
 	</p>
 	 <p>
-		<label for="area">Region</label>
+		<label for="area">Zone</label>
 		<select name="region" class="dropdown validate[required]" id="region">
 			<option></option>
 			<?php
@@ -59,7 +59,7 @@ foreach($regions as $region_object){
 			?>><?php echo $region_object -> Region_Name;?></option>
 			<?php }?>
 		</select>
-		<span class="field_desc">Select the region covered by this field officer</span>
+		<span class="field_desc">Select the zone covered by this field officer</span>
 	</p>
 	<p>
 		<input class="button" type="submit" value="Submit">

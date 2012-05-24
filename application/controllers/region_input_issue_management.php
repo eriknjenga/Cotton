@@ -148,7 +148,7 @@ class Region_Input_Issue_Management extends MY_Controller {
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('region', 'Region', 'trim|required|max_length[100]|xss_clean');
+		$this -> form_validation -> set_rules('region', 'Zone', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('delivery_note_number', 'Delivery Note Number', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('date[]', 'Date', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('farm_input[]', 'Farm Input', 'trim|required|xss_clean');

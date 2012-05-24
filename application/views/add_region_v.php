@@ -27,12 +27,12 @@ echo validation_errors('
 	</legend>
 	<input type="hidden" name="editing_id" value="<?php echo $region_id;?>" />
 	<p>
-		<label for="region_code">Region Code: </label>
+		<label for="region_code">Zone Code: </label>
 		<input id="region_code"  name="region_code" type="text"  value="<?php echo $region_code;?>" class="validate[required]"/>
 		<span class="field_desc">Enter the code for this Region</span>
 	</p>
 	<p>
-		<label for="region_name">Region Name: </label>
+		<label for="region_name">Zone Name: </label>
 		<input id="region_name" name="region_name" type="text" value="<?php echo $region_name;?>" class="validate[required]"/>
 		<span class="field_desc">Enter the name for this region</span>
 	</p>

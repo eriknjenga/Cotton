@@ -39,8 +39,8 @@ class Field_Cash_Management extends MY_Controller {
 		if ($data == null) {
 			$data = array();
 		}
-		$data['field_cashiers'] = Field_Cashier::getAll();
-		$data['buyers'] = Buyer::getAll();
+		$data['field_cashiers'] = Field_Cashier::getAll(); 
+		$data['depots'] = Depot::getAll();
 		$data['content_view'] = "add_field_cash_disbursement_v";
 		$data['quick_link'] = "new_payment";
 		$data['batch_information'] = "You are entering records into batch number: <b>" . $this -> session -> userdata('cihb_batch') . "</b>";
@@ -62,25 +62,26 @@ class Field_Cash_Management extends MY_Controller {
 			$editing = $this -> input -> post("editing_id");
 			$log = new System_Log();
 			$temp_disb = new Field_Cash_Disbursement();
-			$temp_disb -> Field_Cashier = $this -> input -> post("field_cashier");
-			$temp_disb -> Buyer = $this -> input -> post("buyer");
-			$details_desc = "{Buyer: '" . $temp_disb -> Buyer_Object -> Name . "' Field Cashier: '" . $temp_disb -> Field_Cashier_Object -> Field_Cashier_Name . "' Amount: '" . $this -> input -> post("amount") . "' CIH(b) Voucher: '" . $this -> input -> post("cih") . "' Receipt: '" . $this -> input -> post("receipt") . "' Date: '" . $this -> input -> post("date") . "'}";
+			$temp_disb -> Field_Cashier = $this -> input -> post("field_cashier"); 
+			$temp_disb -> Depot = $this -> input -> post("depot");
+			$details_desc = "{Field Cashier: '" . $temp_disb -> Field_Cashier_Object -> Field_Cashier_Name . "' Depot: '" . $temp_disb -> Depot_Object -> Depot_Name . "' Amount: '" . $this -> input -> post("amount") . "' Details: '" . $this -> input -> post("details") . "' CIH(b) Voucher: '" . $this -> input -> post("cih") . "' Receipt: '" . $this -> input -> post("receipt") . "' Date: '" . $this -> input -> post("date") . "'}";
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$disbursement = Field_Cash_Disbursement::getDisbursement($editing);
 				$log -> Log_Type = "2";
-				$log -> Log_Message = "Edited Field Cash Payment Record From {Buyer: '" . $disbursement -> Buyer_Object -> Name . "' Field Cashier: '" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "' Amount: '" . $disbursement -> Amount . "' CIH(b) Voucher: '" . $disbursement -> CIH . "' Receipt '" . $disbursement -> Receipt . "' Date: '" . $disbursement -> Date . "'} to " . $details_desc;
+				$log -> Log_Message = "Edited Field Cash Payment Record From {Field Cashier: '" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "'Depot: '" . $disbursement -> Depot_Object -> Depot_Name . "' Amount: '" . $disbursement -> Amount . "' Details: '" . $disbursement -> Details . "' CIH(b) Voucher: '" . $disbursement -> CIH . "' Receipt '" . $disbursement -> Receipt . "' Date: '" . $disbursement -> Date . "'} to " . $details_desc;
 			} else {
 				$disbursement = new Field_Cash_Disbursement();
 				$log -> Log_Type = "1";
 				$log -> Log_Message = "Created Field Cash Payment Record " . $details_desc;
 			}
 			$disbursement -> Field_Cashier = $this -> input -> post("field_cashier");
-			$disbursement -> Buyer = $this -> input -> post("buyer");
+			$disbursement -> Depot = $this -> input -> post("depot");
 			$disbursement -> Amount = $this -> input -> post("amount");
 			$disbursement -> CIH = $this -> input -> post("cih");
 			$disbursement -> Receipt = $this -> input -> post("receipt");
 			$disbursement -> Date = $this -> input -> post("date");
+			$disbursement -> Details = $this -> input -> post("details");
 			$disbursement -> Batch = $this -> session -> userdata('cihb_batch');
 			$disbursement -> save();
 			$log -> User = $this -> session -> userdata('user_id');
@@ -104,7 +105,7 @@ class Field_Cash_Management extends MY_Controller {
 		$disbursement -> delete();
 		$log = new System_Log();
 		$log -> Log_Type = "3";
-		$log -> Log_Message = "Deleted Field Cash Payment Record {Buyer: '" . $disbursement -> Buyer_Object -> Name . "' Field Cashier: '" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "' Amount: '" . $disbursement -> Amount . "' CIH(b) Voucher: '" . $disbursement -> CIH . "' Receipt '" . $disbursement -> Receipt . "' Date: '" . $disbursement -> Date . "'}";
+		$log -> Log_Message = "Deleted Field Cash Payment Record {Field Cashier: '" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "'Depot: '" . $disbursement -> Depot_Object -> Depot_Name . "' Amount: '" . $disbursement -> Amount . "' Details: '" . $disbursement -> Details . "' CIH(b) Voucher: '" . $disbursement -> CIH . "' Receipt '" . $disbursement -> Receipt . "' Date: '" . $disbursement -> Date . "'}";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
@@ -114,7 +115,7 @@ class Field_Cash_Management extends MY_Controller {
 
 	public function validate_form() {
 		$this -> form_validation -> set_rules('field_cashier', 'Field Cashier', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('buyer', 'Buyer', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('depot', 'Buying Center', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('receipt', 'Buying Center Receipt', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('amount', 'Amount Disbursed', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('cih', 'CIH Voucher', 'trim|required|max_length[50]|xss_clean');

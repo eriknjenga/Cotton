@@ -13,15 +13,15 @@
 if (isset($receipt)) {
 	$amount = $receipt -> Amount;
 	$receipt_number = $receipt -> Receipt_Number;
-	$buyer = $receipt -> Buyer;
+	$depot = $receipt -> Depot;
 	$receipt_id = $receipt -> id;
 	$date = $receipt -> Date;
 } else {
 	$amount = "";
 	$receipt_id = "";
 	$receipt_number = "";
-	$buyer = "";
 	$date = "";
+	$depot = "";
 
 }
 $attributes = array("method" => "post", "id" => "buying_center_receipt_input");
@@ -56,19 +56,22 @@ if(isset($batch_information)){
 		<span class="field_desc">Enter the transaction date</span>
 	</p>
 	<p>
-		<label for="buyer">Buyer</label>
-		<select name="buyer" class="dropdown validate[required]" id="buyer">
+		<label for="depot">Buying Center</label>
+		<select name="depot" class="dropdown depot validate[required]" id="depot" >
 			<option></option>
 			<?php
-foreach($buyers as $buyer_object){
+foreach($depots as $depot_object){
 			?>
-			<option value="<?php echo $buyer_object -> id;?>" <?php
-			if ($buyer_object -> id == $buyer) {echo "selected";
+			<option value="<?php echo $depot_object -> id;?>" <?php
+			if ($depot_object -> id == $depot) {echo "selected";
 			}
-			?>><?php echo $buyer_object -> Name;?></option>
-			<?php }?>
+			?>><?php echo $depot_object -> Depot_Name;?></option>
+			<?php
+			$counter++;
+			}
+			?>
 		</select>
-		<span class="field_desc">Select the recipient of the cash</span>
+		<span class="field_desc">Select the affected buying center</span>
 	</p>
 	<p>
 		<label for="amount">Amount Returned: </label>

@@ -17,7 +17,7 @@ class Region extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Region");
+		$query = Doctrine_Query::create() -> select("*") -> from("Region")->orderBy("Region_Name asc");
 		$regions = $query -> execute();
 		return $regions;
 	}

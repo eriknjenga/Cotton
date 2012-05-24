@@ -5,6 +5,8 @@ class Depot extends Doctrine_Record {
 		$this -> hasColumn('Depot_Name', 'varchar', 100);
 		$this -> hasColumn('Buyer', 'varchar', 10);
 		$this -> hasColumn('Region', 'varchar', 10);
+		$this -> hasColumn('Capacity', 'varchar', 20);
+		$this -> hasColumn('Distance', 'varchar', 10);
 		$this -> hasColumn('Deleted', 'varchar', 1);
 	}
 
@@ -46,7 +48,7 @@ class Depot extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Depot") -> where("Deleted = '0'");
+		$query = Doctrine_Query::create() -> select("*") -> from("Depot") -> where("Deleted = '0'")->orderBy("Depot_Name asc");
 		$depots = $query -> execute();
 		return $depots;
 	}

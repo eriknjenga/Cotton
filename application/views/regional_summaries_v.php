@@ -1,24 +1,3 @@
-<script type="text/javascript">
-	$(function() {
-		$("#date").datepicker({
-			defaultDate : new Date(),
-			changeYear : true,
-			changeMonth : true
-		});
-	});
-
-</script>
-<style type="text/css">
-	#filter {
-		border: 2px solid #DDD;
-		display: block;
-		width: 80%;
-		margin: 10px auto;
-	}
-	.filter_input {
-		border: 1px solid black;
-	}
-</style>
 <div id="filter">
 	<?php
 	$attributes = array("method" => "POST");
@@ -33,19 +12,18 @@
 			Select Filter Options
 		</legend>
 		<p>
-			<label for="region">Select Region</label>
+			<label for="region">Select Zone</label>
 			<select name="region" id="region">
-				<option value="0">All Regions</option>
+				<option value="0">All Zones</option>
 				<?php
 foreach($regions as $region){
 				?>
 				<option value="<?php echo $region -> id;?>"><?php echo $region -> Region_Name;?></option>
 				<?php }?>
-			</select>
-			<label for="date">Transaction Date</label>
-			<input id="date" name="date" type="text"/>
+			</select> 
 		</p>
-		<input type="submit" name="surveillance" class="button"	value="Download Regional Summary" />
+		<input type="submit" name="action" class="button"	value="Download Zonal Summary PDF" />
+		<input type="submit" name="action" class="button"	value="Download Zonal Summary Excel" />
 	</fieldset>
 	</form>
 </div>

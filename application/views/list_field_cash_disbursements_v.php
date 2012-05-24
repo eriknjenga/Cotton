@@ -38,9 +38,8 @@
 	<thead>
 		<tr>
 			<th>CIH(b) Voucher No.</th>
-			<th>Receipt No.</th>
-			<th>Field Cashier</th>
-			<th>Buyer</th>
+			<th>Receipt No.</th> 
+			<th>Buying Center</th>
 			<th>Amount</th>
 			<th>Date</th>
 			<th>Action</th>
@@ -64,12 +63,9 @@ $class = "odd";
 		</td>
 				<td>
 		<?php echo $disbursement -> Receipt;?>
-		</td>
-		<td>
-		<?php echo $disbursement -> Field_Cashier_Object -> Field_Cashier_Name;?>
-		</td>
+		</td> 
 				<td>
-		<?php echo $disbursement -> Buyer_Object ->Name;?>
+		<?php echo $disbursement -> Depot_Object ->Depot_Name;?>
 		</td>
 		<td>
 		<?php echo $disbursement -> Amount;?>

@@ -42,7 +42,8 @@ class Buying_Center_Receipt_Management extends MY_Controller {
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$data['batch_information'] = "You are entering records into batch number: <b>" . $this -> session -> userdata('buying_center_receipt_batch') . "</b>";
-		$data['buyers'] = Buyer::getAll();
+		 
+		$data['depots'] = Depot::getAll();
 		$this -> base_params($data);
 	}
 
@@ -62,13 +63,13 @@ class Buying_Center_Receipt_Management extends MY_Controller {
 			$receipt_number = $this -> input -> post("receipt_number");
 			$date = $this -> input -> post("date");
 			$amount = $this -> input -> post("amount");
-			$buyer = $this -> input -> post("buyer");
+			$depot = $this -> input -> post("depot");
 			$batch = $this -> session -> userdata('buying_center_receipt_batch');
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$receipt = Buying_Center_Receipt::getReceipt($editing);
 				$log -> Log_Type = "2";
-				$message = "Edited Buying Center Receipt Record From {Buyer: '" . $receipt -> Buyer_Object -> Name . "' Receipt Number: '" . $receipt -> Receipt_Number . "' Date: '" . $receipt -> Date . "' Amount: '" . $receipt -> Amount . "' Batch '" . $receipt -> Batch . "'} to ";
+				$message = "Edited Buying Center Receipt Record From {Buying Center: '" . $receipt -> Depot_Object -> Depot_Name . "' Receipt Number: '" . $receipt -> Receipt_Number . "' Date: '" . $receipt -> Date . "' Amount: '" . $receipt -> Amount . "' Batch '" . $receipt -> Batch . "'} to ";
 			} else {
 				$receipt = new Buying_Center_Receipt();
 				$log -> Log_Type = "1";
@@ -78,11 +79,11 @@ class Buying_Center_Receipt_Management extends MY_Controller {
 			$receipt -> Receipt_Number = $receipt_number;
 			$receipt -> Date = $date;
 			$receipt -> Amount = $amount;
-			$receipt -> Buyer = $buyer;
+			$receipt -> Depot = $depot;
 			$receipt -> Timestamp = date('U');
 			$receipt -> Batch = $batch;
 			$receipt -> save();
-			$message .= "{Buyer: '" . $receipt -> Buyer_Object -> Name . "' Receipt Number: '" . $receipt -> Receipt_Number . "' Date: '" . $receipt -> Date . "' Amount: '" . $receipt -> Amount . "' Batch '" . $receipt -> Batch . "'}";
+			$message .= "{Buying Center: '" . $receipt -> Depot_Object -> Depot_Name . "' Receipt Number: '" . $receipt -> Receipt_Number . "' Date: '" . $receipt -> Date . "' Amount: '" . $receipt -> Amount . "' Batch '" . $receipt -> Batch . "'}";
 			$log -> Log_Message = $message;
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
@@ -105,7 +106,7 @@ class Buying_Center_Receipt_Management extends MY_Controller {
 		$receipt -> delete();
 		$log = new System_Log();
 		$log -> Log_Type = "3";
-		$log -> Log_Message = "Deleted Buying Center Receipt Record {Buyer: '" . $receipt -> Buyer_Object -> Name . "' Receipt Number: '" . $receipt -> Receipt_Number . "' Date: '" . $receipt -> Date . "' Amount: '" . $receipt -> Amount . "' Batch '" . $receipt -> Batch . "'}";
+		$log -> Log_Message = "Deleted Buying Center Receipt Record {Buyer: '" . $receipt -> Depot_Object -> Depot_Name . "' Receipt Number: '" . $receipt -> Receipt_Number . "' Date: '" . $receipt -> Date . "' Amount: '" . $receipt -> Amount . "' Batch '" . $receipt -> Batch . "'}";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
@@ -114,7 +115,7 @@ class Buying_Center_Receipt_Management extends MY_Controller {
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('buyer', 'Buyer', 'trim|required|max_length[100]|xss_clean');
+		$this -> form_validation -> set_rules('depot', 'Buying Center', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('receipt_number', 'Receipt Number', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('date', 'Transaction Date', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('amount', 'Amount Returned', 'trim|required|xss_clean');

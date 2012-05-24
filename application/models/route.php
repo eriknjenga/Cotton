@@ -9,6 +9,7 @@ class Route extends Doctrine_Record {
 	public function setUp() {
 		$this -> setTableName('route');
 		$this -> hasOne('Field_Cashier as Field_Cashier_Object', array('local' => 'Field_Cashier', 'foreign' => 'id'));
+		$this -> hasMany('Route_Depot as Route_Depot_Objects', array('local' => 'id', 'foreign' => 'Route'));
 	}
 
 	public function getTotalRoutes() {
@@ -18,7 +19,7 @@ class Route extends Doctrine_Record {
 	}
 
 	public function getPagedRoutes($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Route") -> offset($offset) -> limit($items)->orderBy("id Desc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Route") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$routes = $query -> execute(array());
 		return $routes;
 	}
@@ -30,9 +31,15 @@ class Route extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Route");
+		$query = Doctrine_Query::create() -> select("*") -> from("Route")->orderBy("Route_Name asc");
 		$routes = $query -> execute();
 		return $routes;
+	}
+
+	public function getRouteArray($id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Route") -> where("id = '$id'");
+		$route = $query -> execute();
+		return $route;
 	}
 
 }

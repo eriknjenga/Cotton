@@ -1,7 +1,7 @@
 <?php
 class Buyer extends Doctrine_Record {
 	public function setTableDefinition() {
-		$this -> hasColumn('Buyer_Code', 'varchar', 20);
+		$this -> hasColumn('Buyer_Code', 'varchar', 100);
 		$this -> hasColumn('Name', 'varchar', 100);
 		$this -> hasColumn('National_Id', 'varchar', 30);
 		$this -> hasColumn('Phone_Number', 'varchar', 30);
@@ -10,6 +10,7 @@ class Buyer extends Doctrine_Record {
 
 	public function setUp() {
 		$this -> setTableName('buyer'); 
+		
 	}
 
 	public function getTotalBuyers() {
@@ -31,7 +32,7 @@ class Buyer extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Buyer")-> where("Deleted = '0'");
+		$query = Doctrine_Query::create() -> select("*") -> from("Buyer")-> where("Deleted = '0'")->orderBy("Name asc");
 		$buyers = $query -> execute();
 		return $buyers;
 	}

@@ -34,7 +34,7 @@
 			<th>Officer Code</th>
 			<th>Officer Name</th>
 			<th>National ID</th> 
-			<th>Region</th> 
+			<th>Zone</th> 
 			<th>Action</th>
 		</tr>
 	</thead>

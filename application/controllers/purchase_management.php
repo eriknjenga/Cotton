@@ -49,7 +49,7 @@ class Purchase_Management extends MY_Controller {
 		$data['batch_information'] = "You are entering records into batch number: <b>" . $this -> session -> userdata('purchases_batch') . "</b>";
 		$data['prices'] = Cotton_Price::getCottonPrices();
 		$data['content_view'] = "add_purchase_v";
-		$data['quick_link'] = "add_purchase";
+		$data['quick_link'] = "new_purchase";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js", "jquery.ui.autocomplete.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
@@ -63,7 +63,7 @@ class Purchase_Management extends MY_Controller {
 		$data['content_view'] = "search_depot_v";
 		$data['link'] = "purchase_management";
 		$data['quick_link'] = "search_depot";
-		$data['search_title'] = "Search For an Depot to Record Purchases For";
+		$data['search_title'] = "Search For an Buying Center to Record Purchases For";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$this -> load -> view("demo_template", $data);
@@ -134,7 +134,7 @@ class Purchase_Management extends MY_Controller {
 			$log -> save();
 
 			$submit_button = $this -> input -> post("submit");
-			if ($submit_button == "Save & Add New From Depot") {
+			if ($submit_button == "Save & Add New From Buying Center") {
 				$saved_depot = $this -> session -> userdata('saved_depot');
 				$url = "purchase_management/record_purchase/" . $saved_depot;
 				redirect($url);
@@ -163,7 +163,7 @@ class Purchase_Management extends MY_Controller {
 
 	public function validate_form() {
 		$this -> form_validation -> set_rules('dpn', 'Daily Purchases Number', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('depot', 'Depot', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('depot', 'Buying Center', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('date', 'Date', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('price', 'Unit Price', 'trim|required|xss_clean');
 		$this -> form_validation -> set_rules('quantity', 'Quantity', 'trim|required|xss_clean');

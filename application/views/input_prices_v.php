@@ -29,7 +29,6 @@
 			$(this).datepicker("destroy");
 			$(this).not('.hasDatePicker').datepicker();
 			counter++;
-
 		});
 	}
 </script>

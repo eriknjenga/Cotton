@@ -69,11 +69,11 @@ foreach($field_cashiers as $field_cashier_object){
 	</p>
 	<table class="normal" id="depots_table" style="margin:0 auto;">
 		<caption>
-			Depots along this route
+			Buying Centers along this route
 		</caption>
 		<thead>
 			<tr>
-				<th>Depot</th>
+				<th>Buying Centers</th>
 				<th></th>
 			</tr>
 		</thead>

@@ -13,19 +13,21 @@
 if (isset($disbursement)) {
 	$amount = $disbursement -> Amount;
 	$field_cashier = $disbursement -> Field_Cashier;
-	$receipt = $disbursement -> Receipt;
-	$buyer = $disbursement -> Buyer;
+	$receipt = $disbursement -> Receipt; 
 	$cih = $disbursement -> CIH;
 	$disbursement_id = $disbursement -> id;
 	$date = $disbursement -> Date;
+	$details = $disbursement -> Details;
+	$depot = $disbursement -> Depot;
 } else {
 	$amount = "";
 	$field_cashier = "";
 	$cih = "";
 	$disbursement_id = "";
-	$receipt = "";
-	$buyer = "";
+	$receipt = ""; 
 	$date = "";
+	$details = "";
+	$depot = "";
 
 }
 $attributes = array("method" => "post", "id" => "disburse_cash_input");
@@ -77,28 +79,36 @@ foreach($field_cashiers as $field_cashier_object){
 			<?php }?>
 		</select>
 		<span class="field_desc">Select the origin of the cash</span>
-	</p>
+	</p> 
 	<p>
-		<label for="buyer">Buyer</label>
-		<select name="buyer" class="dropdown validate[required]" id="buyer">
+		<label for="depot">Buying Center</label>
+		<select name="depot" id="depot">
 			<option></option>
-			<?php
-foreach($buyers as $buyer_object){
-			?>
-			<option value="<?php echo $buyer_object -> id;?>" <?php
-			if ($buyer_object -> id == $buyer) {echo "selected";
-			}
-			?>><?php echo $buyer_object -> Name;?></option>
-			<?php }?>
+					<?php
+foreach($depots as $depot_object){
+					?>
+					<option value="<?php echo $depot_object -> id;?>" <?php
+					if ($depot_object -> id == $depot) {echo "selected";
+					}
+						?>><?php echo $depot_object -> Depot_Name;?></option>
+					<?php
+					$counter++;
+					}
+					?>
 		</select>
-		<span class="field_desc">Select the recipient of the cash</span>
+		<span class="field_desc">Select the buying center affected by this transaction</span>
 	</p>
 	<p>
 		<label for="amount">Amount Issued: </label>
 		<input id="amount" name="amount" type="text" value="<?php echo $amount;?>" class="validate[required,custom[integer]]"/>
 		<span class="field_desc">Enter the amount issued</span>
 	</p>
-	<p> 
+	<p>
+		<label for="details">Additional Details: </label>
+		<input id="details" name="details" type="text" value="<?php echo $details;?>"/>
+		<span class="field_desc">Enter any other details</span>
+	</p>
+	<p>
 		<input class="button" type="reset" value="Reset">
 		<input class="button" type="submit" value="Save & Add New" name="submit">
 		<input class="button" type="submit" value="Save & View List" name="submit">

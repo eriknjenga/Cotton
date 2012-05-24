@@ -369,7 +369,7 @@ class Batch_Management extends MY_Controller {
 			$loan_recovery_total = 0;
 			$quantity_total = 0;
 			$purchases = Purchase::getBatchPurchases($batch_id);
-			$data_buffer .= "<tr><th>FGB</th><th>DPN</th><th>Date</th><th>Depot</th><th>Quantity</th><th>Unit Price</th><th>Loan Recovery</th><th>Farmer Reg. Fee</th><th>Other Recoveries</th><th>Buyer</th><th>Gross Value</th><th>Net Value</th></tr>";
+			$data_buffer .= "<tr><th>FGB</th><th>DPN</th><th>Date</th><th>Buying Center</th><th>Quantity</th><th>Unit Price</th><th>Loan Recovery</th><th>Farmer Reg. Fee</th><th>Other Recoveries</th><th>Buyer</th><th>Gross Value</th><th>Net Value</th></tr>";
 			foreach ($purchases as $purchase) {
 				$data_buffer .= "<tr><td>" . $purchase -> FBG_Object -> Group_Name . "</td><td>" . $purchase -> DPN . "</td><td>" . $purchase -> Date . "</td><td>" . $purchase -> Depot_Object -> Depot_Name . "</td><td>" . $purchase -> Quantity . "</td><td>" . $purchase -> Unit_Price . "</td><td>" . $purchase -> Loan_Recovery . "</td><td>" . $purchase -> Farmer_Reg_Fee . "</td><td>" . $purchase -> Other_Recoveries . "</td><td>" . $purchase -> Buyer_Object -> Name . "</td><td>" . $purchase -> Gross_Value . "</td><td>" . $purchase -> Net_Value . "</td></tr>";
 				$batch_gross_total += $purchase -> Gross_Value;
@@ -394,9 +394,9 @@ class Batch_Management extends MY_Controller {
 		if ($transaction_type == "buying_center_receipts") {
 			$total_receipts_value = 0;
 			$receipts = Buying_Center_Receipt::getBatchReceipts($batch_id);
-			$data_buffer .= "<tr><th>Buyer</th><th>Receipt Number</th><th>Date</th><th>Amount</th><th>Timestamp</th></tr>";
+			$data_buffer .= "<tr><th>Buying Center</th><th>Receipt Number</th><th>Date</th><th>Amount</th><th>Timestamp</th></tr>";
 			foreach ($receipts as $receipt) {
-				$data_buffer .= "<tr><td>" . $receipt -> Buyer_Object -> Name . "</td><td>" . $receipt -> Receipt_Number . "</td><td>" . $receipt -> Date . "</td><td>" . $receipt -> Amount . "</td><td>" . date("d/m/Y H:i:s", $receipt -> Timestamp) . "</td></tr>";
+				$data_buffer .= "<tr><td>" . $receipt -> Depot_Object -> Depot_Name . "</td><td>" . $receipt -> Receipt_Number . "</td><td>" . $receipt -> Date . "</td><td>" . $receipt -> Amount . "</td><td>" . date("d/m/Y H:i:s", $receipt -> Timestamp) . "</td></tr>";
 				$total_receipts_value += $receipt -> Amount;
 			}
 			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_receipts_value . "</b></td><td>-</td></tr>";
@@ -424,17 +424,17 @@ class Batch_Management extends MY_Controller {
 		if ($transaction_type == "cihb") {
 			$total_disbursements_value = 0;
 			$disbursements = Field_Cash_Disbursement::getBatchDisbursements($batch_id);
-			$data_buffer .= "<tr><th>Buyer</th><th>Field Cashier</th><th>CIH(b) Number</th><th>Receipt</th><th>Date</th><th>Amount</th></tr>";
+			$data_buffer .= "<tr><th>Buying Center</th><th>Field Cashier</th><th>CIH(b)</th><th>Receipt</th><th>Date</th><th>Amount</th><th>Details</th></tr>";
 			foreach ($disbursements as $disbursement) {
-				$data_buffer .= "<tr><td>" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $disbursement -> Buyer_Object -> Name . "</td><td>" . $disbursement -> CIH . "</td><td>" . $disbursement -> Receipt . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Amount . "</td></tr>";
+				$data_buffer .= "<tr><td>" . $disbursement -> Depot_Object -> Depot_Name . "</td><td>" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $disbursement -> CIH . "</td><td>" . $disbursement -> Receipt . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Amount . "</td><td>" . $disbursement -> Details . "</td></tr>";
 				$total_disbursements_value += $disbursement -> Amount;
 			}
-			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_disbursements_value . "</b></td></tr>";
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . $total_disbursements_value . "</b></td><td>-</td></tr>";
 		}
 		if ($transaction_type == "input_transfers") {
 			$total_inputs_value = 0;
 			$disbursements = Region_Input_Issue::getBatchDisbursements($batch_id);
-			$data_buffer .= "<tr><th>Region</th><th>Agent</th><th>Delivery Note Number</th><th>Date</th><th>Farm Input</th><th>Quantity</th><th>Total Value</th><th>Timestamp</th></tr>";
+			$data_buffer .= "<tr><th>Zone</th><th>Agent</th><th>Delivery Note Number</th><th>Date</th><th>Farm Input</th><th>Quantity</th><th>Total Value</th><th>Timestamp</th></tr>";
 			foreach ($disbursements as $disbursement) {
 				$data_buffer .= "<tr><td>" . $disbursement -> Region_Object -> Region_Name . "</td><td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . $disbursement -> Delivery_Note_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td>" . $disbursement -> Quantity . "</td><td>" . $disbursement -> Total_Value . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
 				$total_inputs_value += $disbursement -> Total_Value;
@@ -444,7 +444,7 @@ class Batch_Management extends MY_Controller {
 		if ($transaction_type == "mopping_payments") {
 			$total_amount = 0;
 			$payments = Mopping_Payment::getBatchPayments($batch_id);
-			$data_buffer .= "<tr><th>Voucher Number</th><th>Depot</th><th>Date</th><th>Amount</th></tr>";
+			$data_buffer .= "<tr><th>Voucher Number</th><th>Buying Center</th><th>Date</th><th>Amount</th></tr>";
 			foreach ($payments as $payment) {
 				$data_buffer .= "<tr><td>" . $payment -> Voucher_Number . "</td><td>" . $payment -> Depot_Object -> Depot_Name . "</td><td> " . $payment -> Date . "</td><td>" . $payment -> Amount . "</td></tr>";
 				$total_amount += $payment -> Amount;

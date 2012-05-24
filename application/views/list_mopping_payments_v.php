@@ -33,13 +33,13 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
-<h1>Mopping Payments Listing</h1>
+<h1>Buying Center Expenses Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
 			<th>Voucher No.</th>
 			<th>Date</th>
-			<th>Depot</th>
+			<th>Buying Center</th>
 			<th>Amount</th> 
 			<th>Action</th>
 		</tr>

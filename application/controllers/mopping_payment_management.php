@@ -68,7 +68,7 @@ class Mopping_Payment_Management extends MY_Controller {
 			if (strlen($editing) > 0) {
 				$payment = Mopping_payment::getPayment($editing);
 				$log -> Log_Type = "2";
-				$message = "Edited Mopping Payment Record From {Depot: '" . $payment -> Depot_Object -> Depot_Name . "' Voucher Number: '" . $payment -> Voucher_Number . "' Date: '" . $payment -> Date . "' Amount: '" . $payment -> Amount . "' Batch '" . $payment -> Batch . "'} to ";
+				$message = "Edited Buying Center Expense Record From {Buying Center: '" . $payment -> Depot_Object -> Depot_Name . "' Voucher Number: '" . $payment -> Voucher_Number . "' Date: '" . $payment -> Date . "' Amount: '" . $payment -> Amount . "' Batch '" . $payment -> Batch . "'} to ";
 			} else {
 				$payment = new Mopping_Payment();
 				$log -> Log_Type = "1";
@@ -81,7 +81,7 @@ class Mopping_Payment_Management extends MY_Controller {
 			$payment -> Depot = $depot;
 			$payment -> Batch = $batch;
 			$payment -> save();
-			$message .= "{Depot: '" . $payment -> Depot_Object -> Depot_Name . "' Voucher Number: '" . $payment -> Voucher_Number . "' Date: '" . $payment -> Date . "' Amount: '" . $payment -> Amount . "' Batch '" . $payment -> Batch . "'}";
+			$message .= "{Buying Center: '" . $payment -> Depot_Object -> Depot_Name . "' Voucher Number: '" . $payment -> Voucher_Number . "' Date: '" . $payment -> Date . "' Amount: '" . $payment -> Amount . "' Batch '" . $payment -> Batch . "'}";
 			$log -> Log_Message = $message;
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
@@ -104,7 +104,7 @@ class Mopping_Payment_Management extends MY_Controller {
 		$payment -> delete();
 		$log = new System_Log();
 		$log -> Log_Type = "3";
-		$log -> Log_Message = "Deleted Mopping Payment Record {Depot: '" . $payment -> Depot_Object -> Depot_Name . "' Voucher Number: '" . $payment -> Voucher_Number . "' Date: '" . $payment -> Date . "' Amount: '" . $payment -> Amount . "' Batch '" . $payment -> Batch . "'}";
+		$log -> Log_Message = "Deleted Buying Center Expense Record {Depot: '" . $payment -> Depot_Object -> Depot_Name . "' Voucher Number: '" . $payment -> Voucher_Number . "' Date: '" . $payment -> Date . "' Amount: '" . $payment -> Amount . "' Batch '" . $payment -> Batch . "'}";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
@@ -113,7 +113,7 @@ class Mopping_Payment_Management extends MY_Controller {
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('depot', 'Depot', 'trim|required|max_length[100]|xss_clean');
+		$this -> form_validation -> set_rules('depot', 'Buying Center', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('voucher_number', 'Voucher Number', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('date', 'Transaction Date', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('amount', 'Amount Payed', 'trim|required|xss_clean');

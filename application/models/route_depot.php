@@ -7,6 +7,8 @@ class Route_Depot extends Doctrine_Record {
 
 	public function setUp() {
 		$this -> setTableName('route_depot'); 
+		$this -> hasOne('Route as Route_Object', array('local' => 'Route', 'foreign' => 'id'));
+		$this -> hasOne('Depot as Depot_Object', array('local' => 'Depot', 'foreign' => 'id'));
 	} 
 
 	public function getAllForRoute($route) {

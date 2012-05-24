@@ -27,13 +27,14 @@
 		window.location = url;
 		}
 </script>
-<h1>Depot Listing</h1>
+<h1>Buying Centers Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Depot Code</th>
-			<th>Depot Name</th>
-			<th>Region</th>
+			<th>Code</th>
+			<th>Name</th>
+			<th>Capacity</th>
+			<th>Zone</th>
 			<th>Buyer</th>
 			<th>Action</th>
 		</tr>
@@ -58,21 +59,24 @@ $class = "odd";
 		<?php echo $depot -> Depot_Name;?>
 		</td>
 		<td>
+		<?php echo $depot -> Capacity;?>
+		</td>
+		<td>
 		<?php echo $depot -> Region_Object -> Region_Name;?>
 		</td>
 		<td>
 		<?php echo $depot -> Buyer_Object -> Name;?>
 		</td>
 		<td>
-			<?php
-			if($this -> session -> userdata('user_indicator') == "system_administrator"){?>
-			<a href="<?php echo base_url()."depot_management/edit_depot/".$depot->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" depot = "<?php echo $depot -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a>	
-			<?php }
-			else{?>
-				<a href="<?php echo base_url()."purchase_management/record_purchase/".$depot->id?>" class="button"><span class="ui-icon ui-icon-clipboard"></span>Record Purchases</a>
-			<?php }
-			?>
-			</td>
+		<?php
+		if($this -> session -> userdata('user_indicator') == "system_administrator"){?>
+		<a href="<?php echo base_url()."depot_management/edit_depot/".$depot->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" depot = "<?php echo $depot -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a>
+		<?php }
+			else{
+		?>
+		<a href="<?php echo base_url()."purchase_management/record_purchase/".$depot->id?>" class="button"><span class="ui-icon ui-icon-clipboard"></span>Record Purchases</a>
+		<?php }?>
+		</td>
 		</tr>
 		<?php
 

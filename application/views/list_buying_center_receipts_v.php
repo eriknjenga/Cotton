@@ -39,7 +39,7 @@
 		<tr>
 			<th>Receipt No.</th>
 			<th>Date</th>
-			<th>Buyer</th>
+			<th>Buying Center</th>
 			<th>Amount</th> 
 			<th>Action</th>
 		</tr>
@@ -64,7 +64,7 @@ $class = "odd";
 		<?php echo $receipt -> Date;?>
 		</td>
 		<td>
-		<?php echo $receipt -> Buyer_Object->Name;?>
+		<?php echo $receipt -> Depot_Object->Depot_Name;?>
 		</td> 
 		<td>
 		<?php echo $receipt -> Amount;?>

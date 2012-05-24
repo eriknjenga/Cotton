@@ -37,7 +37,7 @@ class Route_Management extends MY_Controller {
 		$data['depots'] = Depot::getAll();
 		$data['field_cashiers'] = Field_Cashier::getAll();
 		$data['content_view'] = "add_route_v";
-		$data['quick_link'] = "add_route";
+		$data['quick_link'] = "new_route";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);

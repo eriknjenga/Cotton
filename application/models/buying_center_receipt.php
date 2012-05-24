@@ -3,7 +3,7 @@ class Buying_Center_Receipt extends Doctrine_Record {
 	public function setTableDefinition() {
 		$this -> hasColumn('Receipt_Number', 'varchar', 100);
 		$this -> hasColumn('Date', 'varchar', 20);
-		$this -> hasColumn('Buyer', 'varchar', 10);
+		$this -> hasColumn('Depot', 'varchar', 10);
 		$this -> hasColumn('Amount', 'varchar', 10); 
 		$this -> hasColumn('Timestamp', 'varchar', 32); 
 		$this -> hasColumn('Batch', 'varchar', 10);
@@ -13,7 +13,7 @@ class Buying_Center_Receipt extends Doctrine_Record {
 
 	public function setUp() {
 		$this -> setTableName('buying_center_receipt');
-		$this -> hasOne('Buyer as Buyer_Object', array('local' => 'Buyer', 'foreign' => 'id')); 
+		$this -> hasOne('Depot as Depot_Object', array('local' => 'Depot', 'foreign' => 'id')); 
 	}
 
 	public function getTotalReceipts($batch) {

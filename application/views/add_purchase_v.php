@@ -236,7 +236,7 @@ foreach ($prices as $price_object) {
 </p>
 <p>
 	<input class="button" type="reset" value="Reset">
-	<input class="button" type="submit" value="Save & Add New From Depot" name="submit">
+	<input class="button" type="submit" value="Save & Add New From Buying Center" name="submit">
 	<input class="button" type="submit" value="Save & View List" name="submit">
 </p>
 </fieldset> <!-- End of fieldset -->

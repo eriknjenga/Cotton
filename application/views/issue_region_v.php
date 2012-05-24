@@ -118,7 +118,7 @@ if(isset($batch_information)){
 <!-- Fieldset -->
 <fieldset>
 	<legend>
-		Issue Farm Inputs to Region
+		Issue Farm Inputs to Zone
 	</legend>
 	<input type="hidden" name="editing_id" value="<?php echo $issue_id;?>" />
 	<p>
@@ -137,7 +137,7 @@ foreach($agents as $agent_object){
 		<span class="field_desc">Select the agent who delivered these inputs</span>
 	</p>
 	<p>
-		<label for="region">Region</label>
+		<label for="region">Zone</label>
 		<select name="region" class="dropdown validate[required]" id="region">
 			<option></option>
 			<?php
@@ -149,7 +149,7 @@ foreach($regions as $region_object){
 			?>><?php echo $region_object -> Region_Name;?></option>
 			<?php }?>
 		</select>
-		<span class="field_desc">Select the region that these inputs were delivered</span>
+		<span class="field_desc">Select the zone that these inputs were delivered</span>
 	</p>
 	<p>
 		<label for="delivery_note_number">Delivery Note Number: </label>
