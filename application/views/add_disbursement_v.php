@@ -11,14 +11,22 @@
 			limitFarmInputs();
 		});
 		$(".farmer_farm_input").change(function() {
-			console.log($(this));
 			updateFarmerInputPrice($(this));
 		});
 		$(".quantity").keyup(function() {
 			var input_object = $(this).closest("tr").find(".farm_input");
-			updateInputPrice(input_object);
+			updateTotalValue(input_object);
 		});
 		$(".farmer_quantity").keyup(function() {
+			var input_object = $(this).closest("tr").find(".farmer_farm_input");
+			updateFarmerInputPrice(input_object);
+		});
+		$(".unit_price").keyup(function() {
+			var input_object = $(this).closest("tr").find(".farm_input");
+			updateTotalValue(input_object);
+			limitFarmInputs();
+		});
+		$(".farmer_unit_price").keyup(function() {
 			var input_object = $(this).closest("tr").find(".farmer_farm_input");
 			updateFarmerInputPrice(input_object);
 		});
@@ -40,11 +48,13 @@
 			var invoice_id = "invoice_number_" + next_input_row;
 			var farm_input_id = "farm_input_" + next_input_row;
 			var quantity_id = "quantity_" + next_input_row;
+			var unit_price_id = "unit_price_" + next_input_row;
 			var total_value_id = "total_value_" + next_input_row;
 			var season_id = "season_" + next_input_row;
 			cloned_object.find(".invoice_number").attr("id", invoice_id);
 			cloned_object.find(".farm_input").attr("id", farm_input_id);
 			cloned_object.find(".quantity").attr("id", quantity_id);
+			cloned_object.find(".unit_price").attr("id", unit_price_id);
 			cloned_object.find(".total_value").attr("id", total_value_id);
 			cloned_object.find(".quantity").attr("value", "");
 			cloned_object.find(".total_value").attr("value", "");
@@ -60,10 +70,12 @@
 			var farmer_id = "farmer_" + next_farmer_row;
 			var farmer_farm_input_id = "farmer_farm_input_" + next_farmer_row;
 			var farmer_quantity_id = "farmer_quantity_" + next_farmer_row;
+			var farmer_unit_price_id = "farmer_unit_price_" + next_farmer_row;
 			var farmer_total_value_id = "farmer_total_value_" + next_farmer_row;
 			cloned_object.find(".farmer").attr("id", farmer_id);
 			cloned_object.find(".farmer_farm_input").attr("id", farmer_farm_input_id);
 			cloned_object.find(".farmer_quantity").attr("id", farmer_quantity_id);
+			cloned_object.find(".farmer_unit_price").attr("id", farmer_unit_price_id);
 			cloned_object.find(".farmer_total_value").attr("id", farmer_quantity_id);
 			cloned_object.find(".farmer_quantity").attr("value", "");
 			cloned_object.find(".farmer_total_value").attr("value", "");
@@ -108,10 +120,17 @@
 			}
 			counter++;
 		});
-		input_object.find(":selected").attr("current_price", most_current_price);
-		//Clear out the 'total value' field
+		
+		input_object.closest("tr").find(".unit_price").attr("value", most_current_price);
+		updateTotalValue(input_object);
+
+	}
+
+	function updateTotalValue(input_object) {
 		input_object.closest("tr").find(".total_value").attr("value", "");
 		var quantity = input_object.closest("tr").find(".quantity").attr("value");
+		var most_current_price = input_object.closest("tr").find(".unit_price").attr("value");
+		input_object.find(":selected").attr("current_price", most_current_price); 
 		var total_value = 0;
 		if(parseInt(quantity) >= 0 && parseInt(most_current_price) > 0) {
 			total_value = quantity * most_current_price;
@@ -124,6 +143,7 @@
 		input_object.closest("tr").find(".farmer_total_value").attr("value", "");
 		var quantity = input_object.closest("tr").find(".farmer_quantity").attr("value");
 		var most_current_price = input_object.find(":selected").attr("current_price");
+		input_object.closest("tr").find(".farmer_unit_price").attr("value", most_current_price);
 		var total_value = 0;
 		if(parseInt(quantity) >= 0 && parseInt(most_current_price) > 0) {
 			total_value = quantity * most_current_price;
@@ -136,6 +156,7 @@ if (isset($fbg_disbursement)) {
 $disbursement = $fbg_disbursement[0];
 $fbg_id = $disbursement -> FBG;
 $fbg_name = $disbursement -> FBG_Object -> Group_Name;
+$fbg = $disbursement->FBG_Object;
 $invoice_number = $disbursement -> Invoice_Number;
 $date = $disbursement -> Date;
 $agent = $disbursement -> Agent;
@@ -173,7 +194,7 @@ if(isset($batch_information)){
 <!-- Fieldset -->
 <fieldset>
 	<legend>
-		Disburse Farm Inputs to <b><?php echo $fbg_name;?></b>
+		Disburse Farm Inputs to <b><?php echo $fbg_name . " (" . $fbg -> Village_Object -> Name . ")";?></b>
 	</legend>
 	<input type="hidden" name="fbg" value="<?php echo $fbg_id;?>" />
 	<p>
@@ -208,6 +229,7 @@ foreach($agents as $agent_object){
 		<thead>
 			<tr>
 				<th>Input Name</th>
+				<th>Unit Price</th>
 				<th>Quantity</th>
 				<th>Total Value</th>
 				<th>Season</th>
@@ -239,6 +261,9 @@ foreach($farm_inputs as $farm_input_object){
 					<?php }?>
 				</select></td>
 				<td>
+				<input class="unit_price" name="unit_price[]" id="unit_price" type="text" value="<?php echo $disbursement -> Unit_Price;?>" style="width: 60px; padding:2px;"/>
+				</td>
+				<td>
 				<input class="quantity validate[required,number]" name="quantity[]" id="quantity"  type="text" value="<?php echo $disbursement -> Quantity;?>" style="width: 60px; padding:2px;"/>
 				</td>
 				<td>
@@ -256,7 +281,7 @@ foreach($farm_inputs as $farm_input_object){
 			$input_row++;
 			}
 			}
-else{
+			else{
 			?>
 			<tr input_row="<?php echo $input_row?>">
 				<td>
@@ -275,6 +300,9 @@ foreach($farm_inputs as $farm_input_object){
 					value="<?php echo $farm_input_object -> id;?>"><?php echo $farm_input_object -> Product_Name;?></option>
 					<?php }?>
 				</select></td>
+				<td>
+				<input class="unit_price" name="unit_price[]" id="unit_price" type="text" value="" style="width: 60px; padding:2px;"/>
+				</td>
 				<td>
 				<input class="quantity validate[required,number]" name="quantity[]" id="quantity"  type="text" value="" style="width: 60px; padding:2px;"/>
 				</td>
@@ -299,6 +327,7 @@ foreach($farm_inputs as $farm_input_object){
 			<tr>
 				<th>Farmer</th>
 				<th>Input Name</th>
+				<th>Unit Price</th>
 				<th>Quantity</th>
 				<th>Total Value</th>
 				<th></th>
@@ -312,14 +341,15 @@ foreach($farmer_disbursements as $disbursement){
 			?>
 			<tr farmer_row="<?php echo $farmer_row;?>">
 				<td>
-				<input class="farmer" name="farmer[]" id="farmer" type="text" value="<?php echo $disbursement->Farmer;?>"/>
+				<input class="farmer" name="farmer[]" id="farmer" type="text" value="<?php echo $disbursement -> Farmer;?>"/>
 				</td>
-				<td><select name="farmer_farm_input[]" id="farmer_farm_input" class="dropdown farmer_farm_input" style="width: 70px; padding:2px;">
+				<td>
+				<select name="farmer_farm_input[]" id="farmer_farm_input" class="dropdown farmer_farm_input" style="width: 70px; padding:2px;">
 					<option></option>
 					<?php
 foreach($issued_inputs as $farm_input){
-	$farm_input_object = $farm_input->Farm_Input_Object;
-	
+$farm_input_object = $farm_input->Farm_Input_Object;
+
 					?>
 					<option prices="<?php
 					foreach ($farm_input_object->Prices as $price) {echo $price -> Price . ',';
@@ -335,14 +365,15 @@ foreach($issued_inputs as $farm_input){
 						?>
 						><?php echo $farm_input_object -> Product_Name;?></option>
 					<?php }?>
-				</select>
-				
+				</select></td>
+				<td>
+				<input readonly="" class="farmer_unit_price" name="unit_price[]" id="farmer_unit_price" type="text" value="<?php echo $disbursement -> Unit_Price;?>" style="width: 60px; padding:2px;"/>
 				</td>
 				<td>
-				<input class="farmer_quantity " name="farmer_quantity[]" id="farmer_quantity"  type="text" value="<?php echo $disbursement->Quantity;?>" style="width: 60px; padding:2px;"/>
+				<input class="farmer_quantity " name="farmer_quantity[]" id="farmer_quantity"  type="text" value="<?php echo $disbursement -> Quantity;?>" style="width: 60px; padding:2px;"/>
 				</td>
 				<td>
-				<input readonly="" class="farmer_total_value" name="farmer_total_value[]" id="farmer_total_value" type="text" value="<?php echo $disbursement->Total_Value;?>" style="width: 60px; padding:2px;"/>
+				<input readonly="" class="farmer_total_value" name="farmer_total_value[]" id="farmer_total_value" type="text" value="<?php echo $disbursement -> Total_Value;?>" style="width: 60px; padding:2px;"/>
 				</td>
 				<td>
 				<input  class="farmer_add button"   value="+" style="width:20px; text-align: center"/>
@@ -353,7 +384,7 @@ foreach($issued_inputs as $farm_input){
 			$farmer_row++;
 			}
 			}
-else{ 
+			else{
 			?>
 			<tr farmer_row="<?php echo $farmer_row;?>">
 				<td>
@@ -363,6 +394,9 @@ else{
 				<select name="farmer_farm_input[]" id="farmer_farm_input" class="dropdown farmer_farm_input" style="width: 70px; padding:2px;">
 					<option></option>
 				</select></td>
+				<td>
+				<input readonly="" class="farmer_unit_price" name="farmer_unit_price[]" id="farmer_unit_price" type="text" value="" style="width: 60px; padding:2px;"/>
+				</td>
 				<td>
 				<input class="farmer_quantity" name="farmer_quantity[]" id="farmer_quantity"  type="text" value="" style="width: 60px; padding:2px;"/>
 				</td>

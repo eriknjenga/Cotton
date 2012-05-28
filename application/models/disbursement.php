@@ -6,6 +6,7 @@ class Disbursement extends Doctrine_Record {
 		$this -> hasColumn('Date', 'varchar', 20);
 		$this -> hasColumn('Farm_Input', 'varchar', 10);
 		$this -> hasColumn('Quantity', 'varchar', 20);
+		$this -> hasColumn('Unit_Price', 'varchar', 20);
 		$this -> hasColumn('Total_Value', 'varchar', 20);
 		$this -> hasColumn('Season', 'varchar', 20);
 		$this -> hasColumn('ID_Batch', 'varchar', 20);
@@ -58,7 +59,7 @@ class Disbursement extends Doctrine_Record {
 	}
 
 	public function getInvoiceInputs($invoice) {
-		$query = Doctrine_Query::create() -> select("Farm_Input") -> from("Disbursement") -> where("Invoice_Number = '$invoice'")->groupBy("Farm_Input");
+		$query = Doctrine_Query::create() -> select("Farm_Input") -> from("Disbursement") -> where("Invoice_Number = '$invoice'") -> groupBy("Farm_Input");
 		$inputs = $query -> execute();
 		return $inputs;
 	}
@@ -67,6 +68,6 @@ class Disbursement extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> where("fbg = '$fbg'");
 		$disbursements = $query -> execute();
 		return $disbursements;
-	}
+	} 
 
 }

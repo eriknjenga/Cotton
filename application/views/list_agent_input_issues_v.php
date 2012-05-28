@@ -33,6 +33,9 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
+<p>
+	<a href="<?php echo base_url().'agent_input_issue_management/new_issue'?>" class="button"><span class="ui-icon ui-icon-transferthick-e-w"></span>New Agent Input Issue</a>
+</p>
 <h1>Agent Inputs Issued Listing</h1>
 <table class="fullwidth">
 	<thead>
@@ -66,10 +69,10 @@ $class = "odd";
 		<?php echo $issue -> Date;?>
 		</td>
 		<td>
-		<?php echo $issue -> Agent_Object->First_Name." ".$issue -> Agent_Object->Surname;?>
+		<?php echo $issue -> Agent_Object -> First_Name . " " . $issue -> Agent_Object -> Surname;?>
 		</td>
 		<td>
-		<?php echo $issue -> Farm_Input_Object->Product_Name;?>
+		<?php echo $issue -> Farm_Input_Object -> Product_Name;?>
 		</td>
 		<td>
 		<?php echo $issue -> Quantity;?>

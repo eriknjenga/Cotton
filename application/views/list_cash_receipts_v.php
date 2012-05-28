@@ -33,6 +33,9 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
+<p>
+	<a href="<?php echo base_url().'cash_receipt_management/new_receipt'?>" class="button"><span class="ui-icon ui-icon-arrowthickstop-1-w"></span>New Cash Receipt</a>
+</p>
 <h1>Field Cash Receipts Listing</h1>
 <table class="fullwidth">
 	<thead>

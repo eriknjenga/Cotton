@@ -27,6 +27,9 @@
 		window.location = url;
 		}
 </script>
+<p>
+	<a href="<?php echo base_url().'batch_management/new_batch'?>" class="button"><span class="ui-icon ui-icon-note"></span>New Batch</a>
+</p>
 <h1>Batch Listing</h1>
 <table class="fullwidth">
 	<thead>

@@ -33,6 +33,9 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
+<p>
+	<a href="<?php echo base_url().'mopping_payment_management/new_payment'?>" class="button"><span class="ui-icon ui-icon-suitcase"></span>New Buying Center Expense</a>
+</p>
 <h1>Buying Center Expenses Listing</h1>
 <table class="fullwidth">
 	<thead>
@@ -40,7 +43,7 @@
 			<th>Voucher No.</th>
 			<th>Date</th>
 			<th>Buying Center</th>
-			<th>Amount</th> 
+			<th>Amount</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -64,11 +67,11 @@ $class = "odd";
 		<?php echo $payment -> Date;?>
 		</td>
 		<td>
-		<?php echo $payment -> Depot_Object->Depot_Name;?>
-		</td> 
+		<?php echo $payment -> Depot_Object -> Depot_Name;?>
+		</td>
 		<td>
 		<?php echo $payment -> Amount;?>
-		</td> 
+		</td>
 		<td><a href="<?php echo base_url()."mopping_payment_management/edit_payment/".$payment->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" payment = "<?php echo $payment -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
 		<?php

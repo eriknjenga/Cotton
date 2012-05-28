@@ -1,65 +1,46 @@
 <?php
 class Log_Management extends MY_Controller {
-
-	//required
 	function __construct() {
 		parent::__construct();
+		$this -> load -> library('pagination');
 	}
 
 	public function index() {
-		$this -> show_interface();
+		$this -> listing();
 	}
 
-	public function show_interface() {
-		$data = array();
-		$data['content_view'] = "log_download_v";
+	public function listing($type = 0, $offset = 0) {
+		$items_per_page = 20;
+		$number_of_logs = System_Log::getTotalLogs($type);
+		$logs = System_Log::getPagedLogs($type, $offset, $items_per_page);
+		if ($number_of_logs > $items_per_page) {
+			$config['base_url'] = base_url() . "log_management/listing/" . $type . "/";
+			$config['total_rows'] = $number_of_logs;
+			$config['per_page'] = $items_per_page;
+			$config['uri_segment'] = 4;
+			$config['num_links'] = 5;
+			$this -> pagination -> initialize($config);
+			$data['pagination'] = $this -> pagination -> create_links();
+		}
+		$data['logs'] = $logs;
+		$data['title'] = "All System Logs";
+		$data['content_view'] = "list_system_logs_v";
+		$data['styles'] = array("pagination.css");
 		$this -> base_params($data);
 	}
 
-	public function export() {
-		$surveillance_data_requested = $this -> input -> post('surveillance');
-		$malaria_data_requested = $this -> input -> post('malaria');
-		$year = $this -> input -> post('year_from');
-		$start_week = $this -> input -> post('epiweek_from');
-		$end_week = $this -> input -> post('epiweek_to');
-		if (strlen($surveillance_data_requested)>0) {
-$surveillance_data = Surveillance::getRawDataArray($year, $start_week, $end_week);
-			$excell_headers = "Disease\t District Name\t Province Name\t Week Number\t Week Ending\t Male Cases (Less Than 5)\t Female Cases (Less Than 5)\t Male Cases (Greater Than 5)\t Female Cases (Greater Than 5)\t Total Cases\t Male Deaths (Less Than 5)\t Female Deaths (Less Than 5)\t Male Deaths (Greater Than 5)\t Female Deaths (Greater Than 5)\t Total Deaths\tYear\t Reported By\t Designation\t Date Reported\t\n";
-			$excell_data = "";
-			foreach ($surveillance_data as $result_set) {
-				//$excell_data .= $result_set -> Disease_Object -> Name . "\t" . $result_set -> District_Object -> Name . "\t" . $result_set -> District_Object -> Province_Object -> Name . "\t" . $result_set -> Epiweek . "\t" . $result_set -> Week_Ending . "\t" . $result_set -> Lmcase . "\t" . $result_set -> Lfcase . "\t" . $result_set -> Gmcase . "\t" . $result_set -> Gfcase . "\t" . ($result_set -> Lmcase + $result_set -> Lfcase + $result_set -> Gmcase + $result_set -> Gfcase) . "\t" . $result_set -> Lmdeath . "\t" . $result_set -> Lfdeath . "\t" . $result_set -> Gmdeath . "\t" . $result_set -> Gfdeath . "\t" . ($result_set -> Lmdeath + $result_set -> Lfdeath + $result_set -> Gmdeath + $result_set -> Gfdeath) . "\t" . $result_set -> Reporting_Year . "\t" . $result_set -> Reported_By . "\t" . $result_set -> Designation . "\t" . $result_set -> Date_Reported . "\t";
-				$excell_data .= $result_set['Disease_Name'] . "\t" . $result_set['District_Name'] . "\t" . $result_set['Province_Name'] . "\t" . $result_set ['Epiweek'] . "\t" . $result_set['Week_Ending'] . "\t" . $result_set ['Lmcase'] . "\t" . $result_set['Lfcase'] . "\t" . $result_set ['Gmcase'] . "\t" . $result_set ['Gfcase'] . "\t" . ($result_set ['Lmcase'] + $result_set ['Lfcase'] + $result_set['Gmcase'] + $result_set ['Gfcase']) . "\t" . $result_set ['Lmdeath'] . "\t" . $result_set ['Lfdeath'] . "\t" . $result_set['Gmdeath'] . "\t" . $result_set ['Gfdeath'] . "\t" . ($result_set['Lmdeath'] + $result_set['Lfdeath'] + $result_set['Gmdeath'] + $result_set['Gfdeath']) . "\t" . $result_set['Reporting_Year'] . "\t" . $result_set['Reported_By'] . "\t" . $result_set['Designation']. "\t" . $result_set['Date_Reported'] . "\t";
-				$excell_data .= "\n";
-			}
-			header("Content-type: application/vnd.ms-excel; name='excel'");
-			header("Content-Disposition: filename=Surveillance_Data (" . $year . " epiweek " . $start_week . " to epiweek " . $end_week . ").xls");
-			// Fix for crappy IE bug in download.
-			header("Pragma: ");
-			header("Cache-Control: ");
-			echo $excell_headers . $excell_data;
-		} else if (strlen($malaria_data_requested)>0) {
-			$malaria_data = Lab_Weekly::getRawData($year, $start_week, $end_week);
-			$excell_headers = "District\t Province\t Week Number\t Week Ending\t Tested (Less Than 5)\t Tested (Greater Than 5)\t Total Tested\t Positive (Less Than 5)\t Positive (Greater Than 5)\t Total Positive\t\n";
-			$excell_data = "";
-			foreach ($malaria_data as $result_set) {
-				$excell_data .= $result_set -> District_Object -> Name . "\t" . $result_set -> District_Object -> Province_Object -> Name . "\t" . $result_set -> Epiweek . "\t" . $result_set -> Week_Ending . "\t" . $result_set -> Malaria_Below_5 . "\t" . $result_set -> Malaria_Above_5 . "\t" . ($result_set -> Malaria_Below_5 + $result_set -> Malaria_Above_5) . "\t" . $result_set -> Positive_Below_5 . "\t" . $result_set -> Positive_Above_5 . "\t" . ($result_set -> Positive_Below_5 + $result_set -> Positive_Above_5) . "\t";
-				$excell_data .= "\n";
-			}
-			header("Content-type: application/vnd.ms-excel; name='excel'");
-			header("Content-Disposition: filename=Malaria_Test_Data (" . $_POST['year_from'] . " epiweek " . $_POST['epiweek_from'] . " to epiweek " . $_POST['epiweek_to'] . ").xls");
-			// Fix for crappy IE bug in download.
-			header("Pragma: ");
-			header("Cache-Control: ");
-			echo $excell_headers . $excell_data;
-		}
+	public function view_log_details($log_id) {
+		$log = System_Log::getLog($log_id);
+		$data['log'] = $log;
+		$data['content_view'] = "view_log_details_v";
+		$this -> base_params($data);
 	}
 
-	public function base_params($data) { 
-		$data['quick_link'] = "download_log";
-		$data['title'] = "Download System Logs";   
+	public function base_params($data) {
+		$data['title'] = "Security Log Management";
 		$data['link'] = "log_management";
 
-		$this -> load -> view('demo_template', $data);
+		$this -> load -> view("demo_template", $data);
 	}
 
 }

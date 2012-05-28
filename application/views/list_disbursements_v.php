@@ -33,13 +33,17 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
+<p>
+	<a href="<?php echo base_url().'disbursement_management/search_fbg'?>" class="button"><span class="ui-icon ui-icon-transferthick-e-w"></span>New Disbursement</a>
+</p>
 <h1>Input Disbursements Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
 			<th>Invoice No.</th>
 			<th>Date</th>
-			<th>FBG Name</th> 
+			<th>FBG Name</th>
+			<th>Village</th>
 			<th>Season</th>
 			<th>Action</th>
 		</tr>
@@ -65,6 +69,9 @@ $class = "odd";
 		</td>
 		<td>
 		<?php echo $disbursement -> FBG_Object -> Group_Name;?>
+		</td>
+		<td>
+		<?php echo $disbursement -> FBG_Object->Village_Object -> Name;?>
 		</td>
 		<td>
 		<?php echo $disbursement -> Season;?>

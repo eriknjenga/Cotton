@@ -35,7 +35,7 @@ class Depot_Management extends MY_Controller {
 		$data['quick_link'] = "search_depot";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
-		$data['search_title'] = "Search For a Depot";
+		$data['search_title'] = "Search For a Buying Center";
 		$this -> base_params($data);
 	}
 

@@ -18,8 +18,8 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'fbg_management/delete_fbg/'?>
-		" +$(this).attr("fbg");
+	url = "<?php echo base_url().'price_management/delete_price/'?>
+		" +$(this).attr("price");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -27,22 +27,24 @@
 		window.location = url;
 		}
 </script>
-<h1><?php echo $listing_title;?></h1>
+<p>
+<a href="<?php echo base_url().'price_management/new_price'?>" class="button"><span class="ui-icon ui-icon-cart"></span>New Price</a>
+</p>
+<h1>Cotton Price Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Contract Number</th>
-			<th>Group Name</th>
-			<th>Village</th>
-			<th>Acreage</th>
+			<th>Price Effective From</th>
+			<th>Season</th>
+			<th>Price</th>
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-if (isset($fbgs[0])) {
+if (isset($prices[0])) {
 $counter = 1;
-foreach ($fbgs as $fbg) {
+foreach ($prices as $price) {
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
@@ -52,20 +54,18 @@ $class = "odd";
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $fbg -> CPC_Number;?>
+		<?php echo $price -> Date;?>
 		</td>
 		<td>
-		<?php echo $fbg -> Group_Name;?>
+		<?php echo $price -> Season;?>
 		</td>
 		<td>
-		<?php echo $fbg -> Village_Object->Name;?>
+		<?php echo $price -> Price;?>
 		</td>
-		<td>
-		<?php echo $fbg -> Hectares_Available;?>
-		</td>
-		<td><a href="<?php echo base_url()."fbg_management/edit_fbg/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" fbg = "<?php echo $fbg -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><a href="<?php echo base_url()."disbursement_management/disburse_inputs/".$fbg->id?>" class="button"><span class="ui-icon ui-icon-suitcase"></span>Disburse</a></td>
+		<td><a href="#" class="button delete" price = "<?php echo $price -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
 		<?php
+
 		$counter++;
 		}
 		}
@@ -73,7 +73,7 @@ $class = "odd";
 	</tbody>
 </table>
 <div title="Confirm Delete!" id="confirm_delete" style="width: 300px; height: 150px; margin: 5px auto 5px auto;">
-	Are you sure you want to delete this record?
+	Are you sure you want to delete this record? <br/><br/>Note: <b>All purchases recorded using this price will remain unchanged!</b>
 </div>
 <?php if (isset($pagination)):
 ?>

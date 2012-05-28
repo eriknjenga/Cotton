@@ -7,6 +7,7 @@ class Farmer_Input extends Doctrine_Record {
 		$this -> hasColumn('Farmer', 'text');
 		$this -> hasColumn('Farm_Input', 'varchar', 10);
 		$this -> hasColumn('Quantity', 'varchar', 20);
+		$this -> hasColumn('Unit_Price', 'varchar', 20);
 		$this -> hasColumn('Total_Value', 'varchar', 20);
 		$this -> hasColumn('Batch_Id', 'varchar', 10);
 		$this -> hasColumn('Timestamp', 'varchar', 32);

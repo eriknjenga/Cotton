@@ -76,10 +76,7 @@ if (isset($styles)) {
 								<a href="<?php echo site_url("user_management/logout");?>" ><span class="ui-icon ui-icon-power"></span>Logout</a>
 							</li>
 							<li>
-								<a href="#" title="Change current settings" class="tooltip"><span class="ui-icon ui-icon-wrench"></span>Settings</a>
-							</li>
-							<li>
-								<a href="#" title="Go to your account" class="tooltip"><span class="ui-icon ui-icon-person"></span>My account</a>
+								<a href="user_management/change_password" title="Change My Password" class="tooltip"><span class="ui-icon ui-icon-wrench"></span>Change My Password</a>
 							</li>
 						</ul>
 					</div>

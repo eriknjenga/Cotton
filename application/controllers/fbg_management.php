@@ -65,7 +65,7 @@ class FBG_Management extends MY_Controller {
 		$data['field_officers'] = Field_Officer::getAll();
 		$data['content_view'] = "add_fbg_v";
 		$data['quick_link'] = "add_fbg";
-		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['scripts'] = array("validationEngine-en.js", "validator.js","jquery.ui.autocomplete.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
@@ -89,9 +89,24 @@ class FBG_Management extends MY_Controller {
 		$final_results = array();
 		$counter = 0;
 		foreach ($fbgs as $fbg) {
-			$final_results [$counter] =  array("value"=>$fbg -> id,"label"=>$fbg->Group_Name);
+			$fbg_details = $fbg -> Group_Name . " (" . $fbg -> Village_Object -> Name . ")";
+			$final_results[$counter] = array("value" => $fbg -> id, "label" => $fbg_details);
 			$counter++;
-		} 
+		}
+		echo json_encode($final_results);
+	}
+
+	public function autocomplete_village() {
+		$search_term = $this -> input -> post("term"); 
+		//Limit search results to 10
+		$villages = Village::getPagedSearchedVillages($search_term, 0, 10);
+		$final_results = array();
+		$counter = 0;
+		foreach ($villages as $village) {
+			$village_details = $village -> Name . " (" . $village -> Ward_Object -> Name . ")";
+			$final_results[$counter] = array("value" => $village -> id, "label" => $village_details);
+			$counter++;
+		}
 		echo json_encode($final_results);
 	}
 
@@ -119,6 +134,7 @@ class FBG_Management extends MY_Controller {
 			$fbg -> Secretary_Name = $this -> input -> post("secretary_name");
 			$fbg -> Secretary_Phone = $this -> input -> post("secretary_phone");
 			$fbg -> Field_Officer = $this -> input -> post("field_officer");
+			$fbg -> Village = $this -> input -> post("village_id");
 			$fbg -> Hectares_Available = $this -> input -> post("hectares_available");
 			$fbg -> save();
 			redirect("fbg_management/listing");

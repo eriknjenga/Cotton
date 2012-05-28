@@ -33,7 +33,10 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
-<h1>Region Input-Transfers Listing</h1>
+<p>
+	<a href="<?php echo base_url().'region_input_issue_management/new_issue'?>" class="button"><span class="ui-icon ui-icon-transferthick-e-w"></span>New Zonal Input Transfer</a>
+</p>
+<h1>Zonal Office Input-Transfers Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>

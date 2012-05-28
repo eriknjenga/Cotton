@@ -1,6 +1,32 @@
+<style>
+	.ui-autocomplete {
+		overflow-y: auto;
+		/* prevent horizontal scrollbar */
+		overflow-x: hidden;
+		/* add padding to account for vertical scrollbar */
+		padding-right: 20px;
+		max-width: 200px;
+		font-size: 14px;
+	}
+	/* IE 6 doesn't support max-height
+	 * we use height instead, but this forces the menu to always be this tall
+	 */
+	* html .ui-autocomplete {
+		width: 200px;
+	}
+</style>
 <script type="text/javascript">
 	$(function() {
 		$("#add_fbg_input").validationEngine();
+		$("#village").autocomplete({
+			source : "<?php echo base_url();?>fbg_management/autocomplete_village",
+				minLength : 1,
+				select: function( event, ui ) {
+				$( "#village" ).val( ui.item.label );
+				$( "#village_id" ).val( ui.item.value );
+				return false;
+				}
+				});
 	});
 
 </script>
@@ -15,6 +41,8 @@ if (isset($fbg)) {
 	$field_officer = $fbg -> Field_Officer;
 	$hectares_available = $fbg -> Hectares_Available;
 	$fbg_id = $fbg -> id;
+	$village = $fbg -> Village_Object->Name;
+	$village_id = $fbg -> Village;
 } else {
 	$cpc_number = "";
 	$group_name = "";
@@ -25,19 +53,23 @@ if (isset($fbg)) {
 	$secretary_name = "";
 	$secretary_phone = "";
 	$fbg_id = "";
+	$village = "";
+	$village_id = "";
 }
 $attributes = array("method" => "post", "id" => "add_fbg_input");
 echo form_open('fbg_management/save', $attributes);
 echo validation_errors('
-<p class="form_error">', '</p>
+<p class="form_error">
+	', '
+</p>
 ');
-?>
-<!-- Fieldset -->
+?> <!-- Fieldset -->
 <fieldset>
 	<legend>
 		Register New Farmer Business Group
 	</legend>
 	<input type="hidden" name="editing_id" value="<?php echo $fbg_id;?>" />
+	<input type="hidden" name="village_id" id="village_id" value="<?php echo $village_id;?>" />
 	<p>
 		<label for="cpc_number">FBG Contract Number: </label>
 		<input id="cpc_number" name="cpc_number" type="text" value="<?php echo $cpc_number;?>" class="validate[required]" />
@@ -86,6 +118,11 @@ foreach($field_officers as $officer){
 		</select>
 		<span class="field_desc">Select the FEO who recruited this FBG</span>
 	</p>
+<p>
+	<label for="village">Village</label>
+	<input id="village" name="village" type="text" value="<?php echo $village;?>" class="village validate[required]"/>
+	<span class="field_desc">Enter the village where this FBG comes from</span>
+</p>
 	<p>
 		<label for="hectares_available">Hectares Available: </label>
 		<input id="hectares_available" name="hectares_available" type="text" value="<?php echo $hectares_available;?>" class="validate[required]"/>

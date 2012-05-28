@@ -33,6 +33,9 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
+<p>
+<a href="<?php echo base_url().'purchase_management/search_depot'?>" class="button"><span class="ui-icon ui-icon-cart"></span>New Purchase</a>
+</p>
 <h1>Produce Purchases Listing</h1>
 <table class="fullwidth">
 	<thead>

@@ -33,6 +33,9 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
+<p>
+	<a href="<?php echo base_url().'cash_management/issue_cash'?>" class="button"><span class="ui-icon ui-icon-transferthick-e-w"></span>Issue Cash</a>
+</p>
 <h1>Cash Disbursement Listing</h1>
 <table class="fullwidth">
 	<thead>

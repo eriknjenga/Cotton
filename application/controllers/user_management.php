@@ -21,6 +21,56 @@ class User_Management extends MY_Controller {
 		redirect("user_management/login");
 	}
 
+	public function change_password() {
+		$data = array();
+		$data['title'] = "Change User Password";
+		$data['content_view'] = "change_password_v";
+		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['styles'] = array("validator.css");
+		$data['link'] = "home";
+		$this -> load -> view('demo_template', $data);
+	}
+
+	public function save_new_password() {
+		$valid = $this -> _submit_validate_password();
+		if ($valid) {
+			$user = User::getUser($this -> session -> userdata('user_id'));
+			$user -> Password = $this -> input -> post("new_password");
+			$user -> save();
+			redirect("user_management/logout");
+		} else {
+			$this -> change_password();
+		}
+	}
+
+	private function _submit_validate_password() {
+		// validation rules
+		$this -> form_validation -> set_rules('old_password', 'Current Password', 'trim|required|min_length[6]|max_length[20]');
+		$this -> form_validation -> set_rules('new_password', 'New Password', 'trim|required|min_length[6]|max_length[20]|matches[new_password_confirm]');
+		$this -> form_validation -> set_rules('new_password_confirm', 'New Password Confirmation', 'trim|required|min_length[6]|max_length[20]');
+		$temp_validation = $this -> form_validation -> run();
+		if ($temp_validation) {
+			$this -> form_validation -> set_rules('old_password', 'Current Password', 'trim|required|callback_correct_current_password');
+			return $this -> form_validation -> run();
+		} else {
+			return $temp_validation;
+		}
+
+	}
+
+	public function correct_current_password($pass) {
+		$user = User::getUser($this -> session -> userdata('user_id'));
+		$dummy_user = new User();
+		$dummy_user -> Password = $pass;
+		if ($user -> Password != $dummy_user -> Password) {
+			$this -> form_validation -> set_message('correct_current_password', 'The current password you provided is not correct.');
+			return FALSE;
+		} else {
+			return TRUE;
+		}
+
+	}
+
 	public function authenticate() {
 		$data = array();
 		$validated = $this -> _submit_validate();
@@ -132,7 +182,7 @@ class User_Management extends MY_Controller {
 	public function delete_user($id) {
 		$user = User::getUser($id);
 		$user -> Active = '0';
-		$user->save();
+		$user -> save();
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
 	}

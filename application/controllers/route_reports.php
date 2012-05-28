@@ -6,7 +6,7 @@ class Route_Reports extends MY_Controller {
 	}
 
 	public function index() {
-		$this -> view_interface();
+		$this -> view_collections_interface();
 	}
 
 	public function view_collections_interface($data = null) {
@@ -52,13 +52,15 @@ class Route_Reports extends MY_Controller {
 			$data_buffer .= $this -> echoTitles();
 			//Get data for each depot
 			foreach ($route->Route_Depot_Objects as $route_depot) {
-				$sql = "select center_details.*,total_purchased-total_dispatched as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,sum(quantity) as total_purchased,max(str_to_date(date,'%m/%d/%Y'))as last_purchase_date, sum(net_weight) as total_dispatched from depot d  left join purchase p on p.depot = d.id left join weighbridge w on d.depot_code = w.buying_center_code where d.id = '" . $route_depot -> Depot . "') center_details";
-				$query = $this -> db -> query($sql);
-				$depot_data = $query -> row_array();
-				$data_buffer .= "<tr><td>" . $depot_data['depot_code'] . "</td><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['distance'] . "</td><td>" . $depot_data['last_purchase_date'] . "</td><td>" . $depot_data['total_purchased'] . "</td><td>" . $depot_data['total_dispatched'] . "</td><td>" . $depot_data['stock_balance'] . "</td><td>" . ($depot_data['capacity'] * 1000) . "</td></tr>";
-				$route_summaries['total_purchases'] += $depot_data['total_purchased'];
-				$route_summaries['total_dispatched'] += $depot_data['total_dispatched'];
-				$route_summaries['total_stock_balance'] += $depot_data['stock_balance'];
+				if ($route_depot -> Depot_Object -> Deleted == "0") {
+					$sql = "select center_details.*,total_purchased-total_dispatched as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,sum(quantity) as total_purchased,max(str_to_date(date,'%m/%d/%Y'))as last_purchase_date, sum(net_weight) as total_dispatched from depot d  left join purchase p on p.depot = d.id left join weighbridge w on d.depot_code = w.buying_center_code where d.id = '" . $route_depot -> Depot . "') center_details";
+					$query = $this -> db -> query($sql);
+					$depot_data = $query -> row_array();
+					$data_buffer .= "<tr><td>" . $depot_data['depot_code'] . "</td><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['distance'] . "</td><td>" . $depot_data['last_purchase_date'] . "</td><td>" . $depot_data['total_purchased'] . "</td><td>" . $depot_data['total_dispatched'] . "</td><td>" . $depot_data['stock_balance'] . "</td><td>" . ($depot_data['capacity'] * 1000) . "</td></tr>";
+					$route_summaries['total_purchases'] += $depot_data['total_purchased'];
+					$route_summaries['total_dispatched'] += $depot_data['total_dispatched'];
+					$route_summaries['total_stock_balance'] += $depot_data['stock_balance'];
+				}
 			}
 			$data_buffer .= "<tr></tr><tr><td><b>Totals</b></td><td>-</td><td>-</td><td>-</td><td>" . $route_summaries['total_purchases'] . "</td><td>" . $route_summaries['total_dispatched'] . "</td><td>" . $route_summaries['total_stock_balance'] . "</td><td>-</td></tr>";
 		}
@@ -72,7 +74,7 @@ class Route_Reports extends MY_Controller {
 	public function downloadExcel($routes) {
 		$this -> load -> database();
 		$data_buffer = "";
-		//echo the start of the table 
+		//echo the start of the table
 		$route_summaries = array();
 		foreach ($routes as $route) {
 			$route_summaries = array();
@@ -83,18 +85,18 @@ class Route_Reports extends MY_Controller {
 			$data_buffer .= $this -> echoExcelTitles();
 			//Get data for each depot
 			foreach ($route->Route_Depot_Objects as $route_depot) {
-				$sql = "select center_details.*,total_purchased-total_dispatched as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,sum(quantity) as total_purchased,max(str_to_date(date,'%m/%d/%Y'))as last_purchase_date, sum(net_weight) as total_dispatched from depot d  left join purchase p on p.depot = d.id left join weighbridge w on d.depot_code = w.buying_center_code where d.id = '" . $route_depot -> Depot . "' and p.batch_status = '2') center_details";
-				$query = $this -> db -> query($sql);
-				$depot_data = $query -> row_array();
-				$data_buffer .= $depot_data['depot_code'] . "\t" . $depot_data['depot_name'] . "\t" . $depot_data['distance'] . "\t" . $depot_data['last_purchase_date'] . "\t" . $depot_data['total_purchased'] . "\t" . $depot_data['total_dispatched'] . "\t" . $depot_data['stock_balance'] . "\t" . ($depot_data['capacity'] * 1000) . "\t\n";
-				$route_summaries['total_purchases'] += $depot_data['total_purchased'];
-				$route_summaries['total_dispatched'] += $depot_data['total_dispatched'];
-				$route_summaries['total_stock_balance'] += $depot_data['stock_balance'];
+				if ($route_depot -> Depot_Object -> Deleted == "0") {
+					$sql = "select center_details.*,total_purchased-total_dispatched as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,sum(quantity) as total_purchased,max(str_to_date(date,'%m/%d/%Y'))as last_purchase_date, sum(net_weight) as total_dispatched from depot d  left join purchase p on p.depot = d.id left join weighbridge w on d.depot_code = w.buying_center_code where d.id = '" . $route_depot -> Depot . "' and p.batch_status = '2') center_details";
+					$query = $this -> db -> query($sql);
+					$depot_data = $query -> row_array();
+					$data_buffer .= $depot_data['depot_code'] . "\t" . $depot_data['depot_name'] . "\t" . $depot_data['distance'] . "\t" . $depot_data['last_purchase_date'] . "\t" . $depot_data['total_purchased'] . "\t" . $depot_data['total_dispatched'] . "\t" . $depot_data['stock_balance'] . "\t" . ($depot_data['capacity'] * 1000) . "\t\n";
+					$route_summaries['total_purchases'] += $depot_data['total_purchased'];
+					$route_summaries['total_dispatched'] += $depot_data['total_dispatched'];
+					$route_summaries['total_stock_balance'] += $depot_data['stock_balance'];
+				}
 			}
 			$data_buffer .= "\nTotals\t-\t-\t-\t" . $route_summaries['total_purchases'] . "\t" . $route_summaries['total_dispatched'] . "\t" . $route_summaries['total_stock_balance'] . "\t-\t\n\n";
 		}
-
-		 
 
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=Route Collection Summaries.xls");

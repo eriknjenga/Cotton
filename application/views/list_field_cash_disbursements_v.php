@@ -33,12 +33,15 @@
 		You are viewing records for batch number: <b><?php echo $batch;?></b>
 	</p>
 </div>
+<p>
+	<a href="<?php echo base_url().'field_cash_management/new_payment'?>" class="button"><span class="ui-icon ui-icon-transferthick-e-w"></span>New Field Payment</a>
+</p>
 <h1>Field Cash Disbursement Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
 			<th>CIH(b) Voucher No.</th>
-			<th>Receipt No.</th> 
+			<th>Receipt No.</th>
 			<th>Buying Center</th>
 			<th>Amount</th>
 			<th>Date</th>
@@ -61,11 +64,11 @@ $class = "odd";
 		<td>
 		<?php echo $disbursement -> CIH;?>
 		</td>
-				<td>
+		<td>
 		<?php echo $disbursement -> Receipt;?>
-		</td> 
-				<td>
-		<?php echo $disbursement -> Depot_Object ->Depot_Name;?>
+		</td>
+		<td>
+		<?php echo $disbursement -> Depot_Object -> Depot_Name;?>
 		</td>
 		<td>
 		<?php echo $disbursement -> Amount;?>
