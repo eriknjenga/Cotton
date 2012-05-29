@@ -11,13 +11,13 @@
 		border-color: red !important;
 		border-width: 2px !important;
 	}
-	.download {
+	.report {
 		border-color: blue !important;
 		border-width: 2px !important;
 	}
 
 </style>
-<?php
+<?php 
 if ($log -> Log_Type == "1") {
 	$type = "create";
 }

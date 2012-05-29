@@ -69,7 +69,12 @@ class FBG_Reports extends MY_Controller {
 		$data_buffer .= "<h1>Summaries</h1><table class='data-table'><tr><th></th><th>Total Debt</th><th>Total Recoveries</th><th>Total Debt Owing</th></tr>";
 		$data_buffer .= "<tr><td>Totals</td><td>" . $total_debt . "</td><td>" . $total_recoveries . "</td><td>" . $total_debt_owing . "</td></tr>";
 		$data_buffer .= "</table>";
-
+		$log = new System_Log();
+		$log -> Log_Type = "4";
+		$log -> Log_Message = "Downloaded Debtors Aged Analysis PDF";
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> save();
 		//echo $data_buffer;
 		$this -> generatePDF($data_buffer, $date);
 
@@ -103,9 +108,8 @@ class FBG_Reports extends MY_Controller {
 			$total_debt += $region_summaries[$region -> id]['total_debt'];
 			$total_recoveries += $region_summaries[$region -> id]['total_recoveries'];
 			$total_debt_owing += $region_summaries[$region -> id]['total_debt_owing'];
-		}
-		$data_buffer .= "\t";
-		$data_buffer .= "Summaries\nTotal Debt\tTotal Recoveries\tTotal Debt Owing\t\n";
+		} 
+		$data_buffer .= "Summaries\tTotal Debt\tTotal Recoveries\tTotal Debt Owing\t\n";
 		$data_buffer .= "Totals\t" . $total_debt . "\t" . $total_recoveries . "\t" . $total_debt_owing . "\n";
 		//echo $data_buffer;
 		header("Content-type: application/vnd.ms-excel; name='excel'");
@@ -114,6 +118,12 @@ class FBG_Reports extends MY_Controller {
 		header("Pragma: ");
 		header("Cache-Control: ");
 		echo $data_buffer;
+		$log = new System_Log();
+		$log -> Log_Type = "4";
+		$log -> Log_Message = "Downloaded Debtors Aged Analysis Excell Sheet";
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> save();
 	}
 
 	public function echoTitles() {

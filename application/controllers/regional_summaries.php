@@ -78,6 +78,12 @@ class Regional_Summaries extends MY_Controller {
 		}
 		$data_buffer .= "</table>";
 		//echo $data_buffer;
+		$log = new System_Log();
+		$log -> Log_Type = "4";
+		$log -> Log_Message = "Downloaded Buying Center Summaries Report PDF";
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> save();
 		$this -> generatePDF($data_buffer, $date);
 
 	}
@@ -99,16 +105,16 @@ class Regional_Summaries extends MY_Controller {
 			//Get data for each depot
 			foreach ($region->Depot_Objects as $depot) {
 				if ($depot -> Deleted == "0") {
-				$sql = "select center_summaries.*,purchases_value/purchases_kg as avg_per_kg, cash_received - cash_paid-purchases_value as cash_balance,purchases_kg - dispatch as product_balance from(select cash_summary.*,coalesce(sum(w.net_weight),0) as dispatch from (select depot_summary.*,coalesce(sum(payments.amount),0) as cash_paid from (select depot_purchases.*,coalesce(sum(c.amount),0) as cash_received from(select depot_name,depot_code,depot,date as last_transaction_date,sum(quantity) as purchases_kg,coalesce(sum(gross_value),0) as purchases_value,coalesce(unit_price,0) as last_price from (select depot_details.*,date,coalesce(quantity,0) as quantity,coalesce(gross_value,0) as gross_value,unit_price from (select depot_name,depot_code,id as depot from depot where id = '" . $depot -> id . "') depot_details left join purchase p on p.depot = depot_details.depot and p.batch_status = '2' order by date desc) purchases_summary) depot_purchases left join field_cash_disbursement c on depot_purchases.depot = c.depot and c.batch_status = '2') depot_summary  left join mopping_payment payments on depot_summary.depot = payments.depot and payments.batch_status = '2') cash_summary left join weighbridge w on w.buying_center_code = depot_code where w.weighing_type = '2') center_summaries";
+					$sql = "select center_summaries.*,purchases_value/purchases_kg as avg_per_kg, cash_received - cash_paid-purchases_value as cash_balance,purchases_kg - dispatch as product_balance from(select cash_summary.*,coalesce(sum(w.net_weight),0) as dispatch from (select depot_summary.*,coalesce(sum(payments.amount),0) as cash_paid from (select depot_purchases.*,coalesce(sum(c.amount),0) as cash_received from(select depot_name,depot_code,depot,date as last_transaction_date,sum(quantity) as purchases_kg,coalesce(sum(gross_value),0) as purchases_value,coalesce(unit_price,0) as last_price from (select depot_details.*,date,coalesce(quantity,0) as quantity,coalesce(gross_value,0) as gross_value,unit_price from (select depot_name,depot_code,id as depot from depot where id = '" . $depot -> id . "') depot_details left join purchase p on p.depot = depot_details.depot and p.batch_status = '2' order by date desc) purchases_summary) depot_purchases left join field_cash_disbursement c on depot_purchases.depot = c.depot and c.batch_status = '2') depot_summary  left join mopping_payment payments on depot_summary.depot = payments.depot and payments.batch_status = '2') cash_summary left join weighbridge w on w.buying_center_code = depot_code where w.weighing_type = '2') center_summaries";
 
-				$query = $this -> db -> query($sql);
-				$depot_data = $query -> row_array();
-				$data_buffer .= $depot_data['depot_name'] . "\t" . $depot_data['last_transaction_date'] . "\t" . $depot_data['cash_received'] . "\t" . $depot_data['cash_paid'] . "\t" . $depot_data['purchases_value'] . "\t" . $depot_data['purchases_kg'] . "\t" . $depot_data['dispatch'] . "\t" . $depot_data['avg_per_kg'] . "\t" . $depot_data['cash_balance'] . "\t" . $depot_data['product_balance'] . "\t" . $depot_data['last_price'] . "\t\n";
-				$region_summaries[$region -> id]['total_cash_received'] += $depot_data['cash_received'];
-				$region_summaries[$region -> id]['total_cash_paid'] += $depot_data['cash_paid'];
-				$region_summaries[$region -> id]['total_purchases_value'] += $depot_data['purchases_value'];
-				$region_summaries[$region -> id]['total_purchases_kg'] += $depot_data['purchases_kg'];
-				$region_summaries[$region -> id]['total_dispatch'] += $depot_data['dispatch'];
+					$query = $this -> db -> query($sql);
+					$depot_data = $query -> row_array();
+					$data_buffer .= $depot_data['depot_name'] . "\t" . $depot_data['last_transaction_date'] . "\t" . $depot_data['cash_received'] . "\t" . $depot_data['cash_paid'] . "\t" . $depot_data['purchases_value'] . "\t" . $depot_data['purchases_kg'] . "\t" . $depot_data['dispatch'] . "\t" . $depot_data['avg_per_kg'] . "\t" . $depot_data['cash_balance'] . "\t" . $depot_data['product_balance'] . "\t" . $depot_data['last_price'] . "\t\n";
+					$region_summaries[$region -> id]['total_cash_received'] += $depot_data['cash_received'];
+					$region_summaries[$region -> id]['total_cash_paid'] += $depot_data['cash_paid'];
+					$region_summaries[$region -> id]['total_purchases_value'] += $depot_data['purchases_value'];
+					$region_summaries[$region -> id]['total_purchases_kg'] += $depot_data['purchases_kg'];
+					$region_summaries[$region -> id]['total_dispatch'] += $depot_data['dispatch'];
 				}
 			}
 			$data_buffer .= "\n";
@@ -127,6 +133,12 @@ class Regional_Summaries extends MY_Controller {
 		header("Pragma: ");
 		header("Cache-Control: ");
 		echo $data_buffer;
+		$log = new System_Log();
+		$log -> Log_Type = "4";
+		$log -> Log_Message = "Downloaded Buying Center Summaries Report Excell Sheet";
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> save();
 
 	}
 

@@ -31,11 +31,11 @@ class Depot_Reports extends MY_Controller {
 			$start_date = $this -> input -> post("start_date");
 			$end_date = $this -> input -> post("end_date");
 			$depot = Depot::getDepot($depot_id);
-			$sql = "SELECT voucher_number as document_number,str_to_date(date,'%m/%d/%Y') as transaction_date,amount as cash_paid, '' as cash_received,'' as dispatch,'' as purchase_value,'' as purchase_kg FROM mopping_payment where depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  union all (select cih as document_number,str_to_date(date,'%m/%d/%Y') as transaction_date,'',amount as cash_received,'','','' from field_cash_disbursement where depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')) union all select  ticket_number as document_number, str_to_date(transaction_date,'%d/%m/%Y'), '', '', net_weight as dispatch,'' ,'' from weighbridge w where w.buying_center_code = (select depot_code from depot where id = '" . $depot_id . "' and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')) union all select dpn as document_number, str_to_date(date,'%m/%d/%Y') as transaction_date,'','','',p.gross_value, p.quantity from purchase p where p.depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by transaction_date asc";
+			$sql = "SELECT voucher_number as document_number,str_to_date(date,'%m/%d/%Y') as transaction_date,amount as cash_paid, '' as cash_received,'' as dispatch,'' as purchase_value,'' as purchase_kg FROM mopping_payment where depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  union all (select cih as document_number,str_to_date(date,'%m/%d/%Y') as transaction_date,'',amount as cash_received,'','','' from field_cash_disbursement where depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')) union all select  ticket_number as document_number, str_to_date(transaction_date,'%d/%m/%Y'), '', '', net_weight as dispatch,'' ,'' from weighbridge w where w.buying_center_code = (select depot_code from depot where id = '" . $depot_id . "' and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')) union all select dpn as document_number, str_to_date(date,'%m/%d/%Y') as transaction_date,'','','',p.gross_value, p.quantity from purchase p where p.depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by transaction_date desc";
 			$query = $this -> db -> query($sql);
 			$depot_transactions = $query -> result_array();
 			//echo the start of the table
-			$data_buffer.="<h3>Buying Center: ".$depot->Depot_Name."</h3>";
+			$data_buffer .= "<h3>Buying Center: " . $depot -> Depot_Name . "</h3>";
 			$data_buffer .= "<table class='data-table'>";
 			$data_buffer .= $this -> echoTitles();
 			$total_cash_received = 0;
@@ -62,11 +62,17 @@ class Depot_Reports extends MY_Controller {
 			$data_buffer .= "</table>";
 			$data_buffer .= "<h1>Weight Summary</h1><table class='data-table'>";
 			$data_buffer .= "<tr><td><b>Total Purchases</b></td><td>" . $total_purchased_weight . "</td></tr>";
-			$data_buffer .= "<tr><td><b>Total Dispatches</b></td><td>" . $total_dispatched . "</td></tr>"; 
+			$data_buffer .= "<tr><td><b>Total Dispatches</b></td><td>" . $total_dispatched . "</td></tr>";
 			$data_buffer .= "<tr></tr><tr><td><b>Balance</b></td><td>" . ($total_purchased_weight - $total_dispatched) . "</td></tr>";
 			$data_buffer .= "</table>";
 			//echo $data_buffer;
-			$this -> generatePDF($data_buffer, $start_date,$end_date);
+			$log = new System_Log();
+			$log -> Log_Type = "4";
+			$log -> Log_Message = "Downloaded Buying Center Transactions PDF";
+			$log -> User = $this -> session -> userdata('user_id');
+			$log -> Timestamp = date('U');
+			$log -> save();
+			$this -> generatePDF($data_buffer, $start_date, $end_date);
 		} else {
 			$this -> view_transactions_interface();
 		}
@@ -77,7 +83,7 @@ class Depot_Reports extends MY_Controller {
 		return "<tr><th>Transaction Date</th><th>Doc. Number</th><th>Cash Received</th><th>Cash Paid</th><th>Purchases (Tsh.)</th><th>Purchases (Kgs.)</th><th>Dispatch (Kgs.)</th></tr>";
 	}
 
-	function generatePDF($data, $start_date,$end_date) {
+	function generatePDF($data, $start_date, $end_date) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h2 style='text-align:center; text-decoration:underline;'>Alliance Ginneries</h2>";
 

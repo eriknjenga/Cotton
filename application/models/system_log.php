@@ -7,7 +7,7 @@ class System_Log extends Doctrine_Record {
 		 * 1 - New Record
 		 * 2 - Edited Record
 		 * 3 - Deleted Record
-		 * 4 - Downloaded Record(s)
+		 * 4 - Downloaded Report(s)
 		 */
 		$this -> hasColumn('Log_Type', 'varchar', 10);
 		$this -> hasColumn('Log_Message', 'text');

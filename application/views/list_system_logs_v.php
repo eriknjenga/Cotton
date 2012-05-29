@@ -14,7 +14,7 @@
 	.delete {
 		background-color: red !important;
 	}
-	.download {
+	.report {
 		background-color: blue !important;
 	}
 </style>

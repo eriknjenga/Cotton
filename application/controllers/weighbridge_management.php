@@ -12,6 +12,13 @@ class Weighbridge_Management extends MY_Controller {
 		$this -> load -> library('csvreader');
 
 		$filePath = '/wbridge/weigh.csv';
+		$resource = @fopen($filePath, 'r');
+		if (!$resource) {
+			$data['content_view'] = "weighbridge_error";
+			$data['link'] = "home";
+			$this -> load -> view("demo_template", $data);
+			return;
+		}
 
 		$data = $this -> csvreader -> parse_file($filePath, false);
 		$records = 0;
