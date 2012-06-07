@@ -69,12 +69,10 @@ class Depot_Management extends MY_Controller {
 	public function new_depot($data = null) {
 		if ($data == null) {
 			$data = array();
-		}
-		$data['buyers'] = Buyer::getAll();
-		$data['regions'] = Region::getAll();
+		} 
 		$data['content_view'] = "add_depot_v";
 		$data['quick_link'] = "add_depot";
-		$data['scripts'] = array("validationEngine-en.js", "validator.js");
+		$data['scripts'] = array("validationEngine-en.js", "validator.js","jquery.ui.autocomplete.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
@@ -91,15 +89,15 @@ class Depot_Management extends MY_Controller {
 		if ($valid) {
 			$log = new System_Log();
 			$temp_depot = new Depot();
-			$temp_depot -> Buyer = $this -> input -> post("buyer");
-			$temp_depot -> Region = $this -> input -> post("region");
-			$details_desc = "{Code: '" . $this -> input -> post("depot_code") . "' Name: '" . $this -> input -> post("depot_name") . "' Capacity: '" . $this -> input -> post("capacity") . "' Distance: '" . $this -> input -> post("distance") . "' Buyer: '" . $temp_depot -> Buyer_Object -> Name . "' Region: '" . $temp_depot -> Region_Object -> Region_Name . "'}";
+			$temp_depot -> Buyer = $this -> input -> post("buyer_id");
+			$temp_depot -> Village = $this -> input -> post("village_id");
+			$details_desc = "{Code: '" . $this -> input -> post("depot_code") . "' Name: '" . $this -> input -> post("depot_name") . "' Capacity: '" . $this -> input -> post("capacity") . "' Distance: '" . $this -> input -> post("distance") . "' Buyer: '" . $temp_depot -> Buyer_Object -> Name . "' Village: '" . $temp_depot -> Village_Object -> Name . "'}";
 			$editing = $this -> input -> post("editing_id");
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$depot = Depot::getDepot($editing);
 				$log -> Log_Type = "2";
-				$log -> Log_Message = "Edited Buying Center Record From {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . $depot -> Distance . "'  Buyer: '" . $depot -> Buyer_Object -> Name . "' Region: '" . $depot -> Region_Object -> Region_Name . "'} to " . $details_desc;
+				$log -> Log_Message = "Edited Buying Center Record From {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . $depot -> Distance . "'  Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "'} to " . $details_desc;
 			} else {
 				$depot = new Depot();
 				$log -> Log_Type = "1";
@@ -107,8 +105,8 @@ class Depot_Management extends MY_Controller {
 			}
 			$depot -> Depot_Code = $this -> input -> post("depot_code");
 			$depot -> Depot_Name = $this -> input -> post("depot_name");
-			$depot -> Buyer = $this -> input -> post("buyer");
-			$depot -> Region = $this -> input -> post("region");
+			$depot -> Buyer = $this -> input -> post("buyer_id");
+			$depot -> Village = $this -> input -> post("village_id");
 			$depot -> Capacity = $this -> input -> post("capacity");
 			$depot -> Distance = $this -> input -> post("distance");
 			$depot -> save();
@@ -135,10 +133,9 @@ class Depot_Management extends MY_Controller {
 		redirect($previous_page);
 	}
 
-	public function validate_form() {
-		$this -> form_validation -> set_rules('depot_code', 'Buying Center Code', 'trim|required|max_length[20]|xss_clean');
+	public function validate_form() { 
 		$this -> form_validation -> set_rules('depot_name', 'Buying Center Name', 'trim|required|max_length[100]|xss_clean');
-		$this -> form_validation -> set_rules('buyer', 'Buyer', 'trim|required|xss_clean');
+		$this -> form_validation -> set_rules('village', 'Village', 'trim|required|xss_clean');
 		return $this -> form_validation -> run();
 	}
 

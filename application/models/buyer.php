@@ -9,8 +9,8 @@ class Buyer extends Doctrine_Record {
 	}
 
 	public function setUp() {
-		$this -> setTableName('buyer'); 
-		
+		$this -> setTableName('buyer');
+
 	}
 
 	public function getTotalBuyers() {
@@ -20,7 +20,13 @@ class Buyer extends Doctrine_Record {
 	}
 
 	public function getPagedBuyers($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Buyer") -> where("Deleted = '0'") -> offset($offset) -> limit($items)->orderBy("id Desc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Buyer") -> where("Deleted = '0'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+		$buyers = $query -> execute(array());
+		return $buyers;
+	}
+
+	public function getPagedSearchedBuyers($search_value, $offset, $items) {
+		$query = Doctrine_Query::create() -> select("*") -> from("buyer") -> where("Buyer_Code like '%$search_value%' or Name like '%$search_value%' or National_Id like '%$search_value%' or Phone_Number like '%$search_value%'") -> offset($offset) -> limit($items);
 		$buyers = $query -> execute(array());
 		return $buyers;
 	}
@@ -32,7 +38,7 @@ class Buyer extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Buyer")-> where("Deleted = '0'")->orderBy("Name asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Buyer") -> where("Deleted = '0'") -> orderBy("Name asc");
 		$buyers = $query -> execute();
 		return $buyers;
 	}

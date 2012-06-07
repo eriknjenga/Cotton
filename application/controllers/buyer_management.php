@@ -30,6 +30,23 @@ class Buyer_Management extends MY_Controller {
 
 	}
 
+	public function autocomplete_buyer() {
+		$search_term = $this -> input -> post("term");
+		if (strlen($search_term) == 0) {
+			redirect("buyer_management/search_buyer");
+		}
+		//Limit search results to 10
+		$buyers = Buyer::getPagedSearchedBuyers($search_term, 0, 10);
+		$final_results = array();
+		$counter = 0;
+		foreach ($buyers as $buyer) {
+			$buyer_details = $buyer -> Name . " (" . $buyer -> Phone_Number . ")";
+			$final_results[$counter] = array("value" => $buyer -> id, "label" => $buyer_details);
+			$counter++;
+		}
+		echo json_encode($final_results);
+	}
+
 	public function new_buyer($data = null) {
 		if ($data == null) {
 			$data = array();

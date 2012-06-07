@@ -1,6 +1,46 @@
+<style>
+	.ui-autocomplete {
+		overflow-y: auto;
+		/* prevent horizontal scrollbar */
+		overflow-x: hidden;
+		/* add padding to account for vertical scrollbar */
+		padding-right: 20px;
+		max-width: 400px;
+		font-size: 14px;
+	}
+	/* IE 6 doesn't support max-height
+	 * we use height instead, but this forces the menu to always be this tall
+	 */
+	* html .ui-autocomplete {
+		width: 200px;
+	}
+</style>
 <script type="text/javascript">
 	$(function() {
 		$("#add_depot_input").validationEngine();
+				$("#buyer").keyup(function(event) {
+					if(event.keyCode == 8 && $("#buyer").attr("value") == ""){
+						$("#buyer_id").attr("value","");
+					} 
+				});
+				$("#village").autocomplete({
+				source : "<?php echo base_url();?>fbg_management/autocomplete_village",
+				minLength : 1,
+				select: function( event, ui ) {
+				$( "#village" ).val( ui.item.label );
+				$( "#village_id" ).val( ui.item.value );
+				return false;
+				}
+				});
+				$("#buyer").autocomplete({
+				source : "<?php echo base_url();?>buyer_management/autocomplete_buyer",
+				minLength : 1,
+				select: function( event, ui ) { 
+				$( "#buyer" ).val( ui.item.label );
+				$( "#buyer_id" ).val( ui.item.value );
+				return false;
+				}
+				});
 	});
 
 </script>
@@ -9,15 +49,21 @@ if (isset($depot)) {
 	$depot_code = $depot -> Depot_Code;
 	$depot_name = $depot -> Depot_Name;
 	$buyer = $depot -> Buyer;
-	$region = $depot -> Region;
+	$village = $depot -> Village_Object->Name;
+	$village_id = $depot -> Village;
 	$capacity = $depot -> Capacity;
 	$distance = $depot -> Distance;
 	$depot_id = $depot -> id;
+	$buyer_id = $depot -> Buyer;
+	$buyer = $depot -> Buyer_Object->Name;
 } else {
 	$depot_code = "";
 	$depot_name = "";
 	$buyer = "";
-	$region = "";
+	$village = "";
+	$village_id = "";
+	$buyer = "";
+	$buyer_id = "";
 	$capacity = "";
 	$distance = "";
 	$depot_id = "";
@@ -35,9 +81,11 @@ echo validation_errors('
 		Add new Buying Center
 	</legend>
 	<input type="hidden" name="editing_id" value="<?php echo $depot_id;?>" />
+	<input type="hidden" name="village_id" id="village_id" value="<?php echo $village_id;?>" />
+	<input type="hidden" name="buyer_id" id="buyer_id" value="<?php echo $buyer_id;?>" />
 	<p>
 		<label for="depot_code">Code: </label>
-		<input id="depot_code"  name="depot_code" type="text"  value="<?php echo $depot_code;?>" class="validate[required]"/>
+		<input id="depot_code"  name="depot_code" type="text"  value="<?php echo $depot_code;?>" />
 		<span class="field_desc">Enter the code for this Buying Center</span>
 	</p>
 	<p>
@@ -55,36 +103,16 @@ echo validation_errors('
 		<input id="distance" name="distance" type="text" value="<?php echo $distance;?>"/>
 		<span class="field_desc">Enter the distance of this buying center from the ginnery</span>
 	</p>
-	<p>
-		<label for="buyer">Buyer</label>
-		<select name="buyer" class="dropdown validate[required]" id="buyer">
-			<option></option>
-			<?php
-foreach($buyers as $buyer_object){
-			?>
-			<option value="<?php echo $buyer_object -> id;?>" <?php
-			if ($buyer_object -> id == $buyer) {echo "selected";
-			}
-			?>><?php echo $buyer_object -> Name;?></option>
-			<?php }?>
-		</select>
-		<span class="field_desc">Select the buyer responsible for this Buying Center</span>
-	</p>
-	<p>
-		<label for="region">Zone</label>
-		<select name="region" class="dropdown validate[required]" id="region">
-			<option></option>
-			<?php
-foreach($regions as $region_object){
-			?>
-			<option value="<?php echo $region_object -> id;?>" <?php
-			if ($region_object -> id == $region) {echo "selected";
-			}
-			?>><?php echo $region_object -> Region_Name;?></option>
-			<?php }?>
-		</select>
-		<span class="field_desc">Select this Buying Center's Zone</span>
-	</p>
+<p>
+	<label for="buyer">Buyer</label>
+	<input id="buyer" name="buyer" type="text" value="<?php echo $buyer;?>"/>
+	<span class="field_desc">Enter the buyer responsible for this center</span>
+</p>
+<p>
+	<label for="village">Village</label>
+	<input id="village" name="village" type="text" value="<?php echo $village;?>" class="village validate[required]"/>
+	<span class="field_desc">Enter the village where this Center is located</span>
+</p>
 	<p>
 		<input class="button" type="submit" value="Submit">
 		<input class="button" type="reset" value="Reset">

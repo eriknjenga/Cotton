@@ -34,7 +34,7 @@
 			<th>Code</th>
 			<th>Name</th>
 			<th>Capacity</th>
-			<th>Zone</th>
+			<th>Village</th>
 			<th>Buyer</th>
 			<th>Action</th>
 		</tr>
@@ -62,7 +62,7 @@ $class = "odd";
 		<?php echo $depot -> Capacity;?>
 		</td>
 		<td>
-		<?php echo $depot -> Region_Object -> Region_Name;?>
+		<?php echo $depot -> Village_Object -> Name." (".$depot -> Village_Object->Ward_Object->Name.")";?>
 		</td>
 		<td>
 		<?php echo $depot -> Buyer_Object -> Name;?>

@@ -4,7 +4,7 @@ class Depot extends Doctrine_Record {
 		$this -> hasColumn('Depot_Code', 'varchar', 20);
 		$this -> hasColumn('Depot_Name', 'varchar', 100);
 		$this -> hasColumn('Buyer', 'varchar', 10);
-		$this -> hasColumn('Region', 'varchar', 10);
+		$this -> hasColumn('Village', 'varchar', 10);
 		$this -> hasColumn('Capacity', 'varchar', 20);
 		$this -> hasColumn('Distance', 'varchar', 10);
 		$this -> hasColumn('Deleted', 'varchar', 1);
@@ -13,7 +13,7 @@ class Depot extends Doctrine_Record {
 	public function setUp() {
 		$this -> setTableName('depot');
 		$this -> hasOne('Buyer as Buyer_Object', array('local' => 'Buyer', 'foreign' => 'id'));
-		$this -> hasOne('Region as Region_Object', array('local' => 'Region', 'foreign' => 'id'));
+		$this -> hasOne('Village as Village_Object', array('local' => 'Village', 'foreign' => 'id'));
 	}
 
 	public function getTotalDepots() {

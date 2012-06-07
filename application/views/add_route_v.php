@@ -53,7 +53,7 @@ echo validation_errors('
 	</p>
 	<p>
 		<label for="field_cashier">Field Cashier</label>
-		<select name="field_cashier" class="dropdown validate[required]" id="field_cashier">
+		<select name="field_cashier" class="dropdown" id="field_cashier">
 			<option></option>
 			<?php
 
@@ -67,70 +67,6 @@ foreach($field_cashiers as $field_cashier_object){
 		</select>
 		<span class="field_desc">Select this route's field cashier</span>
 	</p>
-	<table class="normal" id="depots_table" style="margin:0 auto;">
-		<caption>
-			Buying Centers along this route
-		</caption>
-		<thead>
-			<tr>
-				<th>Buying Centers</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			<?php if(isset($route_depots[0])){
-$counter = 0;
-foreach($route_depots as $route_depot){
-
-			?>
-			<tr depot_row="<?php echo $counter;?>">
-				<td>
-				<select name="depot[]" class="dropdown depot validate[required]" id="depot_<?php echo $counter;?>" >
-					<option></option>
-					<?php
-foreach($depots as $depot_object){
-					?>
-					<option value="<?php echo $depot_object -> id;?>" <?php
-					if ($depot_object -> id == $route_depot -> Depot) {echo "selected";
-					}
-						?>><?php echo $depot_object -> Depot_Name;?></option>
-					<?php
-					$counter++;
-					}
-					?>
-				</select></td>
-				<td>
-				<input  class="add button"   value="+" style="width:20px; text-align: center"/>
-				</td>
-			</tr>
-			<?php
-			}//end foreach loop
-			}//endif
-			else{
-			?>
-			<tr depot_row="1">
-				<td>
-				<select name="depot[]" class="dropdown depot validate[required]" id="depot" >
-					<option></option>
-					<?php
-foreach($depots as $depot_object){
-					?>
-					<option value="<?php echo $depot_object -> id;?>"><?php echo $depot_object -> Depot_Name;?></option>
-					<?php }?>
-				</select></td>
-				<td>
-				<input  class="add button"   value="+" style="width:20px; text-align: center"/>
-				</td>
-			</tr>
-			<?php
-			}
-			?>
-
-			</td>
-
-			</tr>
-		</tbody>
-	</table>
 	<p>
 		<input class="button" type="submit" value="Submit">
 		<input class="button" type="reset" value="Reset">
