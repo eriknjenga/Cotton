@@ -27,12 +27,15 @@
 		window.location = url;
 		}
 </script>
+<?php 
+$this->load->view("geography_submenu");
+?>
 <h1>Zone Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
 			<th>Code</th>
-			<th>Name</th> 
+			<th>Name</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -54,12 +57,10 @@ $class = "odd";
 		</td>
 		<td>
 		<?php echo $region -> Region_Name;?>
-		</td> 
+		</td>
 		<td><a href="<?php echo base_url()."region_management/edit_region/".$region->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" region = "<?php echo $region -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
-		<?php
-
-		$counter++;
+		<?php $counter++;
 		}
 		}
 		?>

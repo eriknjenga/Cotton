@@ -27,6 +27,9 @@
 		window.location = url;
 		}
 </script>
+<?php 
+$this->load->view("geography_submenu");
+?>
 <h1>Route Listing</h1>
 <table class="fullwidth">
 	<thead>

@@ -87,9 +87,9 @@ class Route_Management extends MY_Controller {
 		return $this -> form_validation -> run();
 	}
 
-	public function base_params($data) {
-		$data['link'] = "route_management";
-
+	public function base_params($data) { 
+		$data['sub_link'] = "route_management";
+		$data['link'] = "geography_management";
 		$this -> load -> view("demo_template", $data);
 	}
 
