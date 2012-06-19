@@ -33,7 +33,8 @@ class Route_Management extends MY_Controller {
 	public function new_route($data = null) {
 		if ($data == null) {
 			$data = array();
-		} 
+		}
+		$data['depots'] = Depot::getAll();
 		$data['field_cashiers'] = Field_Cashier::getAll();
 		$data['content_view'] = "add_route_v";
 		$data['quick_link'] = "new_route";
@@ -68,6 +69,13 @@ class Route_Management extends MY_Controller {
 			$route -> Route_Name = $this -> input -> post("route_name");
 			$route -> Field_Cashier = $this -> input -> post("field_cashier");
 			$route -> save();
+			$depots = $this -> input -> post("depot");
+			foreach ($depots as $depot) {
+				$route_depot = new Route_Depot();
+				$route_depot -> Route = $route -> id;
+				$route_depot -> Depot = $depot;
+				$route_depot -> save();
+			}
 			redirect("route_management/listing");
 		} else {
 			$this -> new_route();
@@ -76,19 +84,24 @@ class Route_Management extends MY_Controller {
 
 	public function delete_route($id) {
 		$route = Route::getRoute($id);
-		$route -> delete(); 
+		$route -> delete();
+		$route_depots = Route_Depot::getAllForRoute($id);
+		foreach ($route_depots as $depot) {
+			$depot -> delete();
+		}
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('route_code', 'Route Code', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('route_name', 'Route Name', 'trim|required|max_length[100]|xss_clean'); 
+		$this -> form_validation -> set_rules('route_code', 'Area Code', 'trim|required|max_length[20]|xss_clean');
+		$this -> form_validation -> set_rules('route_name', 'Area Name', 'trim|required|max_length[100]|xss_clean');
+		$this -> form_validation -> set_rules('field_cashier', 'Field_Cashier', 'trim|required|xss_clean');
 		return $this -> form_validation -> run();
 	}
 
-	public function base_params($data) { 
-		$data['sub_link'] = "route_management";
+	public function base_params($data) {
+		$data['sub_link'] = "route_management"; 
 		$data['link'] = "geography_management";
 		$this -> load -> view("demo_template", $data);
 	}

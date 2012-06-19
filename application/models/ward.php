@@ -2,7 +2,7 @@
 class Ward extends Doctrine_Record {
 	public function setTableDefinition() {
 		$this -> hasColumn('Name', 'varchar', 50);
-		$this -> hasColumn('Region', 'varchar',10);
+		$this -> hasColumn('Region', 'varchar', 10);
 		$this -> hasColumn('Deleted', 'varchar', 2);
 	}
 
@@ -12,9 +12,27 @@ class Ward extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Ward")->orderBy("Name asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Ward") -> orderBy("Name asc");
 		$wards = $query -> execute();
 		return $wards;
 	}
+
+	public function getTotalWards() {
+		$query = Doctrine_Query::create() -> select("count(*) as Total_Wards") -> from("Ward");
+		$total = $query -> execute();
+		return $total[0]['Total_Wards'];
+	}
+
+	public function getPagedWards($offset, $items) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Ward") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+		$wards = $query -> execute(array());
+		return $wards;
+	}
+
+	public function getWard($id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Ward") -> where("id = '$id'");
+		$ward = $query -> execute();
+		return $ward[0];
+	} 
 
 }
