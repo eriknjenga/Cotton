@@ -16,11 +16,11 @@ class Home_Controller extends MY_Controller {
 		// Create session for holding quick menus
 		$config_session1 = array('sess_cookie_name' => 'quick_menus');
 		$this -> load -> library('session', $config_session1, 'quick_menus');
-		
+
 		// Create session for holding  menus
 		$config_session = array('sess_cookie_name' => 'menus');
 		$this -> load -> library('session', $config_session, 'menus');
-		
+
 		$quick_menu_rights = Quick_Menu_User_Right::getRights($this -> session -> userdata('access_level'));
 		$menu_rights = User_Right::getRights($this -> session -> userdata('access_level'));
 		$dashboard_rights = Dashboard_User_Right::getRights($this -> session -> userdata('access_level'));
@@ -61,6 +61,15 @@ class Home_Controller extends MY_Controller {
 		$data['scripts'] = array("FusionCharts/FusionCharts.js");
 		$this -> load -> view("demo_template", $data);
 
+	}
+
+	function management_dashboard() {
+		$data['title'] = "System Home";
+		$data['content_view'] = "management_dashboard_v";
+		$data['banner_text'] = "System Home";
+		$data['link'] = "home";
+		$data['scripts'] = array("FusionCharts/FusionCharts.js");
+		$this -> load -> view("demo_template", $data);
 	}
 
 }

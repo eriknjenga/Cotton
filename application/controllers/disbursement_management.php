@@ -33,7 +33,7 @@ class Disbursement_Management extends MY_Controller {
 
 	public function new_disbursement($data = null) {
 		$batch = $this -> session -> userdata('input_disbursement_batch');
-		if (strlen($batch) == 0) { 
+		if (strlen($batch) == 0) {
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {
@@ -51,7 +51,7 @@ class Disbursement_Management extends MY_Controller {
 
 	public function search_fbg() {
 		$batch = $this -> session -> userdata('input_disbursement_batch');
-		if (strlen($batch) == 0) { 
+		if (strlen($batch) == 0) {
 			redirect("batch_management/no_batch");
 		}
 		$data['content_view'] = "search_fbg_v";
@@ -204,6 +204,35 @@ class Disbursement_Management extends MY_Controller {
 		$this -> form_validation -> set_rules('farm_input[]', 'Farm Input', 'trim|required|xss_clean');
 		$this -> form_validation -> set_rules('quantity[]', 'Invoice Number', 'trim|required|xss_clean');
 		return $this -> form_validation -> run();
+	}
+
+	public function getOutstandingDebt() {
+		$this -> load -> database();
+		$season = date('Y');
+		$sql = "SELECT r.region_name, sum(total_value) as total_debt FROM `disbursement` d left join fbg f on d.fbg = f.id and d.batch_status = '2'  and season = '$season' left join village v on f.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id group by r.id";
+		$query = $this -> db -> query($sql);
+		$regional_data = $query -> result_array();
+		$chart = '<chart caption="Zonal Debt Summaries" subcaption="For the ' . $season . ' Season" xAxisName="Zone" yAxisName="Total Amount Borrowed (Tsh.)" showValues="0" decimals="0" formatNumberScale="0">';
+		foreach ($regional_data as $data) {
+			$chart .= '<set label="' . $data['region_name'] . '" value="' . $data['total_debt'] . '"/>';
+		}
+		$chart .= "</chart>";
+		echo $chart;
+	}
+
+
+	public function getTotalInputDisbursements() {
+		$this -> load -> database();
+		$season = date('Y');
+		$sql = "select f.product_name, sum(total_value) as total_issued from disbursement d left join farm_input f on d.farm_input = f.id and d.season = '$season' and d.batch_status = '2' group by f.id";
+		$query = $this -> db -> query($sql);
+		$regional_data = $query -> result_array();
+		$chart = '<chart caption="Total Input Disbursements (by Input)" subcaption="For the ' . $season . ' Season" xAxisName="Farm Input" yAxisName="Total Value of Inputs (Tsh.)" showValues="0" decimals="0" formatNumberScale="0">';
+		foreach ($regional_data as $data) {
+			$chart .= '<set label="' . $data['product_name'] . '" value="' . $data['total_issued'] . '"/>';
+		}
+		$chart .= "</chart>";
+		echo $chart;
 	}
 
 	public function base_params($data) {

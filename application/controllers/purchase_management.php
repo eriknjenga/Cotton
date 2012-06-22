@@ -40,7 +40,7 @@ class Purchase_Management extends MY_Controller {
 
 	public function new_purchase($data = null) {
 		$batch = $this -> session -> userdata('purchases_batch');
-		if (strlen($batch) == 0) { 
+		if (strlen($batch) == 0) {
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {
@@ -57,7 +57,7 @@ class Purchase_Management extends MY_Controller {
 
 	public function search_depot() {
 		$batch = $this -> session -> userdata('purchases_batch');
-		if (strlen($batch) == 0) { 
+		if (strlen($batch) == 0) {
 			redirect("batch_management/no_batch");
 		}
 		$data['content_view'] = "search_depot_v";
@@ -168,6 +168,32 @@ class Purchase_Management extends MY_Controller {
 		$this -> form_validation -> set_rules('price', 'Unit Price', 'trim|required|xss_clean');
 		$this -> form_validation -> set_rules('quantity', 'Quantity', 'trim|required|xss_clean');
 		return $this -> form_validation -> run();
+	}
+
+	function getDailyTrend() {
+		$this -> load -> database();
+		$sql = "SELECT sum(gross_value) as total_purchases,date FROM `purchase` p where batch_status = '2'   group by date order by str_to_date(p.date,'%m/%d/%Y') asc limit 7";
+		$query = $this -> db -> query($sql);
+		$purchasing_data = $query -> result_array();
+		$chart = '<chart caption="Daily Purchases Trend" subcaption="For the past 7 days" xAxisName="Day" yAxisName="Purchases (Tsh.)" showValues="0" alternateHGridColor="FCB541" alternateHGridAlpha="20" divLineColor="FCB541" divLineAlpha="50" canvasBorderColor="666666" baseFontColor="666666" lineColor="FCB541">';
+		foreach ($purchasing_data as $data) {
+			$chart .= '<set label="' . $data['date'] . '" value="' . $data['total_purchases'] . '"/>';
+		}
+		$chart .= '
+		<styles>
+<definition>
+<style name="Anim1" type="animation" param="_xscale" start="0" duration="1"/>
+<style name="Anim2" type="animation" param="_alpha" start="0" duration="0.6"/>
+<style name="DataShadow" type="Shadow" alpha="40"/>
+</definition>
+<application>
+<apply toObject="DIVLINES" styles="Anim1"/>
+<apply toObject="HGRID" styles="Anim2"/>
+<apply toObject="DATALABELS" styles="DataShadow,Anim2"/>
+</application>
+</styles>
+		</chart>';
+		echo $chart;
 	}
 
 	public function base_params($data) {

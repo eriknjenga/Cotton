@@ -80,6 +80,32 @@ class Price_Management extends MY_Controller {
 
 	}
 
+	function getPriceTrend() {
+		$this -> load -> database();
+		$sql = "SELECT price,date FROM cotton_price group by date order by str_to_date(date,'%m/%d/%Y') asc limit 7";
+		$query = $this -> db -> query($sql);
+		$purchasing_data = $query -> result_array();
+		$chart = '<chart caption="Cotton Price Trend" subcaption="Showing the past 7 changes" xAxisName="Date" yAxisName="Cotton Price (Tsh.)" showValues="0" alternateHGridColor="FCB541" alternateHGridAlpha="20" divLineColor="FCB541" divLineAlpha="50" canvasBorderColor="666666" baseFontColor="666666" lineColor="FCB541">';
+		foreach ($purchasing_data as $data) {
+			$chart .= '<set label="' . $data['date'] . '" value="' . $data['price'] . '"/>';
+		}
+		$chart .= '
+		<styles>
+<definition>
+<style name="Anim1" type="animation" param="_xscale" start="0" duration="1"/>
+<style name="Anim2" type="animation" param="_alpha" start="0" duration="0.6"/>
+<style name="DataShadow" type="Shadow" alpha="40"/>
+</definition>
+<application>
+<apply toObject="DIVLINES" styles="Anim1"/>
+<apply toObject="HGRID" styles="Anim2"/>
+<apply toObject="DATALABELS" styles="DataShadow,Anim2"/>
+</application>
+</styles>
+		</chart>';
+		echo $chart;
+	}
+
 	public function base_params($data) {
 		$data['title'] = "Cotton Price Management";
 		$data['link'] = "price_management";

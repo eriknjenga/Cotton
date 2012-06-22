@@ -59,7 +59,7 @@ class Region_Management extends MY_Controller {
 				$region = new Region();
 			}
 			$region -> Region_Code = $this -> input -> post("region_code");
-			$region -> Region_Name = $this -> input -> post("region_name"); 
+			$region -> Region_Name = $this -> input -> post("region_name");
 			$region -> save();
 			redirect("region_management/listing");
 		} else {
@@ -76,8 +76,21 @@ class Region_Management extends MY_Controller {
 
 	public function validate_form() {
 		$this -> form_validation -> set_rules('region_code', 'Zone Code', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('region_name', 'Zone Name', 'trim|required|max_length[100]|xss_clean'); 
+		$this -> form_validation -> set_rules('region_name', 'Zone Name', 'trim|required|max_length[100]|xss_clean');
 		return $this -> form_validation -> run();
+	}
+
+	public function getRegionalPurchases() {
+		$this -> load -> database();
+		$sql = "SELECT r.region_name, sum(gross_value) as total_purchases FROM `purchase` p left join depot d on p.depot = d.id and p.batch_status = '2'  left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id group by r.id";
+		$query = $this -> db -> query($sql);
+		$regional_data = $query -> result_array();
+		$chart = '<chart caption="Zonal Purchase Summaries" xAxisName="Zone" yAxisName="Gross Value (Tsh.)" showValues="0" decimals="0" formatNumberScale="0">';
+		foreach ($regional_data as $data){
+			$chart .= '<set label="'.$data['region_name'].'" value="'.$data['total_purchases'].'"/>';
+		}
+		$chart .="</chart>";
+		echo $chart;
 	}
 
 	public function base_params($data) {
@@ -87,6 +100,5 @@ class Region_Management extends MY_Controller {
 
 		$this -> load -> view("demo_template", $data);
 	}
-
 
 }
