@@ -24,8 +24,26 @@ $(function() {
 	var url = '<?php echo base_url()."price_management/getPriceTrend/"?>'; 
 	chart.setDataURL(url);
 	chart.render("price_movement");
+	
+	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionWidgets/Charts/AngularGauge.swf"?>", "performance", "350", "200", "0", "0");
+	var url = '<?php echo base_url()."price_management/getPerformance/"?>'; 
+	chart.setDataURL(url);
+	chart.render("performance");
 });
 </script>
+<style>
+	.graph_container{
+		width: 600px; 
+		float: left;
+	}
+	.graph_title{
+		letter-spacing: 1px;
+		font-size: 10px;
+		font-weight: bold;
+		margin: 0 auto;
+		width:300px;
+	}
+</style>
 <div class="graph_container">
 	<div id="zonal_purchases"></div>
 </div>
@@ -44,4 +62,8 @@ $(function() {
 
 <div class="graph_container">
 	<div id="price_movement"></div>
+</div>
+<div class="graph_container">
+	<div class="graph_title">% of Target Reached</div>
+	<div id="performance" style="margin-left:50px;"></div>
 </div>

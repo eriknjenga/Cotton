@@ -106,6 +106,36 @@ class Price_Management extends MY_Controller {
 		echo $chart;
 	}
 
+	function getPerformance() {
+		echo '
+		<chart bgAlpha="0" bgColor="FFFFFF" showValue="1" caption="Performance vs Target" lowerLimit="0" upperLimit="100" numberSuffix="%25" showBorder="0" basefontColor="FFFFDD" chartTopMargin="25" chartBottomMargin="25" chartLeftMargin="25" chartRightMargin="25" toolTipBgColor="80A905" gaugeFillMix="{dark-10},FFFFFF,{dark-10}" gaugeFillRatio="3">
+<colorRange>
+<color minValue="0" maxValue="45" code="FF654F"/>
+<color minValue="45" maxValue="80" code="F6BD0F"/>
+<color minValue="80" maxValue="100" code="8BBA00"/>
+</colorRange>
+<dials>
+<dial value="82" rearExtension="10"/>
+</dials>
+<!-- Rectangles behind the gauge -->
+<annotations>
+<annotationGroup id="Grp1" showBelow="1">
+<annotation type="rectangle" x="5" y="5" toX="345" toY="195" radius="10" color="009999,333333" showBorder="0"/>
+</annotationGroup>
+</annotations>
+<styles>
+<definition>
+<style name="RectShadow" type="shadow" strength="3"/>
+</definition>
+<application>
+<apply toObject="Grp1" styles="RectShadow"/>
+</application>
+</styles>
+</chart>
+		';
+
+	}
+
 	public function base_params($data) {
 		$data['title'] = "Cotton Price Management";
 		$data['link'] = "price_management";
