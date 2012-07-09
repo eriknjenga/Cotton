@@ -7,7 +7,6 @@ class Region extends Doctrine_Record {
 
 	public function setUp() {
 		$this -> setTableName('region');
-		$this -> hasMany('Depot as Depot_Objects', array('local' => 'id', 'foreign' => 'Region'));
 	}
 
 	public function getTotalRegions() {

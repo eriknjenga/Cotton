@@ -17,4 +17,11 @@ class Quick_Menu_User_Right extends Doctrine_Record {
 		return $rights;
 	}
 
+	public static function getRight($level,$menu) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Quick_Menu_User_Right") -> where("Access_Level = '" . $level . "' and Menu = '$menu'");
+		echo $query->getSQL();
+		$rights = $query -> execute();
+		return $rights;
+	}
+
 }

@@ -5,6 +5,7 @@ class Quick_Menu extends Doctrine_Record {
 		$this -> hasColumn('Menu_Url', 'varchar', 100);
 		$this -> hasColumn('Description', 'text');
 		$this -> hasColumn('Indicator', 'varchar', 100);
+		$this -> hasColumn('Report', 'varchar', 1);
 	}
 
 	public function setUp() {
@@ -16,5 +17,7 @@ class Quick_Menu extends Doctrine_Record {
 		$menus = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $menus;
 	}
+
+
 
 }

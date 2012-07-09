@@ -56,6 +56,9 @@ if (isset($depot)) {
 	$depot_id = $depot -> id;
 	$buyer_id = $depot -> Buyer;
 	$buyer = $depot -> Buyer_Object->Name;
+	$fbg = $depot -> FBG;
+	$acre_yield = $depot -> Acre_Yield;
+	$acreage = $depot -> Acreage;
 } else {
 	$depot_code = "";
 	$depot_name = "";
@@ -67,7 +70,9 @@ if (isset($depot)) {
 	$capacity = "";
 	$distance = "";
 	$depot_id = "";
-
+	$fbg = "0";
+	$acre_yield = "";
+	$acreage = "";
 }
 $attributes = array("method" => "post", "id" => "add_depot_input");
 echo form_open('depot_management/save', $attributes);
@@ -93,6 +98,21 @@ echo validation_errors('
 		<input id="depot_name" name="depot_name" type="text" value="<?php echo $depot_name;?>" class="validate[required]"/>
 		<span class="field_desc">Enter the name for this Buying Center</span>
 	</p>
+
+<p>
+	<label for="buyer">Buyer</label>
+	<input id="buyer" name="buyer" type="text" value="<?php echo $buyer;?>"/>
+	<span class="field_desc">Enter the buyer responsible for this center</span>
+</p>
+<p>
+	<label for="village">Village</label>
+	<input id="village" name="village" type="text" value="<?php echo $village;?>" class="village"/>
+	<span class="field_desc">Enter the village where this Center is located</span>
+</p>
+	<p>
+		<label for="fbg">FBG/Non-FBG: </label>
+		<input id="fbg" name="fbg" type="radio" value="1" <?php if($fbg == "1"){echo "checked";};?>/>FBG
+		<input id="fbg" name="fbg" type="radio" value="0" <?php if($fbg == "0"){echo "checked";};?>/>Non-FBG
 	<p>
 		<label for="capacity">Capacity (Tonnes): </label>
 		<input id="capacity" name="capacity" type="text" value="<?php echo $capacity;?>"/>
@@ -104,14 +124,14 @@ echo validation_errors('
 		<span class="field_desc">Enter the distance of this buying center from the ginnery</span>
 	</p>
 <p>
-	<label for="buyer">Buyer</label>
-	<input id="buyer" name="buyer" type="text" value="<?php echo $buyer;?>"/>
-	<span class="field_desc">Enter the buyer responsible for this center</span>
+	<label for="acreage">Acreage</label>
+	<input id="acreage" name="acreage" type="text" value="<?php echo $acreage;?>" class="acreage"/>
+	<span class="field_desc">Enter the number of acres under this buying center</span>
 </p>
 <p>
-	<label for="village">Village</label>
-	<input id="village" name="village" type="text" value="<?php echo $village;?>" class="village validate[required]"/>
-	<span class="field_desc">Enter the village where this Center is located</span>
+	<label for="acre_yield">Yield/Acre</label>
+	<input id="acre_yield" name="acre_yield" type="text" value="<?php echo $acre_yield;?>" class="acre_yield"/>
+	<span class="field_desc">Enter the yield per acre expected from this buying center</span>
 </p>
 	<p>
 		<input class="button" type="submit" value="Submit">

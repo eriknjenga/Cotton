@@ -62,6 +62,17 @@ class User extends Doctrine_Record {
 		return $user[0];
 	}
 
+	public static function userExists($username) {
+		$query = Doctrine_Query::create() -> select("*") -> from("User") -> where("Username = '$username'");
+		$user = $query -> execute();
+		if (isset($user[0])) {
+
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+
 	public function getActiveDataClerks() {
 		$query = Doctrine_Query::create() -> select("*") -> from("User u") -> where("u.Access.Indicator = 'data_entry' and Active = '1'");
 		$clerks = $query -> execute();

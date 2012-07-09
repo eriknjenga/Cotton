@@ -17,14 +17,14 @@
 <div class="message information close">
 	<h2>Report Description</h2>
 	<p>
-		A report showing all buying center transactions i.e. Cash Receipts, Cash Expenses, Purchases (Tsh.),Purchases (Kgs), Dispatches (Kgs) in a particular time frame
+		A report showing all transactions of a particular field cashier in a particular time frame. It includes, cash receipts, cash returns and cash disbursements to buying centers
 	</p>
 </div>
 <div id="filter">
 	<?php
 	$attributes = array("method" => "POST","id"=>"depot_transactions_form");
 
-	echo form_open('depot_reports/download', $attributes);
+	echo form_open('field_cashier_transactions/download', $attributes);
 	echo validation_errors('
 <p class="form_error">', '</p>
 ');
@@ -34,13 +34,13 @@
 			Select Filter Options
 		</legend>
 		<p>
-			<label for="depot">Buying Center</label>
-			<select name="depot" id="depot" class="validate[required]">
+			<label for="field_cashier">Field Cashier</label>
+			<select name="field_cashier" id="field_cashier" class="validate[required]">
 				<option></option>
 				<?php
-foreach($depots as $depot){
+foreach($field_cashiers as $field_cashier){
 				?>
-				<option value="<?php echo $depot -> id;?>"><?php echo $depot -> Depot_Name." (".$depot -> Village_Object->Name.")";?></option>
+				<option value="<?php echo $field_cashier -> id;?>"><?php echo $field_cashier -> Field_Cashier_Name;?></option>
 				<?php }?>
 			</select>
 			</p>
@@ -52,7 +52,7 @@ foreach($depots as $depot){
 			<label for="end_date">To</label>
 			<input id="end_date" name="end_date" type="text" class="validate[required]"/>
 		</p>
-		<input type="submit" name="surveillance" class="button"	value="Download Buying Center Transactions" />
+		<input type="submit" name="surveillance" class="button"	value="Download Field Cashier Transactions" />
 	</fieldset>
 	</form>
 </div>

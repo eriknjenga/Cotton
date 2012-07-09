@@ -1,3 +1,9 @@
+<div class="message information close">
+	<h2>Report Description</h2>
+	<p>
+		A report showing all buying center cotton purchases/dispatches grouped by routes
+	</p>
+</div>
 <div id="filter">
 	<?php
 	$attributes = array("method" => "POST");

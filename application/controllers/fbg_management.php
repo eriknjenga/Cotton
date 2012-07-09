@@ -3,6 +3,7 @@ class FBG_Management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$this -> load -> library('pagination');
+		$this->load->database();
 	}
 
 	public function index() {
@@ -32,15 +33,20 @@ class FBG_Management extends MY_Controller {
 	}
 
 	public function search($search_term = '', $offset = 0) {
+		$db_search_term = "";
 		if ($search_term == '') {
 			$search_term = $this -> input -> post("search_value");
 		}
 		if (strlen($search_term) == 0) {
 			redirect("fbg_management/search_fbg");
 		}
+		$this->load->database();
+		$search_term =urldecode($search_term);
+		$db_search_term = $this->db->escape_str(urldecode($search_term));
+		$search_term = urlencode($search_term);
 		$items_per_page = 10;
-		$number_of_fbgs = FBG::getTotalSearchedFbgs($search_term);
-		$fbgs = FBG::getPagedSearchedFbgs($search_term, $offset, $items_per_page);
+		$number_of_fbgs = FBG::getTotalSearchedFbgs($db_search_term);
+		$fbgs = FBG::getPagedSearchedFbgs($db_search_term, $offset, $items_per_page);
 		if ($number_of_fbgs > $items_per_page) {
 			$config['base_url'] = base_url() . "fbg_management/search/" . $search_term . "/";
 			$config['total_rows'] = $number_of_fbgs;
@@ -51,7 +57,7 @@ class FBG_Management extends MY_Controller {
 			$data['pagination'] = $this -> pagination -> create_links();
 		}
 		$data['fbgs'] = $fbgs;
-		$data['listing_title'] = "FBG Search Results For '$search_term'";
+		$data['listing_title'] = "FBG Search Results For <b>' ".urldecode($search_term)."</b> '";
 		$data['title'] = "Farmer Business Groups";
 		$data['content_view'] = "list_fbgs_v";
 		$data['styles'] = array("pagination.css");
@@ -84,8 +90,10 @@ class FBG_Management extends MY_Controller {
 		if (strlen($search_term) == 0) {
 			redirect("fbg_management/search_fbg");
 		}
+		$this->load->database();
+		$db_search_term = $this->db->escape_str($search_term);
 		//Limit search results to 10
-		$fbgs = FBG::getPagedSearchedFbgs($search_term, 0, 10);
+		$fbgs = FBG::getPagedSearchedFbgs($db_search_term, 0, 10);
 		$final_results = array();
 		$counter = 0;
 		foreach ($fbgs as $fbg) {
@@ -97,9 +105,10 @@ class FBG_Management extends MY_Controller {
 	}
 
 	public function autocomplete_village() {
+		$this->load->database();
 		$search_term = $this -> input -> post("term"); 
 		//Limit search results to 10
-		$villages = Village::getPagedSearchedVillages($search_term, 0, 10);
+		$villages = Village::getPagedSearchedVillages($this->db->escape_str($search_term), 0, 10);
 		$final_results = array();
 		$counter = 0;
 		foreach ($villages as $village) {

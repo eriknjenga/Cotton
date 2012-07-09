@@ -41,7 +41,17 @@ class Deliveries_Report extends MY_Controller {
 			return;
 		}
 		$this -> load -> database();
-		$data_buffer = "";
+		$data_buffer = "
+			<style>
+			table.data-table {
+			table-layout: fixed;
+			width: 1000px;
+			}
+			table.data-table td {
+			width: 70px;
+			}
+			</style>
+			";
 		$total_delivered = 0;
 		$total_gross = 0;
 		$total_recoveries = 0;
@@ -51,30 +61,30 @@ class Deliveries_Report extends MY_Controller {
 		$region_summaries = array();
 		foreach ($regions as $region) {
 			$region_summaries[$region -> id] = array();
-			$region_summaries[$region -> id]['total_delivered'] = "";
-			$region_summaries[$region -> id]['total_gross'] = "";
-			$region_summaries[$region -> id]['total_recovered'] = "";
-			$region_summaries[$region -> id]['total_net'] = "";
+			$region_summaries[$region -> id]['total_delivered'] = 0;
+			$region_summaries[$region -> id]['total_gross'] = 0;
+			$region_summaries[$region -> id]['total_recovered'] = 0;
+			$region_summaries[$region -> id]['total_net'] = 0;
 			$data_buffer .= "<tr><td><b>Zone: </b></td><td><b>" . $region -> Region_Name . "</b></td></tr>";
 			$data_buffer .= $this -> echoTitles();
 			$sql = "SELECT p.date,cpc_number,group_name,v.name as village,p.dpn,p.quantity,p.unit_price,p.gross_value,(p.loan_recovery+p.farmer_reg_fee+p.other_recoveries) as total_recoveries,p.net_value FROM `fbg` f left join village v on v.id = f.village left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on f.id = p.fbg where r.id = '" . $region -> id . "' and str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by str_to_date(p.date,'%m/%d/%Y') desc";
 			$query = $this -> db -> query($sql);
 			foreach ($query->result_array() as $fbg_data) {
-				$data_buffer .= "<tr><td>" . $fbg_data['date'] . "</td><td>" . $fbg_data['cpc_number'] . "</td><td>" . $fbg_data['group_name'] . "</td><td>" . $fbg_data['village'] . "</td><td>" . $fbg_data['dpn'] . "</td><td>" . $fbg_data['quantity'] . "</td><td>" . $fbg_data['unit_price'] . "</td><td>" . $fbg_data['gross_value'] . "</td><td>" . $fbg_data['total_recoveries'] . "</td><td>" . $fbg_data['net_value'] . "</td></tr>";
+				$data_buffer .= "<tr><td>" . $fbg_data['date'] . "</td><td>" . $fbg_data['cpc_number'] . "</td><td>" . $fbg_data['group_name'] . "</td><td>" . $fbg_data['village'] . "</td><td>" . $fbg_data['dpn'] . "</td><td>" . number_format($fbg_data['quantity'] + 0) . "</td><td>" . number_format($fbg_data['unit_price'] + 0) . "</td><td>" . number_format($fbg_data['gross_value'] + 0) . "</td><td>" . number_format($fbg_data['total_recoveries'] + 0) . "</td><td>" . number_format($fbg_data['net_value'] + 0) . "</td></tr>";
 				$region_summaries[$region -> id]['total_delivered'] += $fbg_data['quantity'];
 				$region_summaries[$region -> id]['total_gross'] += $fbg_data['gross_value'];
 				$region_summaries[$region -> id]['total_recovered'] += $fbg_data['total_recoveries'];
 				$region_summaries[$region -> id]['total_net'] += $fbg_data['net_value'];
 			}
-			$data_buffer .= "<tr><td>Totals</td><td>-</td><td>-</td><td>-</td><td>-</td><td>" . $region_summaries[$region -> id]['total_delivered'] . "</td><td>-</td><td>" . $region_summaries[$region -> id]['total_gross'] . "</td><td>" . $region_summaries[$region -> id]['total_recovered'] . "</td><td>" . $region_summaries[$region -> id]['total_net'] . "</td></tr>";
+			$data_buffer .= "<tr><td>Totals</td><td>-</td><td>-</td><td>-</td><td>-</td><td>" . number_format($region_summaries[$region -> id]['total_delivered'] + 0) . "</td><td>-</td><td>" . number_format($region_summaries[$region -> id]['total_gross'] + 0) . "</td><td>" . number_format($region_summaries[$region -> id]['total_recovered'] + 0) . "</td><td>" . number_format($region_summaries[$region -> id]['total_net'] + 0) . "</td></tr>";
 			$total_delivered += $region_summaries[$region -> id]['total_delivered'];
 			$total_gross += $region_summaries[$region -> id]['total_gross'];
 			$total_recoveries += $region_summaries[$region -> id]['total_recovered'];
 			$total_net += $region_summaries[$region -> id]['total_net'];
 		}
 		$data_buffer .= "</table>";
-		$data_buffer .= "<h1>Summaries</h1><table class='data-table'><tr><th></th><th>Total Delivered</th><th>Total Gross Value</th><th>Total Recoveries</th><th>Total Amount Paid</th></tr>";
-		$data_buffer .= "<tr><td>Totals</td><td>" . $total_delivered . "</td><td>" . $total_gross . "</td><td>" . $total_recoveries . "</td><td>" . $total_net . "</td></tr>";
+		$data_buffer .= "<h3>Summaries</h3><table class='data-table'><tr><th></th><th>Total Delivered</th><th>Total Gross Value</th><th>Total Recoveries</th><th>Total Amount Paid</th></tr>";
+		$data_buffer .= "<tr><td>Totals</td><td>" . number_format($total_delivered + 0) . "</td><td>" . number_format($total_gross + 0) . "</td><td>" . number_format($total_recoveries + 0) . "</td><td>" . number_format($total_net + 0) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -128,7 +138,7 @@ class Deliveries_Report extends MY_Controller {
 		echo $data_buffer;
 		$log = new System_Log();
 		$log -> Log_Type = "4";
-		$log -> Log_Message = "Downloaded Deliveries Report Excell Sheet";
+		$log -> Log_Message = "Downloaded Deliveries Report Excel Sheet";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
@@ -144,17 +154,13 @@ class Deliveries_Report extends MY_Controller {
 
 	function generatePDF($data, $start_date, $end_date) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
-		$html_title .= "<h2 style='text-align:center; text-decoration:underline;'>Alliance Ginneries</h2>";
-		$html_title .= "<h1 style='text-align:center; text-decoration:underline;'>Deliveries Report</h1>";
-		$html_title .= "<h3 style='text-align:center;'> between: " . $start_date . " and " . $end_date . "</h3>";
+		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Cotton Deliveries Report</h3>";
+		$html_title .= "<h5 style='text-align:center;'> between: " . $start_date . " and " . $end_date . "</h5>";
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('', 'A4-L', 0, '', 15, 15, 16, 16, 9, 9, '');
 		$this -> mpdf -> SetTitle('Deliveries Report');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
-		$this -> mpdf -> WriteHTML('<br/>');
-		$this -> mpdf -> WriteHTML('<br/>');
-		$this -> mpdf -> WriteHTML('<br/>');
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "Deliveries Report.pdf";

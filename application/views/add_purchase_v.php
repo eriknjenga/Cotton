@@ -69,19 +69,22 @@
 				var prices = $("#cotton_prices").attr("prices");
 				var price_dates = $("#cotton_prices").attr("price_dates");
 				var price_dates_array = price_dates.split(",");
+				
 				var prices_array = prices.split(",");
 				var selected_date_value = date_object.attr("value");
 				var selected_date = new Date(selected_date_value);
 				var difference = 0;
 				var most_current_price = 0;
 				var counter = 0;
-				$.each(price_dates_array, function() {
-				if(this.length > 0 && selected_date_value.length > 0) {
-				var price_date = new Date(this);
+				$.each(price_dates_array, function(key, value) {
+				if(value.length > 0 && selected_date_value.length > 0) {
+				var price_date = new Date(value);
 				var day_difference = Math.floor((selected_date - price_date) / 86400000);
 				if(day_difference >= 0 && (difference == 0 || day_difference < difference)) {
+					
 				difference = day_difference;
 				most_current_price = prices_array[counter];
+				
 				}
 				}
 				counter++;
@@ -151,7 +154,9 @@ if(isset($batch_information)){
 		<?php echo $batch_information;?>
 	</p>
 </div>
-<?php }?>
+<?php }
+
+?>
 
 </p>
 <input type="hidden" name="editing_id" value="<?php echo $purchase_id;?>" />
@@ -170,7 +175,7 @@ foreach ($prices as $price_object) {
 <input type="hidden" value="" id="product_price"/>
 <fieldset>
 	<legend>
-		Recording Purchases For <b><?php echo $depot -> Depot_Name . " (" . $depot -> Region_Object -> Region_Name . ")";?></b>
+		Recording Purchases For <b><?php echo $depot -> Depot_Name . " (" . $depot -> Village_Object -> Name . ")";?></b>
 	</legend>
 	<p>
 		<label><b>Buyer at Site</b> </label>
@@ -179,7 +184,7 @@ foreach ($prices as $price_object) {
 </fieldset>
 <p>
 	<label for="fbg">FBG</label>
-	<input id="fbg" name="fbg" type="text" value="<?php echo $fbg_name;?>" class="fbg validate[required]"/>
+	<input id="fbg" name="fbg" type="text" value="<?php echo $fbg_name;?>" />
 	<span class="field_desc">Enter the relevant <b>FBG</b> for this transaction</span>
 </p>
 <p>
@@ -195,12 +200,12 @@ foreach ($prices as $price_object) {
 
 <p>
 	<label for="quantity">Quantity</label>
-	<input class="quantity validate[required,number]" name="quantity" id="quantity"  type="text" value="<?php echo $quantity;?>"/>
+	<input name="quantity" id="quantity"  type="text" value="<?php echo $quantity;?>"/>
 	<span class="field_desc">Enter the <b>Quantity</b> purchased</span>
 </p>
 <p>
 	<label for="price">Unit Price</label>
-	<input class="price validate[required,number]" readonly="" name="price" id="price"  type="text" value="<?php echo $price;?>" />
+	<input readonly="" name="price" id="price"  type="text" value="<?php echo $price;?>" />
 	<span class="field_desc">Enter the <b>price</b> that the produce was purchased for</span>
 </p>
 <p>

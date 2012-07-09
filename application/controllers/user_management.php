@@ -151,17 +151,17 @@ class User_Management extends MY_Controller {
 	}
 
 	public function save() {
-		$valid = $this -> validate_form();
+		$editing = $this -> input -> post("editing_id");
+		//Check if we are editing the record first
+		if (strlen($editing) > 0) {
+			$user = User::getUser($editing);
+			$valid = $this -> validate_form($user);
+		} else {
+			$user = new User();
+			$valid = $this -> validate_form();
+		}
 		//If the fields have been validated, save the input
 		if ($valid) {
-			$editing = $this -> input -> post("editing_id");
-			//Check if we are editing the record first
-			if (strlen($editing) > 0) {
-				$user = User::getUser($editing);
-			} else {
-				$user = new User();
-			}
-
 			$user -> Name = $this -> input -> post("name");
 			$user -> Username = $this -> input -> post("username");
 			$user -> Password = $this -> input -> post("password");
@@ -187,12 +187,26 @@ class User_Management extends MY_Controller {
 		redirect($previous_page);
 	}
 
-	public function validate_form() {
+	public function validate_form($user = false) {
 		$this -> form_validation -> set_rules('name', 'Full Name', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('username', 'Username', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('password', 'Password', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('access_level', 'Access Level', 'trim|required|xss_clean');
-		return $this -> form_validation -> run();
+		$temp_validation = $this -> form_validation -> run();
+		if ($temp_validation) {
+			//If the user is editing, if the username changes, check whether the new username exists!
+			if ($user) {
+				if ($user -> Username != $this -> input -> post('username')) {
+					$this -> form_validation -> set_rules('username', 'Username', 'trim|required|callback_unique_username');
+				}
+			} else {
+				$this -> form_validation -> set_rules('username', 'Username', 'trim|required|callback_unique_username');
+			}
+
+			return $this -> form_validation -> run();
+		} else {
+			return $temp_validation;
+		}
 	}
 
 	private function _submit_validate() {
@@ -200,6 +214,61 @@ class User_Management extends MY_Controller {
 		$this -> form_validation -> set_rules('username', 'Username', 'trim|required|min_length[4]|max_length[20]');
 		$this -> form_validation -> set_rules('password', 'Password', 'trim|required|min_length[4]|max_length[20]');
 		return $this -> form_validation -> run();
+	}
+
+	public function unique_username($usr) {
+		$exists = User::userExists($usr);
+		if ($exists) {
+			$this -> form_validation -> set_message('unique_username', 'The Username already exists. Enter another one.');
+			return FALSE;
+		} else {
+			return TRUE;
+		}
+
+	}
+
+	public function user_authorization() {
+		$data = array();
+		$validated = $this -> _submit_validate();
+		if ($validated) {
+			$username = $this -> input -> post("username");
+			$password = $this -> input -> post("password");
+			$authorization_from = $this -> input -> post("authorization_from");
+			$error_callback = $this -> input -> post("error_callback");
+			$request_url = $this -> input -> post("request_url");
+			$log_message = $this -> input -> post("log_message");
+			$logged_in = User::login($username, $password);
+			//This code checks if the credentials are valid
+			if ($logged_in == false) {
+				redirect($error_callback);
+
+			}
+			//If the credentials are valid, continue
+			else {
+				//check to see whether the user is active
+				if ($logged_in -> Active == "0") {
+					redirect($error_callback);
+				}
+				//looks good. Continue!
+				else {
+					if ($logged_in -> Access -> Management_Type != $authorization_from) {
+						redirect($error_callback);
+					} else {
+						$log = new System_Log();
+						$log -> Log_Type = "1";
+						$log -> Log_Message = $log_message;
+						$log -> User = $logged_in->id;
+						$log -> Timestamp = date('U');
+						$log -> save();
+						redirect($request_url);
+					}
+				}
+
+			}
+
+		} else {
+			redirect($error_callback);
+		}
 	}
 
 	public function base_params($data) {

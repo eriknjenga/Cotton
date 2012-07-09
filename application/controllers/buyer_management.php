@@ -31,12 +31,13 @@ class Buyer_Management extends MY_Controller {
 	}
 
 	public function autocomplete_buyer() {
+		$this->load->database();
 		$search_term = $this -> input -> post("term");
 		if (strlen($search_term) == 0) {
 			redirect("buyer_management/search_buyer");
 		}
 		//Limit search results to 10
-		$buyers = Buyer::getPagedSearchedBuyers($search_term, 0, 10);
+		$buyers = Buyer::getPagedSearchedBuyers($this->db->escape_str($search_term), 0, 10);
 		$final_results = array();
 		$counter = 0;
 		foreach ($buyers as $buyer) {
@@ -111,9 +112,7 @@ class Buyer_Management extends MY_Controller {
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('buyer_code', 'Buyer Code', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('name', 'Buyer Name', 'trim|required|max_length[100]|xss_clean');
-		$this -> form_validation -> set_rules('national_id', 'National Id', 'trim|required|max_length[30]|xss_clean');
 		return $this -> form_validation -> run();
 	}
 

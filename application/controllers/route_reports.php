@@ -39,15 +39,25 @@ class Route_Reports extends MY_Controller {
 			return;
 		}
 		$this -> load -> database();
-		$data_buffer = "";
+		$data_buffer = "
+			<style>
+			table.data-table {
+			table-layout: fixed;
+			width: 1000px;
+			}
+			table.data-table td {
+			width: 70px;
+			}
+			</style>
+			";
 		//echo the start of the table
 		$data_buffer .= "<table class='data-table'>";
 		$route_summaries = array();
 		foreach ($routes as $route) {
 			$route_summaries = array();
-			$route_summaries['total_purchases'] = "";
-			$route_summaries['total_dispatched'] = "";
-			$route_summaries['total_stock_balance'] = "";
+			$route_summaries['total_purchases'] = 0;
+			$route_summaries['total_dispatched'] = 0;
+			$route_summaries['total_stock_balance'] = 0;
 			$data_buffer .= "<tr><td><b>Route: </b></td><td><b>" . $route -> Route_Name . "</b></td></tr>";
 			$data_buffer .= $this -> echoTitles();
 			//Get data for each depot
@@ -56,13 +66,13 @@ class Route_Reports extends MY_Controller {
 					$sql = "select center_details.*,total_purchased-total_dispatched as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,sum(quantity) as total_purchased,max(str_to_date(date,'%m/%d/%Y'))as last_purchase_date, (select sum(net_weight) as total_dispatched from weighbridge w where w.buying_center_code = d.depot_code and w.weighing_type = '2') as total_dispatched from depot d  left join purchase p on p.depot = d.id and p.batch_status = '2' where d.id = '" . $route_depot -> Depot . "') center_details";
 					$query = $this -> db -> query($sql);
 					$depot_data = $query -> row_array();
-					$data_buffer .= "<tr><td>" . $depot_data['depot_code'] . "</td><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['distance'] . "</td><td>" . $depot_data['last_purchase_date'] . "</td><td>" . $depot_data['total_purchased'] . "</td><td>" . $depot_data['total_dispatched'] . "</td><td>" . $depot_data['stock_balance'] . "</td><td>" . ($depot_data['capacity'] * 1000) . "</td></tr>";
+					$data_buffer .= "<tr><td>" . $depot_data['depot_code'] . "</td><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['distance'] . "</td><td>" . $depot_data['last_purchase_date'] . "</td><td>" . number_format($depot_data['total_purchased'] + 0) . "</td><td>" . number_format($depot_data['total_dispatched'] + 0) . "</td><td>" . number_format($depot_data['stock_balance'] + 0) . "</td><td>" . number_format(($depot_data['capacity'] * 1000) + 0) . "</td></tr>";
 					$route_summaries['total_purchases'] += $depot_data['total_purchased'];
 					$route_summaries['total_dispatched'] += $depot_data['total_dispatched'];
 					$route_summaries['total_stock_balance'] += $depot_data['stock_balance'];
 				}
 			}
-			$data_buffer .= "<tr></tr><tr><td><b>Totals</b></td><td>-</td><td>-</td><td>-</td><td>" . $route_summaries['total_purchases'] . "</td><td>" . $route_summaries['total_dispatched'] . "</td><td>" . $route_summaries['total_stock_balance'] . "</td><td>-</td></tr>";
+			$data_buffer .= "<tr></tr><tr><td><b>Totals</b></td><td>-</td><td>-</td><td>-</td><td>" . number_format($route_summaries['total_purchases'] + 0) . "</td><td>" . number_format($route_summaries['total_dispatched'] + 0) . "</td><td>" . number_format($route_summaries['total_stock_balance'] + 0) . "</td><td>-</td></tr>";
 		}
 
 		$data_buffer .= "</table>";
@@ -112,7 +122,7 @@ class Route_Reports extends MY_Controller {
 		echo $data_buffer;
 		$log = new System_Log();
 		$log -> Log_Type = "4";
-		$log -> Log_Message = "Downloaded Route Collections Excell Sheet";
+		$log -> Log_Message = "Downloaded Route Collections Excel Sheet";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
@@ -129,19 +139,14 @@ class Route_Reports extends MY_Controller {
 
 	function generatePDF($data, $date) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
-		$html_title .= "<h2 style='text-align:center; text-decoration:underline;'>Alliance Ginneries</h2>";
-
-		$html_title .= "<h1 style='text-align:center; text-decoration:underline;'>Route Collection Summaries</h1>";
-		$html_title .= "<h3 style='text-align:center;'> as at: " . $date . "</h3>";
+		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Route Collection Summaries</h3>";
+		$html_title .= "<h5 style='text-align:center;'> as at: " . $date . "</h5>";
 
 		$this -> load -> library('mpdf');
-		$this -> mpdf = new mPDF('', 'A4-L', 0, '', 15, 15, 16, 16, 9, 9, '');
+		$this -> mpdf = new mPDF('c', 'A4-L');
 		$this -> mpdf -> SetTitle('Route Collection Summaries');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
-		$this -> mpdf -> WriteHTML('<br/>');
-		$this -> mpdf -> WriteHTML('<br/>');
-		$this -> mpdf -> WriteHTML('<br/>');
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "Route Collection Summaries.pdf";

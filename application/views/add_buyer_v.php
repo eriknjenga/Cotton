@@ -32,7 +32,7 @@ echo validation_errors('
 	<input type="hidden" name="editing_id" value="<?php echo $buyer_id;?>" />
 	<p>
 		<label for="buyer_code">Buyer Code: </label>
-		<input id="buyer_code"  name="buyer_code" type="text"  value="<?php echo $buyer_code;?>" class="validate[required]"/>
+		<input id="buyer_code"  name="buyer_code" type="text"  value="<?php echo $buyer_code;?>" />
 		<span class="field_desc">Enter the code for this Buyer</span>
 	</p>
 	<p>
@@ -42,12 +42,12 @@ echo validation_errors('
 	</p>
 		<p>
 		<label for="phone_number">Phone Number: </label>
-		<input id="phone_number" name="phone_number" type="text" value="<?php echo $phone_number;?>" class="validate[required]"/>
+		<input id="phone_number" name="phone_number" type="text" value="<?php echo $phone_number;?>" />
 		<span class="field_desc">Enter the phone number for this Buyer</span>
 	</p>
 		<p>
 		<label for="national_id">National Id Number: </label>
-		<input id="national_id" name="national_id" type="text" value="<?php echo $national_id;?>" class="validate[required]"/>
+		<input id="national_id" name="national_id" type="text" value="<?php echo $national_id;?>"  />
 		<span class="field_desc">Enter the national Id number for this Buyer</span>
 	</p> 
 	<p>

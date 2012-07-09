@@ -33,6 +33,36 @@ class Purchase_Management extends MY_Controller {
 
 	public function record_purchase($depot) {
 		$depot_object = Depot::getDepot($depot);
+		if ($depot_object -> Deleted == '2') {
+			$data['depot'] = $depot_object;
+			$data['content_view'] = "chief_accountant_authorization_v";
+			$data['request_url'] = "purchase_management/authorize_purchase/".$depot;
+			$data['message'] = "This Buying Center is marked as closed";
+			$data['quick_link'] = "new_purchase";
+			$data['scripts'] = array("validationEngine-en.js", "validator.js", "jquery.ui.autocomplete.js");
+			$data['styles'] = array("validator.css");
+			$this -> base_params($data);
+		} else {
+			$data['depot'] = $depot_object;
+			$this -> session -> set_userdata(array('saved_depot' => $depot));
+			$this -> new_purchase($data);
+		}
+	}
+
+	public function authorization_failed($depot) {
+		$depot_object = Depot::getDepot($depot);
+		$data['depot'] = $depot_object;
+		$data['content_view'] = "chief_accountant_authorization_v";
+		$data['request_url'] = "purchase_management/authorize_purchase/".$depot;
+		$data['message'] = "Authorization Failed. This could be caused by, Invalid credentials, wrong access level or the user has been disabled. Consult your Administrator and try again!";
+		$data['quick_link'] = "new_purchase";
+		$data['scripts'] = array("validationEngine-en.js", "validator.js", "jquery.ui.autocomplete.js");
+		$data['styles'] = array("validator.css");
+		$this -> base_params($data);
+	}
+
+	public function authorize_purchase($depot) {
+		$depot_object = Depot::getDepot($depot);
 		$data['depot'] = $depot_object;
 		$this -> session -> set_userdata(array('saved_depot' => $depot));
 		$this -> new_purchase($data);
@@ -44,7 +74,7 @@ class Purchase_Management extends MY_Controller {
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {
-			$data = array();
+			$this->search_depot();
 		}
 		$data['batch_information'] = "You are entering records into batch number: <b>" . $this -> session -> userdata('purchases_batch') . "</b>";
 		$data['prices'] = Cotton_Price::getCottonPrices();
@@ -165,8 +195,6 @@ class Purchase_Management extends MY_Controller {
 		$this -> form_validation -> set_rules('dpn', 'Daily Purchases Number', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('depot', 'Buying Center', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('date', 'Date', 'trim|required|max_length[100]|xss_clean');
-		$this -> form_validation -> set_rules('price', 'Unit Price', 'trim|required|xss_clean');
-		$this -> form_validation -> set_rules('quantity', 'Quantity', 'trim|required|xss_clean');
 		return $this -> form_validation -> run();
 	}
 

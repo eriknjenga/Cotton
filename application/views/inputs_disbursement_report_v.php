@@ -1,3 +1,9 @@
+<div class="message information close">
+	<h2>Report Description</h2>
+	<p>
+		A report showing a detailed listing of disbursements of inputs to FBGs in a particular season. This listing can be filtered to show disbursements of a particular input
+	</p>
+</div>
 <div id="filter">
 	<?php
 	$attributes = array("method" => "POST");

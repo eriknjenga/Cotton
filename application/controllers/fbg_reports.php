@@ -37,7 +37,17 @@ class FBG_Reports extends MY_Controller {
 			return;
 		}
 		$this -> load -> database();
-		$data_buffer = "";
+		$data_buffer = "
+			<style>
+			table.data-table {
+			table-layout: fixed;
+			width: 1000px;
+			}
+			table.data-table td {
+			width: 70px;
+			}
+			</style>
+			";
 		$total_debt = 0;
 		$total_recoveries = 0;
 		$total_debt_owing = 0;
@@ -46,28 +56,28 @@ class FBG_Reports extends MY_Controller {
 		$region_summaries = array();
 		foreach ($regions as $region) {
 			$region_summaries[$region -> id] = array();
-			$region_summaries[$region -> id]['total_debt'] = "";
-			$region_summaries[$region -> id]['total_recoveries'] = "";
-			$region_summaries[$region -> id]['total_debt_owing'] = "";
+			$region_summaries[$region -> id]['total_debt'] = 0;
+			$region_summaries[$region -> id]['total_recoveries'] = 0;
+			$region_summaries[$region -> id]['total_debt_owing'] = 0;
 			$data_buffer .= "<tr><td><b>Zone: </b></td><td><b>" . $region -> Region_Name . "</b></td></tr>";
 			$data_buffer .= $this -> echoTitles();
 			$sql = "select cpc_number,group_name,hectares_available,chairman_name,v.name as village,(select sum(d.total_value) from disbursement d where d.fbg = f.id and batch_status = '2') as total_borrowed ,(select sum(gross_value-net_value) from purchase p where p.fbg = f.id and batch_status = '2') as total_recovered  from fbg f left join village v on f.village = v.id left join ward w on v.ward = w.id where w.region = '" . $region -> id . "' order by village asc";
 			$query = $this -> db -> query($sql);
 			foreach ($query->result_array() as $fbg_data) {
 				$total_outstanding = $fbg_data['total_borrowed'] - $fbg_data['total_recovered'];
-				$data_buffer .= "<tr><td>" . $fbg_data['cpc_number'] . "</td><td>" . $fbg_data['group_name'] . "</td><td>" . $fbg_data['chairman_name'] . "</td><td>" . $fbg_data['village'] . "</td><td>" . ($fbg_data['total_borrowed'] + 0) . "</td><td>" . ($fbg_data['total_recovered'] + 0) . "</td><td>" . $total_outstanding . "</td></tr>";
+				$data_buffer .= "<tr><td>" . $fbg_data['cpc_number'] . "</td><td>" . $fbg_data['group_name'] . "</td><td>" . $fbg_data['chairman_name'] . "</td><td>" . $fbg_data['village'] . "</td><td>" . number_format(($fbg_data['total_borrowed'] + 0)) . "</td><td>" . number_format(($fbg_data['total_recovered'] + 0)) . "</td><td>" . number_format($total_outstanding + 0) . "</td></tr>";
 				$region_summaries[$region -> id]['total_debt'] += $fbg_data['total_borrowed'];
 				$region_summaries[$region -> id]['total_recoveries'] += $fbg_data['total_recovered'];
 				$region_summaries[$region -> id]['total_debt_owing'] += $total_outstanding;
 			}
-			$data_buffer .= "<tr><td>Totals</td><td>-</td><td>-</td><td>-</td><td>" . $region_summaries[$region -> id]['total_debt'] . "</td><td>" . $region_summaries[$region -> id]['total_recoveries'] . "</td><td>" . $region_summaries[$region -> id]['total_debt_owing'] . "</td></tr>";
+			$data_buffer .= "<tr><td>Totals</td><td>-</td><td>-</td><td>-</td><td>" . number_format($region_summaries[$region -> id]['total_debt'] + 0) . "</td><td>" . number_format($region_summaries[$region -> id]['total_recoveries'] + 0) . "</td><td>" . number_format($region_summaries[$region -> id]['total_debt_owing'] + 0) . "</td></tr>";
 			$total_debt += $region_summaries[$region -> id]['total_debt'];
 			$total_recoveries += $region_summaries[$region -> id]['total_recoveries'];
 			$total_debt_owing += $region_summaries[$region -> id]['total_debt_owing'];
 		}
 		$data_buffer .= "</table>";
-		$data_buffer .= "<h1>Summaries</h1><table class='data-table'><tr><th></th><th>Total Debt</th><th>Total Recoveries</th><th>Total Debt Owing</th></tr>";
-		$data_buffer .= "<tr><td>Totals</td><td>" . $total_debt . "</td><td>" . $total_recoveries . "</td><td>" . $total_debt_owing . "</td></tr>";
+		$data_buffer .= "<h3>Summaries</h3><table class='data-table'><tr><th></th><th>Total Debt</th><th>Total Recoveries</th><th>Total Debt Owing</th></tr>";
+		$data_buffer .= "<tr><td>Totals</td><td>" . number_format($total_debt + 0) . "</td><td>" . number_format($total_recoveries + 0) . "</td><td>" . number_format($total_debt_owing + 0) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -108,7 +118,7 @@ class FBG_Reports extends MY_Controller {
 			$total_debt += $region_summaries[$region -> id]['total_debt'];
 			$total_recoveries += $region_summaries[$region -> id]['total_recoveries'];
 			$total_debt_owing += $region_summaries[$region -> id]['total_debt_owing'];
-		} 
+		}
 		$data_buffer .= "Summaries\tTotal Debt\tTotal Recoveries\tTotal Debt Owing\t\n";
 		$data_buffer .= "Totals\t" . $total_debt . "\t" . $total_recoveries . "\t" . $total_debt_owing . "\n";
 		//echo $data_buffer;
@@ -120,7 +130,7 @@ class FBG_Reports extends MY_Controller {
 		echo $data_buffer;
 		$log = new System_Log();
 		$log -> Log_Type = "4";
-		$log -> Log_Message = "Downloaded Debtors Aged Analysis Excell Sheet";
+		$log -> Log_Message = "Downloaded Debtors Aged Analysis Excel Sheet";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
@@ -136,19 +146,14 @@ class FBG_Reports extends MY_Controller {
 
 	function generatePDF($data, $date) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
-		$html_title .= "<h2 style='text-align:center; text-decoration:underline;'>Alliance Ginneries</h2>";
-
-		$html_title .= "<h1 style='text-align:center; text-decoration:underline;'>Debtors Analysis</h1>";
+		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Debtors Aged Analysis</h3>";
 		$html_title .= "<h3 style='text-align:center;'> as at: " . $date . "</h3>";
 
 		$this -> load -> library('mpdf');
-		$this -> mpdf = new mPDF('', 'A4-L', 0, '', 15, 15, 16, 16, 9, 9, '');
+		$this -> mpdf = new mPDF('c', 'A4-L');
 		$this -> mpdf -> SetTitle('Debtors Analysis');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
-		$this -> mpdf -> WriteHTML('<br/>');
-		$this -> mpdf -> WriteHTML('<br/>');
-		$this -> mpdf -> WriteHTML('<br/>');
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "Debtors Analysis.pdf";

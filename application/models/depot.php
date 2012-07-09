@@ -8,6 +8,9 @@ class Depot extends Doctrine_Record {
 		$this -> hasColumn('Capacity', 'varchar', 20);
 		$this -> hasColumn('Distance', 'varchar', 10);
 		$this -> hasColumn('Deleted', 'varchar', 1);
+		$this -> hasColumn('FBG', 'varchar', 1);
+		$this -> hasColumn('Acre_Yield', 'varchar', 10);
+		$this -> hasColumn('Acreage', 'varchar', 10);
 	}
 
 	public function setUp() {
@@ -23,19 +26,19 @@ class Depot extends Doctrine_Record {
 	}
 
 	public function getPagedDepots($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Depot") -> where("Deleted = '0'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Depot") -> where("Deleted != '1'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$depots = $query -> execute(array());
 		return $depots;
 	}
 
 	public function getTotalSearchedDepots($search_value) {
-		$query = Doctrine_Query::create() -> select("count(*) as Total_Depots") -> from("depot") -> where("(Depot_Code like '%$search_value%' or Depot_Name like '%$search_value%') and Deleted = '0'");
+		$query = Doctrine_Query::create() -> select("count(*) as Total_Depots") -> from("depot") -> where("(Depot_Code like '%$search_value%' or Depot_Name like '%$search_value%') and Deleted != '1'");
 		$total = $query -> execute();
 		return $total[0]['Total_Depots'];
 	}
 
 	public function getPagedSearchedDepots($search_value, $offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("depot") -> where("(Depot_Code like '%$search_value%' or Depot_Name like '%$search_value%') and Deleted = '0'") -> offset($offset) -> limit($items);
+		$query = Doctrine_Query::create() -> select("*") -> from("depot") -> where("(Depot_Code like '%$search_value%' or Depot_Name like '%$search_value%') and Deleted != '1'") -> offset($offset) -> limit($items);
 
 		$depots = $query -> execute(array());
 		return $depots;
@@ -48,7 +51,7 @@ class Depot extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Depot") -> where("Deleted = '0'")->orderBy("Depot_Name asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Depot") -> where("Deleted != '1'")->orderBy("Depot_Name asc");
 		$depots = $query -> execute();
 		return $depots;
 	}

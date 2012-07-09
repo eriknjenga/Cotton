@@ -1,3 +1,9 @@
+<div class="message information close">
+	<h2>Report Description</h2>
+	<p>
+		A report showing buying center summaries grouped by zones. The summaries include the purchases made by the center, cotton dispatched, cash issued to the center, e.t.c.
+	</p>
+</div>
 <div id="filter">
 	<?php
 	$attributes = array("method" => "POST");

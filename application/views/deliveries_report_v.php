@@ -14,6 +14,12 @@
 	});
 
 </script>
+<div class="message information close">
+	<h2>Report Description</h2>
+	<p>
+		A report showing cotton purchases from FBGs in a particular time frame. This report shows the value purchased, inputs deducted, gross amount payed, e.t.c. The FBGs are grouped by Zones
+	</p>
+</div>
 <div id="filter">
 	<?php
 	$attributes = array("method" => "POST", "id" => "deliveries_report_form");

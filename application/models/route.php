@@ -31,7 +31,7 @@ class Route extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Route")->orderBy("Route_Name asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Route")->orderBy("abs(Route_Code) asc");
 		$routes = $query -> execute();
 		return $routes;
 	}

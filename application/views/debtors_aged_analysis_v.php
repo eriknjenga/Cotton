@@ -1,3 +1,9 @@
+<div class="message information close">
+	<h2>Report Description</h2>
+	<p>
+		A report showing FBG loan amount, total amount recovered to date and total outstanding balance. This is grouped by Zones
+	</p>
+</div>
 <div id="filter">
 	<?php
 	$attributes = array("method" => "POST");

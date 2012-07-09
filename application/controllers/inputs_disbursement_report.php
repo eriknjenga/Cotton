@@ -37,7 +37,17 @@ class Inputs_Disbursement_Report extends MY_Controller {
 			return;
 		}
 		$this -> load -> database();
-		$data_buffer = "";
+		$data_buffer = "
+			<style>
+			table.data-table {
+			table-layout: fixed;
+			width: 1000px;
+			}
+			table.data-table td {
+			width: 70px;
+			}
+			</style>
+			";
 		$total_debt = 0;
 		//echo the start of the table
 		$data_buffer .= "<table class='data-table'>";
@@ -49,10 +59,10 @@ class Inputs_Disbursement_Report extends MY_Controller {
 		}
 		$query = $this -> db -> query($sql);
 		foreach ($query->result_array() as $fbg_data) {
-			$data_buffer .= "<tr><td>" . $fbg_data['date'] . "</td><td>" . $fbg_data['cpc_number'] . "</td><td>" . $fbg_data['group_name'] . "</td><td>" . $fbg_data['chairman_name'] . "</td><td>" . $fbg_data['village'] . "</td><td>" . $fbg_data['region_name'] . "</td><td>" . $fbg_data['hectares_available'] . "</td><td>" . $fbg_data['product_name'] . "</td><td>" . $fbg_data['invoice_number'] . "</td><td>" . $fbg_data['quantity'] . "</td><td>" . $fbg_data['unit_price'] . "</td><td>" . $fbg_data['total_value'] . "</td></tr>";
+			$data_buffer .= "<tr><td>" . $fbg_data['date'] . "</td><td>" . $fbg_data['cpc_number'] . "</td><td>" . $fbg_data['group_name'] . "</td><td>" . $fbg_data['chairman_name'] . "</td><td>" . $fbg_data['village'] . "</td><td>" . $fbg_data['region_name'] . "</td><td>" . number_format($fbg_data['hectares_available'] + 0) . "</td><td>" . $fbg_data['product_name'] . "</td><td>" . $fbg_data['invoice_number'] . "</td><td>" . number_format($fbg_data['quantity'] + 0) . "</td><td>" . number_format($fbg_data['unit_price'] + 0) . "</td><td>" . number_format($fbg_data['total_value'] + 0) . "</td></tr>";
 			$total_debt += $fbg_data['total_value'];
 		}
-		$data_buffer .= "<tr><td>Totals</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>" . $total_debt . "</td></tr>";
+		$data_buffer .= "<tr><td>Totals</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>" . number_format($total_debt + 0) . "</td></tr>";
 		$data_buffer .= "</table>";
 		//echo $data_buffer;
 		$log = new System_Log();
@@ -88,7 +98,7 @@ class Inputs_Disbursement_Report extends MY_Controller {
 		header("Cache-Control: ");
 		$log = new System_Log();
 		$log -> Log_Type = "4";
-		$log -> Log_Message = "Downloaded Detailed Inputs Disbursement PDF";
+		$log -> Log_Message = "Downloaded Detailed Inputs Disbursement Excel Sheet";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
@@ -105,19 +115,14 @@ class Inputs_Disbursement_Report extends MY_Controller {
 
 	function generatePDF($data, $date, $season) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
-		$html_title .= "<h2 style='text-align:center; text-decoration:underline;'>Alliance Ginneries</h2>";
-
-		$html_title .= "<h1 style='text-align:center; text-decoration:underline;'>Detailed Inputs Disbursement Report</h1>";
-		$html_title .= "<h3 style='text-align:center;'> as at: " . $date . " for the " . $season . " season</h3>";
+		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Input Disbursements Report</h3>";
+		$html_title .= "<h5 style='text-align:center;'> as at: " . $date . " for the " . $season . " season</h5>";
 
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('', 'A4-L', 0, '', 15, 15, 16, 16, 9, 9, '');
 		$this -> mpdf -> SetTitle('Detailed Inputs Disbursement');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
-		$this -> mpdf -> WriteHTML('<br/>');
-		$this -> mpdf -> WriteHTML('<br/>');
-		$this -> mpdf -> WriteHTML('<br/>');
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "Detailed Inputs Disbursement.pdf";

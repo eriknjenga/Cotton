@@ -1,5 +1,6 @@
 <script type="text/javascript">
 		var url = "";
+		var delete_url = "";
 	$(function() {
 	$("#confirm_delete").dialog( {
 	height: 150,
@@ -7,8 +8,11 @@
 	modal: true,
 	autoOpen: false,
 	buttons: {
-	"Delete Record": function() {
-	delete_record();
+	"Close Center": function() {
+	close_center();
+	},	
+	"Delete Center": function() {
+	delete_center();
 	},
 	Cancel: function() {
 	$( this ).dialog( "close" );
@@ -18,13 +22,16 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'depot_management/delete_depot/'?>
-		" +$(this).attr("depot");
+		url = "<?php echo base_url().'depot_management/close_center/'?>" +$(this).attr("depot");
+		delete_url = "<?php echo base_url().'depot_management/delete_depot/'?>" +$(this).attr("depot");
 		$("#confirm_delete").dialog('open');
 		});
 		});
-		function delete_record(){
+		function close_center(){
 		window.location = url;
+		}
+		function delete_center(){
+		window.location = delete_url;
 		}
 </script>
 <h1>Buying Centers Listing</h1>
@@ -33,7 +40,6 @@
 		<tr>
 			<th>Code</th>
 			<th>Name</th>
-			<th>Capacity</th>
 			<th>Village</th>
 			<th>Buyer</th>
 			<th>Action</th>
@@ -59,9 +65,6 @@ $class = "odd";
 		<?php echo $depot -> Depot_Name;?>
 		</td>
 		<td>
-		<?php echo $depot -> Capacity;?>
-		</td>
-		<td>
 		<?php echo $depot -> Village_Object -> Name." (".$depot -> Village_Object->Ward_Object->Name.")";?>
 		</td>
 		<td>
@@ -69,9 +72,17 @@ $class = "odd";
 		</td>
 		<td>
 		<?php
-		if($this -> session -> userdata('user_indicator') == "system_administrator"){?>
-		<a href="<?php echo base_url()."depot_management/edit_depot/".$depot->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" depot = "<?php echo $depot -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a>
+		if($this -> session -> userdata('user_indicator') == "system_administrator"){
+			if($depot->Deleted == "2"){
+				echo "Closed!";
+			}
+			else{
+				
+			
+			?>
+		<a href="<?php echo base_url()."depot_management/edit_depot/".$depot->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" depot = "<?php echo $depot -> id;?>"><span class="ui-icon ui-icon-locked"></span>Close</a>
 		<?php }
+		}
 			else{
 		?>
 		<a href="<?php echo base_url()."purchase_management/record_purchase/".$depot->id?>" class="button"><span class="ui-icon ui-icon-clipboard"></span>Record Purchases</a>
@@ -86,8 +97,11 @@ $class = "odd";
 		?>
 	</tbody>
 </table>
-<div title="Confirm Delete!" id="confirm_delete" style="width: 300px; height: 150px; margin: 5px auto 5px auto;">
-	Are you sure you want to delete this record?
+<div title="Confirm Closure!" id="confirm_delete" style="width: 350px; height: 150px; margin: 5px auto 5px auto;">
+	Are you sure you want to close this buying center? 
+</br>
+</br>
+After confirming you will be asked to state a reason for the closure of this buying center.
 </div>
 <?php if (isset($pagination)):
 ?>
