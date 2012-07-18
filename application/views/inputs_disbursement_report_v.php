@@ -36,7 +36,6 @@ foreach($seasons as $season){
 				<?php }?>
 			</select>
 		</p>
-		<input type="submit" name="action" class="button"	value="Download Inputs Disbursement PDF" />
 		<input type="submit" name="action" class="button"	value="Download Inputs Disbursement Excel" />
 	</fieldset>
 	</form>

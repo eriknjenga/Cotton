@@ -4,14 +4,16 @@ class Cotton_Price extends Doctrine_Record {
 		$this -> hasColumn('Season', 'varchar', 10);
 		$this -> hasColumn('Date', 'varchar', 32);
 		$this -> hasColumn('Price', 'varchar', 10);
+		$this -> hasColumn('Zone', 'varchar', 10);
 	}
 
 	public function setUp() {
 		$this -> setTableName('cotton_price');
+		$this -> hasOne('Region as Zone_Object', array('local' => 'Zone', 'foreign' => 'id'));
 	}
 
-	public function getCottonPrices() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Cotton_Price");
+	public function getCottonPrices($zone) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Cotton_Price")->where("Zone = '0' or Zone = '$zone'");
 		$prices = $query -> execute();
 		return $prices;
 	}

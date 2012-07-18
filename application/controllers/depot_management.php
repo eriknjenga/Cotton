@@ -64,7 +64,7 @@ class Depot_Management extends MY_Controller {
 			$data['pagination'] = $this -> pagination -> create_links();
 		}
 		$data['depots'] = $depots;
-		$data['listing_title'] = "Depot Search Results For <b>' ".urldecode($search_term)."</b>";
+		$data['listing_title'] = "Depot Search Results For <b>' " . urldecode($search_term) . "</b>";
 		$data['title'] = "Cotton Depots";
 		$data['content_view'] = "list_depots_v";
 		$data['styles'] = array("pagination.css");
@@ -75,6 +75,8 @@ class Depot_Management extends MY_Controller {
 		if ($data == null) {
 			$data = array();
 		}
+		$data['purchase_routes'] = Route::getAll();
+		$data['cash_disbursement_routes'] = Cash_Route::getAll();
 		$data['content_view'] = "add_depot_v";
 		$data['quick_link'] = "add_depot";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js", "jquery.ui.autocomplete.js");
@@ -96,14 +98,16 @@ class Depot_Management extends MY_Controller {
 			$temp_depot = new Depot();
 			$temp_depot -> Buyer = $this -> input -> post("buyer_id");
 			$temp_depot -> Village = $this -> input -> post("village_id");
+			$temp_depot -> Purchase_Route = $this -> input -> post("purchase_route");
+			$temp_depot -> Cash_Disbursement_Route = $this -> input -> post("cash_disbursement_route");
 			$fbg = array("0" => "No", "1" => "Yes");
-			$details_desc = "{Code: '" . $this -> input -> post("depot_code") . "' Name: '" . $this -> input -> post("depot_name") . "' Capacity: '" . $this -> input -> post("capacity") . "' Distance: '" . $this -> input -> post("distance") . "' FBG/Non-FBG: '" . $fbg[$this -> input -> post("fbg")] . "' Acreage: '" . $this -> input -> post("acreage") . "' Yield/Acre: '" . $this -> input -> post("acre_yield") . "' Buyer: '" . $temp_depot -> Buyer_Object -> Name . "' Village: '" . $temp_depot -> Village_Object -> Name . "'}";
+			$details_desc = "{Code: '" . $this -> input -> post("depot_code") . "' Name: '" . $this -> input -> post("depot_name") . "' Capacity: '" . $this -> input -> post("capacity") . "' Distance: '" . $this -> input -> post("distance") . "' FBG/Non-FBG: '" . $fbg[$this -> input -> post("fbg")] . "' Acreage: '" . $this -> input -> post("acreage") . "' Yield/Acre: '" . $this -> input -> post("acre_yield") . "' Buyer: '" . $temp_depot -> Buyer_Object -> Name . "' Village: '" . $temp_depot -> Village_Object -> Name . "' Purchase Route: '" . $temp_depot -> Purchase_Route_Object -> Route_Name . "' Cash Disbursement Route: '" . $temp_depot -> Cash_Disbursement_Route_Object -> Route_Name . "'}";
 			$editing = $this -> input -> post("editing_id");
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$depot = Depot::getDepot($editing);
 				$log -> Log_Type = "2";
-				$log -> Log_Message = "Edited Buying Center Record From {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . $depot -> Distance . "' FBG/Non-FBG: '" . $fbg[$depot -> FBG] . "' Acreage: '" . $depot -> Acreage . "' Yield/Acre: '" . $depot -> Acre_Yield . "'  Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "'} to " . $details_desc;
+				$log -> Log_Message = "Edited Buying Center Record From {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . $depot -> Distance . "' FBG/Non-FBG: '" . $fbg[$depot -> FBG] . "' Acreage: '" . $depot -> Acreage . "' Yield/Acre: '" . $depot -> Acre_Yield . "'  Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "' Purchase Route: '" . $depot -> Purchase_Route_Object -> Route_Name . "' Cash Disbursement Route: '" . $depot -> Cash_Disbursement_Route_Object -> Route_Name . "'} to " . $details_desc;
 			} else {
 				$depot = new Depot();
 				$log -> Log_Type = "1";
@@ -118,6 +122,8 @@ class Depot_Management extends MY_Controller {
 			$depot -> FBG = $this -> input -> post("fbg");
 			$depot -> Acreage = $this -> input -> post("acreage");
 			$depot -> Acre_Yield = $this -> input -> post("acre_yield");
+			$depot -> Purchase_Route = $this -> input -> post("purchase_route");
+			$depot -> Cash_Disbursement_Route = $this -> input -> post("cash_disbursement_route");
 			$depot -> save();
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
@@ -135,7 +141,7 @@ class Depot_Management extends MY_Controller {
 		$depot -> save();
 		$log = new System_Log();
 		$log -> Log_Type = "3";
-		$log -> Log_Message = "Deleted Buying Center Record {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . "' FBG/Non-FBG: '" . $fbg[$depot -> FBG] . "' Acreage: '" . $depot -> Acreage . "' Yield/Acre: '" . $depot -> Acre_Yield . $depot -> Distance . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "'}";
+		$log -> Log_Message = "Deleted Buying Center Record {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . "' FBG/Non-FBG: '" . $fbg[$depot -> FBG] . "' Acreage: '" . $depot -> Acreage . "' Yield/Acre: '" . $depot -> Acre_Yield . $depot -> Distance . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "' Purchase Route: '" . $depot -> Purchase_Route_Object -> Route_Name . "' Cash Disbursement Route: '" . $depot -> Cash_Disbursement_Route_Object -> Route_Name . "'}";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
@@ -156,7 +162,7 @@ class Depot_Management extends MY_Controller {
 		$log = new System_Log();
 		$depot = Depot::getDepot($this -> input -> post("buying_center"));
 		$log -> Log_Type = "1";
-		$details_desc = "{Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . "' FBG/Non-FBG: '" . $fbg[$depot -> FBG] . "' Acreage: '" . $depot -> Acreage . "' Yield/Acre: '" . $depot -> Acre_Yield . $depot -> Distance . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "' Closure Date:  '" . $this -> input -> post("date") . "' Reason:  '" . $this -> input -> post("reason") . "' }";
+		$details_desc = "{Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . "' FBG/Non-FBG: '" . $fbg[$depot -> FBG] . "' Acreage: '" . $depot -> Acreage . "' Yield/Acre: '" . $depot -> Acre_Yield . $depot -> Distance . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "' Purchase Route: '" . $depot -> Purchase_Route_Object -> Route_Name . "' Cash Disbursement Route: '" . $depot -> Cash_Disbursement_Route_Object -> Route_Name . "' Closure Date:  '" . $this -> input -> post("date") . "' Reason:  '" . $this -> input -> post("reason") . "' }";
 		$log -> Log_Message = "Closed Buying Center " . $details_desc;
 		$depot_closure = new Depot_Closure();
 		$depot_closure -> Depot = $this -> input -> post("buying_center");

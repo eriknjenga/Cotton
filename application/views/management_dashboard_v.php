@@ -1,6 +1,6 @@
 <script type="text/javascript">
 $(function() {
-	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Column3D.swf"?>", "zonal_purchases", "600", "350", "0", "0");
+	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Column2D.swf"?>", "zonal_purchases", "600", "350", "0", "0");
 	var url = '<?php echo base_url()."region_management/getRegionalPurchases/"?>'; 
 	chart.setDataURL(url);
 	chart.render("zonal_purchases");
@@ -10,12 +10,12 @@ $(function() {
 	chart.setDataURL(url);
 	chart.render("daily_purchase_trend");
 	
-	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Column3D.swf"?>", "outstanding_debt", "600", "350", "0", "0");
+	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Column2D.swf"?>", "outstanding_debt", "600", "350", "0", "0");
 	var url = '<?php echo base_url()."disbursement_management/getOutstandingDebt/"?>'; 
 	chart.setDataURL(url);
 	chart.render("outstanding_debt");
 	
-	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Column3D.swf"?>", "input_disbursements", "600", "350", "0", "0");
+	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Column2D.swf"?>", "input_disbursements", "600", "350", "0", "0");
 	var url = '<?php echo base_url()."disbursement_management/getTotalInputDisbursements/"?>'; 
 	chart.setDataURL(url);
 	chart.render("input_disbursements");

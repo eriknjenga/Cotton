@@ -17,7 +17,7 @@
 </div>
 <div id="filter">
 	<?php
-	$attributes = array("method" => "POST","id" => "bc_funding");
+	$attributes = array("method" => "POST", "id" => "bc_funding");
 
 	echo form_open('buying_center_funding/download', $attributes);
 	echo validation_errors('
@@ -35,7 +35,8 @@
 		</p>
 		<p>
 			<label for="region">Select Zone</label>
-			<select name="region" id="region">
+			<select name="region" id="region" class="validate[required]">
+				<option value="">--select--</option>
 				<?php
 foreach($regions as $region){
 				?>
@@ -52,7 +53,12 @@ foreach($regions as $region){
 		<p>
 			<label for="cycle">Funding Cycle</label>
 			<input id="cycle" name="cycle" type="text" class="validate[required]"/>
-			<span class="field_desc">The number of <b>days</b> the center should be funded for</span>
+			<span class="field_desc">The number of <b>days</b> the centers should be funded for</span>
+		</p>
+		<p>
+			<label for="price">Estimated Future Price</label>
+			<input id="price" name="price" type="text" class="validate[required]"/>
+			<span class="field_desc">The forcasted price that the buying centers in this zone will use</span>
 		</p>
 		<p>
 			<label for="nearest">Nearest</label>

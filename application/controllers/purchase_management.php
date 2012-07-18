@@ -77,7 +77,9 @@ class Purchase_Management extends MY_Controller {
 			$this->search_depot();
 		}
 		$data['batch_information'] = "You are entering records into batch number: <b>" . $this -> session -> userdata('purchases_batch') . "</b>";
-		$data['prices'] = Cotton_Price::getCottonPrices();
+		$depot_object = $data['depot'];
+		$depot_zone =  $depot_object->Village_Object->Ward_Object->Region_Object->id;
+		$data['prices'] = Cotton_Price::getCottonPrices($depot_zone);
 		$data['content_view'] = "add_purchase_v";
 		$data['quick_link'] = "new_purchase";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js", "jquery.ui.autocomplete.js");

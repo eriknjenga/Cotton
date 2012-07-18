@@ -37,6 +37,20 @@ echo validation_errors('
 		<span class="field_desc">Enter the price to take effect on the specified date</span>
 	</p>
 	<p>
+		<label for="zone">Zone</label>
+		<select name="zone" id="zone">
+			<option value="0">All Zones</option>
+			<?php
+foreach($regions as $region_object){
+			?>
+			<option value="<?php echo $region_object -> id;?>">
+				<?php echo $region_object -> Region_Name;?>
+				</option>
+			<?php }?>
+		</select>
+		<span class="field_desc">Select the zone affected by this price</span>
+	</p>
+	<p>
 		<input class="button" type="submit" value="Submit">
 		<input class="button" type="reset" value="Reset">
 	</p>

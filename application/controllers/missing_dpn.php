@@ -34,6 +34,8 @@ class Missing_Dpn extends MY_Controller {
 		$date = date("m/d/Y");
 		$this -> load -> database();
 		$depot_object = Depot::getDepot($depot);
+		//Retrieve all buying centers that have started reporting
+		$sql_reporting_depots = "select * from (select distinct depot from purchase where season = '$season') reported_depots left join depot d on reported_depots.depot = d.id left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id order by r.id asc";
 		$data_buffer = "";
 		//echo the start of the table
 		$data_buffer .= "<h3>Buying Center: " . $depot_object -> Depot_Name . "</h3>";
@@ -43,7 +45,8 @@ class Missing_Dpn extends MY_Controller {
 		$total_balance = 0;
 		$data_buffer .= $this -> echoTitles();
 		//Get data for each zone
-		$sql = "select sequence_numbers from (select (@start_sq := @start_sq +1) as sequence_numbers  from dps_sequence,(select @start_sq := $start) s  where @start_sq < $end) sequence where sequence_numbers not in (select dpn from purchase p where depot = '$depot' and season = '$season')";
+		//$sql = "select sequence_numbers from (select (@start_sq := @start_sq +1) as sequence_numbers  from dps_sequence,(select @start_sq := $start) s  where @start_sq < $end) sequence where sequence_numbers not in (select dpn from purchase p where depot = '$depot' and season = '$season')";
+		$sql = "select sequence_numbers from (select (@start_sq := @start_sq +1) as sequence_numbers from dps_sequence,(select @start_sq := $start) s where @start_sq < (select max(abs(dpn)) from purchase where depot = '$depot' and season = '$season')) sequence where sequence_numbers not in (select dpn from purchase p where depot = '$depot' and season = '$season'  and dpn>start_sq)";
 		$query = $this -> db -> query($sql);
 		foreach ($query->result_array() as $depot_data) {
 			$data_buffer .= "<tr><td>" . $depot_data['sequence_numbers'] . "</td></tr>";
@@ -55,7 +58,7 @@ class Missing_Dpn extends MY_Controller {
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
-		$this -> generatePDF($data_buffer, $start, $end, $date);
+		//$this -> generatePDF($data_buffer, $start, $end, $date);
 
 	}
 

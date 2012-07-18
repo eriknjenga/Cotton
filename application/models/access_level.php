@@ -18,8 +18,8 @@ class Access_Level extends Doctrine_Record {
 		return $total[0]['Total_Levels'];
 	}
 
-	public function getPagedLevels($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Access_Level") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+	public function getPagedLevels($offset, $items,$indicator) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Access_Level")->where("Indicator = '$indicator'") -> offset($offset) -> limit($items) -> orderBy("Level_Name asc");
 		$levels = $query -> execute(array());
 		return $levels;
 	}

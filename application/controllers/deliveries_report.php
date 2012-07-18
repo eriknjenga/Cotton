@@ -128,7 +128,7 @@ class Deliveries_Report extends MY_Controller {
 			$total_recoveries += $region_summaries[$region -> id]['total_recovered'];
 			$total_net += $region_summaries[$region -> id]['total_net'];
 		}
-		$data_buffer .= "\nSummaries\nTotal Delivered\tTotal Gross Value\tTotal Recoveries\tTotal Amount Paid\t\n";
+		$data_buffer .= "\nSummaries\n\tTotal Delivered\tTotal Gross Value\tTotal Recoveries\tTotal Amount Paid\t\n";
 		$data_buffer .= "Totals\t" . $total_delivered . "\t" . $total_gross . "\t" . $total_recoveries . "\t" . $total_net . "\t\n";
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=Deliveries Report.xls");

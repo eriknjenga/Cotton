@@ -27,7 +27,13 @@ if (!isset($sub_link)) {
 			<a  href = "<?php echo site_url('route_management')?>" class="<?php
 							if ($sub_link == 'route_management') {echo "active";
 							}
-							?>" >Routes</a>
+							?>" >Purchasing Routes</a>
+		</li>
+		<li>
+			<a  href = "<?php echo site_url('cash_route_management')?>" class="<?php
+							if ($sub_link == 'cash_route_management') {echo "active";
+							}
+							?>" >Cash Disbursement Routes</a>
 		</li>
 	</ul>
 </div>

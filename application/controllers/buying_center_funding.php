@@ -27,12 +27,13 @@ class Buying_Center_Funding extends MY_Controller {
 		$region = $this -> input -> post("region");
 		$history = $this -> input -> post("history");
 		$cycle = $this -> input -> post("cycle");
+		$price = $this -> input -> post("price");
 		$action = $this -> input -> post("action");
 		$nearest = $this -> input -> post("nearest");
 		$region_object = Region::getRegion($region);
 		//Check if the user requested an excel sheet; if so, call the responsible function
 		if ($action == "Download BC Funding Excel") {
-			$this -> downloadExcel($region, $date, $history, $cycle, $nearest);
+			$this -> downloadExcel($region, $date, $history, $cycle, $nearest,$price);
 			return;
 		}
 		$this -> load -> database();
@@ -56,13 +57,13 @@ class Buying_Center_Funding extends MY_Controller {
 		$data_buffer .= "<tr><td><b>Zone: </b></td><td><b>" . $region_object -> Region_Name . "</b></td></tr>";
 		$data_buffer .= $this -> echoTitles();
 		//Get all the depots in this region
-		$sql_funding = "select depot_summaries.*,(select sum(net_value) from purchase where depot = depot_summaries.depot) as total_purchases,(select sum(amount) from field_cash_disbursement where depot = depot_summaries.depot) as total_received,(select sum(amount) from buying_center_receipt where depot = depot_summaries.depot) as total_returned from (select depot_purchase.*, max(str_to_date(date,'%m/%d/%Y')) as last_purchase_date,sum(quantity) as total_purchase, unit_price as last_price from (select d.id as depot,route,d.depot_name,quantity, date,unit_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join route_depot route on route.depot = d.id left join purchase p on p.depot = d.id and str_to_date(date,'%m/%d/%Y') between DATE_SUB(str_to_date('" . $date . "','%m/%d/%Y'), INTERVAL " . $history . " day) and str_to_date('" . $date . "','%m/%d/%Y') where r.id = '" . $region . "' and d.deleted = '0' order by str_to_date(date,'%m/%d/%Y') desc) depot_purchase group by depot) depot_summaries";
+		$sql_funding = "select depot_summaries.*,(select sum(net_value) from purchase where depot = depot_summaries.depot) as total_purchases,(select sum(amount) from field_cash_disbursement where depot = depot_summaries.depot) as total_received,(select sum(amount) from buying_center_receipt where depot = depot_summaries.depot) as total_returned from (select depot_purchase.*, max(str_to_date(date,'%m/%d/%Y')) as last_purchase_date,sum(quantity) as total_purchase, unit_price as last_price from (select d.id as depot,cash_disbursement_route as route,d.depot_name,quantity, date,unit_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on p.depot = d.id and str_to_date(date,'%m/%d/%Y') between DATE_SUB(str_to_date('" . $date . "','%m/%d/%Y'), INTERVAL " . $history . " day) and str_to_date('" . $date . "','%m/%d/%Y') where r.id = '" . $region . "' and d.deleted = '0' order by str_to_date(date,'%m/%d/%Y') desc) depot_purchase group by depot) depot_summaries";
 		$bc_funding = $this -> db -> query($sql_funding);
 		//Get data for each depot
 		foreach ($bc_funding->result_array() as $depot_data) {
 			$avg_per_day = round($depot_data['total_purchase'] / $history);
 			$procurement_estimate = ($avg_per_day * $cycle);
-			$procurement_value = ($procurement_estimate * $depot_data['last_price']);
+			$procurement_value = ($procurement_estimate * $price);
 			$cash_balance = ($depot_data['total_received'] - $depot_data['total_purchases'] - $depot_data['total_returned']);
 			$release_amount = $procurement_value - $cash_balance;
 			if ($release_amount > 0) {
@@ -82,11 +83,11 @@ class Buying_Center_Funding extends MY_Controller {
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
-		$this -> generatePDF($data_buffer, $date, $history, $cycle, $nearest);
+		$this -> generatePDF($data_buffer, $date, $history, $cycle, $nearest,$price);
 
 	}
 
-	public function downloadExcel($region, $date, $history, $cycle, $nearest) {
+	public function downloadExcel($region, $date, $history, $cycle, $nearest,$price) {
 		$this -> load -> database();
 		$region_object = Region::getRegion($region);
 		$data_buffer = "";
@@ -97,13 +98,13 @@ class Buying_Center_Funding extends MY_Controller {
 		$data_buffer .= "Zone:\t" . $region_object -> Region_Name . "\t\n";
 		$data_buffer .= $this -> echoExcelTitles();
 		//Get all the depots in this region
-		$sql_funding = "select depot_summaries.*,(select sum(net_value) from purchase where depot = depot_summaries.depot) as total_purchases,(select sum(amount) from field_cash_disbursement where depot = depot_summaries.depot) as total_received,(select sum(amount) from buying_center_receipt where depot = depot_summaries.depot) as total_returned from (select depot_purchase.*, max(str_to_date(date,'%m/%d/%Y')) as last_purchase_date,sum(quantity) as total_purchase, unit_price as last_price from (select d.id as depot,route,d.depot_name,quantity, date,unit_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join route_depot route on route.depot = d.id left join purchase p on p.depot = d.id and str_to_date(date,'%m/%d/%Y') between DATE_SUB(str_to_date('" . $date . "','%m/%d/%Y'), INTERVAL " . $history . " day) and str_to_date('" . $date . "','%m/%d/%Y') where r.id = '" . $region . "' and d.deleted = '0' order by str_to_date(date,'%m/%d/%Y') desc) depot_purchase group by depot) depot_summaries";
+		$sql_funding = "select depot_summaries.*,(select sum(net_value) from purchase where depot = depot_summaries.depot) as total_purchases,(select sum(amount) from field_cash_disbursement where depot = depot_summaries.depot) as total_received,(select sum(amount) from buying_center_receipt where depot = depot_summaries.depot) as total_returned from (select depot_purchase.*, max(str_to_date(date,'%m/%d/%Y')) as last_purchase_date,sum(quantity) as total_purchase, unit_price as last_price from (select d.id as depot,cash_disbursement_route as route,d.depot_name,quantity, date,unit_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on p.depot = d.id and str_to_date(date,'%m/%d/%Y') between DATE_SUB(str_to_date('" . $date . "','%m/%d/%Y'), INTERVAL " . $history . " day) and str_to_date('" . $date . "','%m/%d/%Y') where r.id = '" . $region . "' and d.deleted = '0' order by str_to_date(date,'%m/%d/%Y') desc) depot_purchase group by depot) depot_summaries";
 		$bc_funding = $this -> db -> query($sql_funding);
 		//Get data for each depot
 		foreach ($bc_funding->result_array() as $depot_data) {
 			$avg_per_day = round($depot_data['total_purchase'] / $history);
 			$procurement_estimate = ($avg_per_day * $cycle);
-			$procurement_value = ($procurement_estimate * $depot_data['last_price']);
+			$procurement_value = ($procurement_estimate * $price);
 			$cash_balance = ($depot_data['total_received'] - $depot_data['total_purchases'] - $depot_data['total_returned']);
 			$release_amount = $procurement_value - $cash_balance;
 			if ($release_amount > 0) {
@@ -132,17 +133,17 @@ class Buying_Center_Funding extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Buying Center</th><th>Route</th><th>Last Purchase Date</th><th>Historical Purchases</th><th>Avg. Kgs.</th><th>Procurement Estimate</th><th>Last Price</th><th>Procurement Value</th><th>Cash Balance</th><th>Release Amount</th></tr>";
+		return "<tr><th>Buying Center</th><th>Cash Route</th><th>Last Purchase Date</th><th>Historical Purchases</th><th>Avg. Kgs.</th><th>Procurement Estimate</th><th>Last Price</th><th>Procurement Value</th><th>Cash Balance</th><th>Release Amount</th></tr>";
 	}
 
 	public function echoExcelTitles() {
-		return "Buying Center\tRoute\tLast Purchase Date\tHistorical Purchases\tAvg. Kgs.\tProcurement Estimate\tLast Price\tProcurement Value\tCash Balance\tRelease Amount\t\n";
+		return "Buying Center\tCash Route\tLast Purchase Date\tHistorical Purchases\tAvg. Kgs.\tProcurement Estimate\tLast Price\tProcurement Value\tCash Balance\tRelease Amount\t\n";
 	}
 
-	function generatePDF($data, $date, $history, $cycle, $nearest) {
+	function generatePDF($data, $date, $history, $cycle, $nearest,$price) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>BC Funding</h3>";
-		$html_title .= "<h5 style='text-align:center;'> as at: " . $date . " for the next " . $cycle . " days using " . $history . " days historical data. Rounded to the nearest " . number_format($nearest) . "</h5>";
+		$html_title .= "<h5 style='text-align:center;'> as at: " . $date . " for the next " . $cycle . " days using " . $history . " days historical data and ". $price." as the forecast price. Rounded to the nearest " . number_format($nearest) . "</h5>";
 
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4-L');

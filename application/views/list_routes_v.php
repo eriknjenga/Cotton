@@ -30,13 +30,12 @@
 <?php 
 $this->load->view("geography_submenu");
 ?>
-<h1>Route Listing</h1>
+<h1>Purchase Route Listing</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
 			<th>Route Code</th>
 			<th>Route Name</th>
-			<th>Field Cashier</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -58,9 +57,6 @@ $class = "odd";
 		</td>
 		<td>
 		<?php echo $route -> Route_Name;?>
-		</td>
-		<td>
-		<?php echo $route -> Field_Cashier_Object -> Field_Cashier_Name;?>
 		</td>
 		<td><a href="<?php echo base_url()."route_management/edit_route/".$route->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" route = "<?php echo $route -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>

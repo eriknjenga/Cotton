@@ -30,6 +30,7 @@ class Price_Management extends MY_Controller {
 	}
 
 	public function new_price() {
+		$data['regions'] = Region::getAll();
 		$data['content_view'] = "add_cotton_price_v";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("Validator.css");
@@ -43,12 +44,15 @@ class Price_Management extends MY_Controller {
 			$date = $this -> input -> post("date");
 			$season = $this -> input -> post("season");
 			$price = $this -> input -> post("price");
+			$zone = $this -> input -> post("zone");
+			$zone_object = Region::getRegion($zone);
 			$log -> Log_Type = "1";
-			$log -> Log_Message = "Created New Cotton Price Record {Effective Date: '" . $date . "' Season: '" . $season . "' Cotton Price: '" . $price . "'}";
+			$log -> Log_Message = "Created New Cotton Price Record {Effective Date: '" . $date . "' Season: '" . $season . "' Cotton Price: '" . $price . "' Zone '".$zone_object->Region_Name."'}";
 			$cotton_price = new Cotton_Price();
 			$cotton_price -> Date = $date;
 			$cotton_price -> Price = $price;
 			$cotton_price -> Season = $season;
+			$cotton_price -> Zone = $zone;
 			$cotton_price -> save();
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
@@ -61,10 +65,11 @@ class Price_Management extends MY_Controller {
 
 	public function delete_price($id) {
 		$price = Cotton_Price::getPrice($id);
+		$zone_object = Region::getRegion($price->Zone);
 		$price -> delete();
 		$log = new System_Log();
 		$log -> Log_Type = "3";
-		$log -> Log_Message = "Deleted Cotton Price Record {Effective Date: '" . $price -> Date . "' Season: '" . $price -> Season . "' Cotton Price: '" . $price -> Price . "'}";
+		$log -> Log_Message = "Deleted Cotton Price Record {Effective Date: '" . $price -> Date . "' Season: '" . $price -> Season . "' Cotton Price: '" . $price -> Price . "' Zone '".$zone_object->Region_Name."'}";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();

@@ -49,7 +49,7 @@ class FBG extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("fbg");
+		$query = Doctrine_Query::create() -> select("*") -> from("fbg")->orderBy("Group_Name asc");
 		$fbgs = $query -> execute();
 		return $fbgs;
 	}

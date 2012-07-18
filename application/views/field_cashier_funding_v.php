@@ -17,12 +17,14 @@
 </div>
 <div id="filter">
 	<?php
-	$attributes = array("method" => "POST","id" => "field_cashier_funding");
+	$attributes = array("method" => "POST", "id" => "field_cashier_funding");
 
 	echo form_open('field_cashier_funding/download', $attributes);
 	echo validation_errors('
-<p class="form_error">', '</p>
-');
+	<p class="form_error">
+		', '
+	</p>
+	');
 	?>
 	<fieldset>
 		<legend>
@@ -35,7 +37,8 @@
 		</p>
 		<p>
 			<label for="cashier">Select Field Cashier</label>
-			<select name="cashier" id="cashier">
+			<select name="cashier" id="cashier" class="validate[required]">
+				<option value=""></option>
 				<?php
 foreach($cashiers as $cashier){
 				?>
@@ -53,6 +56,11 @@ foreach($cashiers as $cashier){
 			<label for="cycle">Funding Cycle</label>
 			<input id="cycle" name="cycle" type="text" class="validate[required]"/>
 			<span class="field_desc">The number of <b>days</b> the centers should be funded for</span>
+		</p>
+		<p>
+			<label for="price">Estimated Future Price</label>
+			<input id="price" name="price" type="text" class="validate[required]"/>
+			<span class="field_desc">The forcasted price that the buying centers in this cashier's route will use</span>
 		</p>
 		<p>
 			<label for="nearest">Nearest</label>

@@ -1,5 +1,5 @@
 <?php
-class Route_Management extends MY_Controller {
+class Cash_Route_Management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$this -> load -> library('pagination');
@@ -11,10 +11,10 @@ class Route_Management extends MY_Controller {
 
 	public function listing($offset = 0) {
 		$items_per_page = 20;
-		$number_of_routes = Route::getTotalRoutes();
-		$routes = Route::getPagedRoutes($offset, $items_per_page);
+		$number_of_routes = Cash_Route::getTotalRoutes();
+		$routes = Cash_Route::getPagedRoutes($offset, $items_per_page);
 		if ($number_of_routes > $items_per_page) {
-			$config['base_url'] = base_url() . "route_management/listing/";
+			$config['base_url'] = base_url() . "cash_route_management/listing/";
 			$config['total_rows'] = $number_of_routes;
 			$config['per_page'] = $items_per_page;
 			$config['uri_segment'] = 3;
@@ -24,7 +24,7 @@ class Route_Management extends MY_Controller {
 		}
 		$data['routes'] = $routes;
 		$data['title'] = "Routes";
-		$data['content_view'] = "list_routes_v";
+		$data['content_view'] = "list_cash_routes_v";
 		$data['styles'] = array("pagination.css");
 		$this -> base_params($data);
 
@@ -34,15 +34,16 @@ class Route_Management extends MY_Controller {
 		if ($data == null) {
 			$data = array();
 		}
-		$data['content_view'] = "add_route_v";
-		$data['quick_link'] = "new_route";
+		$data['field_cashiers'] = Field_Cashier::getAll();
+		$data['content_view'] = "add_cash_route_v";
+		$data['quick_link'] = "new_cash_route";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
 
 	public function edit_route($id) {
-		$route = Route::getRoute($id);
+		$route = Cash_Route::getRoute($id);
 		$data['route'] = $route;
 		$this -> new_route($data);
 	}
@@ -54,21 +55,22 @@ class Route_Management extends MY_Controller {
 			$editing = $this -> input -> post("editing_id");
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
-				$route = Route::getRoute($editing);
+				$route = Cash_Route::getRoute($editing);
 			} else {
-				$route = new Route();
+				$route = new Cash_Route();
 			}
 			$route -> Route_Code = $this -> input -> post("route_code");
 			$route -> Route_Name = $this -> input -> post("route_name");
+			$route -> Field_Cashier = $this -> input -> post("field_cashier");
 			$route -> save();
-			redirect("route_management/listing");
+			redirect("cash_route_management/listing");
 		} else {
 			$this -> new_route();
 		}
 	}
 
 	public function delete_route($id) {
-		$route = Route::getRoute($id);
+		$route = Cash_Route::getRoute($id);
 		$route -> delete();
 		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
@@ -77,11 +79,12 @@ class Route_Management extends MY_Controller {
 	public function validate_form() {
 		$this -> form_validation -> set_rules('route_code', 'Area Code', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('route_name', 'Area Name', 'trim|required|max_length[100]|xss_clean');
+		$this -> form_validation -> set_rules('field_cashier', 'Field_Cashier', 'trim|required|xss_clean');
 		return $this -> form_validation -> run();
 	}
 
 	public function base_params($data) {
-		$data['sub_link'] = "route_management";
+		$data['sub_link'] = "cash_route_management"; 
 		$data['link'] = "geography_management";
 		$this -> load -> view("demo_template", $data);
 	}

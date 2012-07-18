@@ -30,7 +30,7 @@ class Field_Cashier extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cashier");
+		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cashier")->orderBy("Field_Cashier_Name asc");
 		$field_cashiers = $query -> execute();
 		return $field_cashiers;
 	}

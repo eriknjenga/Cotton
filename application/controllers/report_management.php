@@ -12,7 +12,7 @@ class Report_Management extends MY_Controller {
 	public function listing($offset = 0) {
 		$items_per_page = 20;
 		$number_of_levels = Access_Level::getTotalLevels();
-		$levels = Access_Level::getPagedLevels($offset, $items_per_page);
+		$levels = Access_Level::getPagedLevels($offset, $items_per_page,'management');
 		if ($number_of_levels > $items_per_page) {
 			$config['base_url'] = base_url() . "report_management/listing/";
 			$config['total_rows'] = $number_of_levels;

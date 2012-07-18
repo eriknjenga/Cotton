@@ -2,14 +2,12 @@
 class Route extends Doctrine_Record {
 	public function setTableDefinition() {
 		$this -> hasColumn('Route_Code', 'varchar', 20);
-		$this -> hasColumn('Route_Name', 'varchar', 100);
-		$this -> hasColumn('Field_Cashier', 'varchar', 10);
+		$this -> hasColumn('Route_Name', 'varchar', 100); 
 	}
 
 	public function setUp() {
 		$this -> setTableName('route');
-		$this -> hasOne('Field_Cashier as Field_Cashier_Object', array('local' => 'Field_Cashier', 'foreign' => 'id'));
-		$this -> hasMany('Route_Depot as Route_Depot_Objects', array('local' => 'id', 'foreign' => 'Route'));
+		$this -> hasMany('Depot as Route_Depot_Objects', array('local' => 'id', 'foreign' => 'Purchase_Route'));
 	}
 
 	public function getTotalRoutes() {

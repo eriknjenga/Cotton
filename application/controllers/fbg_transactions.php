@@ -1,5 +1,5 @@
 <?php
-class Depot_Reports extends MY_Controller {
+class FBG_Transactions extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$this -> load -> library('pagination');
@@ -13,9 +13,9 @@ class Depot_Reports extends MY_Controller {
 		if ($data == null) {
 			$data = array();
 		}
-		$data['depots'] = Depot::getAll();
-		$data['content_view'] = "depot_transactions_v";
-		$data['quick_link'] = "depot_transactions";
+		$data['fbgs'] = FBG::getAll();
+		$data['content_view'] = "fbg_transactions_v";
+		$data['quick_link'] = "fbg_transactions";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);

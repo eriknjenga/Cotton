@@ -52,7 +52,7 @@ class Field_Cashier_Summaries extends MY_Controller {
 		//Get data for each depot
 		foreach ($cashiers->result_array() as $cashier) {
 			$field_cashier = $cashier['id'];
-			$sql = "select balances.*,total_received - (total_paid+total_returned) as balance from (select (select sum(amount) from cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2') as total_received,(select sum(amount) from field_cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2') as total_paid,(select sum(amount) from cash_receipt where field_cashier = '$field_cashier' and batch_status = '2' ) as total_returned) balances";
+			$sql = "select balances.*,total_received - (total_paid+total_returned) as balance from (select (select coalesce(sum(amount),0) from cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2') as total_received,(select coalesce(sum(amount),0) from field_cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2') as total_paid,(select coalesce(sum(amount),0) from cash_receipt where field_cashier = '$field_cashier' and batch_status = '2' ) as total_returned) balances";
 			$query = $this -> db -> query($sql);
 			$summary_data = $query -> row_array();
 			$data_buffer .= "<tr><td>" . $cashier['field_cashier_name'] . "</td><td>" . number_format($summary_data['total_received'] + 0) . "</td><td>" . number_format(($summary_data['total_paid'] + $summary_data['total_returned']) + 0) . "</td><td>" . number_format($summary_data['balance'] + 0) . "</td></tr>";
@@ -86,7 +86,7 @@ class Field_Cashier_Summaries extends MY_Controller {
 		//Get data for each depot
 		foreach ($cashiers->result_array() as $cashier) {
 			$field_cashier = $cashier['id'];
-			$sql = "select balances.*,total_received - (total_paid+total_returned) as balance from (select (select sum(amount) from cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2') as total_received,(select sum(amount) from field_cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2') as total_paid,(select sum(amount) from cash_receipt where field_cashier = '$field_cashier' and batch_status = '2' ) as total_returned) balances";
+			$sql = "select balances.*,total_received - (total_paid+total_returned) as balance from (select (select coalesce(sum(amount),0) from cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2') as total_received,(select coalesce(sum(amount),0) from field_cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2') as total_paid,(select coalesce(sum(amount),0) from cash_receipt where field_cashier = '$field_cashier' and batch_status = '2' ) as total_returned) balances";
 			$query = $this -> db -> query($sql);
 			$summary_data = $query -> row_array();
 			$data_buffer .= $cashier['field_cashier_name'] . "\t" . $summary_data['total_received'] . "\t" . ($summary_data['total_paid'] + $summary_data['total_returned']) . "\t" . $summary_data['balance'] . "\t\n";

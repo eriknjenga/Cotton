@@ -32,13 +32,14 @@
 				changeYear : true,
 				changeMonth : true
 				});
-				$(".quantity").keyup(function() {
+				$("#quantity").keyup(function() {
 				var date_object = $("#date");
 				updateCottonPrice(date_object);
 				updateNetCalculations();
 				});
 				$("#date").change(function() {
 				updateCottonPrice($(this));
+				updateNetCalculations();
 				});
 				$(".depot").change(function() {
 				$("#buyer").attr("value", "");

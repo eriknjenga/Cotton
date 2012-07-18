@@ -8,15 +8,17 @@
 if (isset($route)) {
 	$route_code = $route -> Route_Code;
 	$route_name = $route -> Route_Name;
+	$field_cashier = $route -> Field_Cashier;
 	$route_id = $route -> id;
 } else {
 	$route_code = "";
 	$route_name = "";
+	$field_cashier = "";
 	$route_id = "";
 
 }
 $attributes = array("method" => "post", "id" => "route_form");
-echo form_open('route_management/save', $attributes);
+echo form_open('cash_route_management/save', $attributes);
 echo validation_errors('
 <p class="form_error">', '</p>
 ');
@@ -38,6 +40,22 @@ echo validation_errors('
 		<label for="route_name">Route Name: </label>
 		<input id="route_name"  name="route_name" type="text"  value="<?php echo $route_name;?>" class="validate[required]"/>
 		<span class="field_desc">Enter the name for this Route</span>
+	</p>
+	<p>
+		<label for="field_cashier">Field Cashier</label>
+		<select name="field_cashier" class="dropdown validate[required]" id="field_cashier">
+			<option></option>
+			<?php
+
+foreach($field_cashiers as $field_cashier_object){
+			?>
+			<option value="<?php echo $field_cashier_object -> id;?>" <?php
+			if ($field_cashier_object -> id == $field_cashier) {echo "selected";
+			}
+			?>><?php echo $field_cashier_object -> Field_Cashier_Name;?></option>
+			<?php }?>
+		</select>
+		<span class="field_desc">Select this route's field cashier</span>
 	</p>
 	<p>
 		<input class="button" type="submit" value="Submit">
