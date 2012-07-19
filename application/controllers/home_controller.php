@@ -59,7 +59,6 @@ class Home_Controller extends MY_Controller {
 		$data['banner_text'] = "System Home";
 		$data['link'] = "home";
 		$data['scripts'] = array("FusionCharts/FusionCharts.js");
-		//var_dump($this->quick_menus->userdata);
 		$this -> load -> view("demo_template", $data);
 
 	}

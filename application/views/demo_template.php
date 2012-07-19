@@ -94,6 +94,7 @@ if (isset($styles)) {
 						</li>
 						<?php
 $menus = $this -> menus -> userdata('menu_items'); 
+if(isset($menus[0])){
 foreach($menus as $menu){
 						?>
 						<li>
@@ -102,7 +103,7 @@ foreach($menus as $menu){
 							}
 						?>" href = "<?php echo base_url() . $menu['url'];?>" ><?php echo $menu['text'];?></a>
 						</li>
-						<?php }?>
+						<?php }}?>
 					</ul>
 				</div>
 				<!-- End of navigation bar" --> 
@@ -125,6 +126,7 @@ foreach($menus as $menu){
 					<ul>
 						<?php 
 $quick_menus = $this -> quick_menus -> userdata('quick_menu_items');
+if(isset($quick_menus[0])){
 foreach($quick_menus as $quick_menu){
 						?>
 						<li class="<?php
@@ -133,7 +135,7 @@ foreach($quick_menus as $quick_menu){
 						?>">
 							<a href = "<?php echo base_url() . $quick_menu['url'];?>" ><?php echo $quick_menu['text'];?></a>
 						</li>
-						<?php }?>
+						<?php }}?>
 					</ul>
 				</div>
 				<!-- End of Sidebar -->

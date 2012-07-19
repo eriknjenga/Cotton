@@ -16,8 +16,10 @@ class User_Management extends MY_Controller {
 	}
 
 	public function logout() {
-		//destroy the session first
+		//destroy the sessions first
 		$this -> session -> sess_destroy();
+		$this->quick_menus->sess_destroy();
+		$this->menus->sess_destroy();
 		redirect("user_management/login");
 	}
 
