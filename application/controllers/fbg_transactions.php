@@ -37,77 +37,90 @@ class FBG_Transactions extends MY_Controller {
 			}
 			</style>
 			";
-			$depot_id = $this -> input -> post("depot");
+			$fbg = $this -> input -> post("fbg");
 			$start_date = $this -> input -> post("start_date");
 			$end_date = $this -> input -> post("end_date");
-			$depot = Depot::getDepot($depot_id);
-			$sql = "SELECT voucher_number as document_number,str_to_date(date,'%m/%d/%Y') as transaction_date,amount as cash_paid, '' as cash_received,'' as dispatch,'' as purchase_value,'' as purchase_kg FROM mopping_payment where depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  union all (select cih as document_number,str_to_date(date,'%m/%d/%Y') as transaction_date,'',amount as cash_received,'','','' from field_cash_disbursement where depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')) union all select  ticket_number as document_number, str_to_date(transaction_date,'%d/%m/%Y'), '', '', net_weight as dispatch,'' ,'' from weighbridge w where w.buying_center_code = (select depot_code from depot where id = '" . $depot_id . "' and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')) union all select dpn as document_number, str_to_date(date,'%m/%d/%Y') as transaction_date,'','','',p.gross_value, p.quantity from purchase p where p.depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by transaction_date asc";
-			
-			$query = $this -> db -> query($sql);
-			$depot_transactions = $query -> result_array();
+			$fbg_object = FBG::getFBG($fbg);
+			//Get all the FBG input disbursements
+			$sql_disbursements = "select * from disbursement d left join farm_input f on d.farm_input = f.id where fbg = '" . $fbg . "' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') and batch_status = '2'";
+			$query = $this -> db -> query($sql_disbursements);
+			$fbg_disbursements = $query -> result_array();
 			//echo the start of the table
-			$data_buffer .= "<h3>Buying Center: " . $depot -> Depot_Name . "</h3>";
+			$data_buffer .= "<h3>FBG: " . $fbg_object -> Group_Name . "(" . $fbg_object -> Village_Object -> Name . ")</h3>";
+			$data_buffer .= "<h4>Input Disbursements</h4>";
 			$data_buffer .= "<table class='data-table'>";
-			$data_buffer .= $this -> echoTitles();
-			$total_cash_received = 0;
-			$total_cash_paid = 0;
-			$total_purchases = 0;
-			$total_purchased_weight = 0;
-			$total_dispatched = 0;
-			foreach ($depot_transactions as $transaction) {
-				$total_cash_received += $transaction['cash_received'];
-				$total_cash_paid += $transaction['cash_paid'];
-				$total_purchases += $transaction['purchase_value'];
-				$total_purchased_weight += $transaction['purchase_kg'];
-				$total_dispatched += $transaction['dispatch'];
-				$data_buffer .= "<tr><td>" . $transaction['transaction_date'] . "</td><td>" . $transaction['document_number'] . "</td><td>" . number_format($transaction['cash_received'] + 0) . "</td><td>" . number_format($transaction['cash_paid'] + 0) . "</td><td>" . number_format($transaction['purchase_value'] + 0) . "</td><td>" . number_format($transaction['purchase_kg'] + 0) . "</td><td>" . number_format($transaction['dispatch'] + 0) . "</td></tr>";
+			//$data_buffer .= $this -> echoTitles();
+			$data_buffer .= "<tr><th>Transaction Date</th><th>Input</th><th>Invoice Number</th><th>Quantity</th><th>Unit Price</th><th>Total Value</th><th>Season</th></tr>";
+			$total_loan_value = 0;
+			foreach ($fbg_disbursements as $disbursement) {
+				$total_loan_value += $disbursement['total_value'];
+				$data_buffer .= "<tr><td>" . $disbursement['date'] . "</td><td>" . $disbursement['product_name'] . "</td><td>" . $disbursement['invoice_number'] . "</td><td>" . number_format($disbursement['quantity'] + 0) . "</td><td>" . (empty($disbursement['unit_price']) ? '-' : number_format($disbursement['unit_price'] + 0)) . "</td><td>" . number_format($disbursement['total_value'] + 0) . "</td><td>" . $disbursement['season'] . "</td></tr>";
 			}
+			$data_buffer .= "<tr><td><b>Totals</b></td><td>-</td><td>-</td><td>-</td><td>-</td><td>" . number_format($total_loan_value + 0) . "</td><td>-</td></tr>";
+			$data_buffer .= "</table>";
+			//Get all purchases from this fbg
+			$sql_purchases = "select * from purchase p left join depot d on p.depot = d.id where p.fbg = '" . $fbg . "' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') and batch_status = '2'";
+			$query = $this -> db -> query($sql_purchases);
+			$fbg_purchases = $query -> result_array();
+			//echo the start of the table
+			$data_buffer .= "<h4>Product Purchases</h4>";
+			$data_buffer .= "<table class='data-table'>";
+			//$data_buffer .= $this -> echoTitles();
+			$data_buffer .= "<tr><th>BC Name</th><th>BC Code</th><th>Transaction Date</th><th>Purchases (Kgs)</th><th>Value(Tshs)</th><th>Total Recovered</th><th>Outstanding Balance</th></tr>";
+			$total_value = 0;
+			$total_kgs = 0;
+			$total_recovered = 0;
+			$outstanding_balance = $total_loan_value;
+			foreach ($fbg_purchases as $purchase) {
+				$total_value += $purchase['gross_value'];
+				$total_kgs += $purchase['quantity'];
+				$recoveries = ($purchase['loan_recovery'] + $purchase['farmer_reg_fee'] + $purchase['other_recoveries']);
+				$total_recovered += $recoveries;
+				$outstanding_balance -= $recoveries; 
+				$data_buffer .= "<tr><td>" . $purchase['depot_name'] . "</td><td>" . $purchase['depot_code'] . "</td><td>" . $purchase['date'] . "</td><td>" . number_format($purchase['quantity'] + 0) . "</td><td>" . (empty($purchase['gross_value']) ? '-' : number_format($purchase['gross_value'] + 0)) . "</td><td>" . (empty($recoveries) ? '-' : number_format($recoveries + 0)) . "</td><td>" . number_format($outstanding_balance) . "</td></tr>";
+			}
+			$data_buffer .= "<tr><td><b>Totals:</b></td><td>-</td><td>-</td><td>" . number_format($total_kgs + 0) . "</td><td>" . number_format($total_value + 0) . "</td><td>" . number_format($total_recovered + 0) . "</td><td>-</td></tr>";
 			$data_buffer .= "</table>";
 			$data_buffer .= "<table>";
-			$data_buffer .= "<tr><td><h3>Cash Summary</h3></td><td><h3>Weight Summary</h3></td></tr>";
-
+			$data_buffer .= "<tr><td><h3>Purchase Summary</h3></td><td><h3>Loan Summary</h3></td></tr>";
 			$data_buffer .= "<tr><td><table class='data-table'>";
-			$data_buffer .= "<tr><td><b>Total Cash Received</b></td><td>" . number_format($total_cash_received) . "</td></tr>";
-			$data_buffer .= "<tr><td><b>Other Payments</b></td><td>" . number_format($total_cash_paid) . "</td></tr>";
-			$data_buffer .= "<tr><td><b>Total Purchases</b></td><td>" . number_format($total_purchases) . "</td></tr>";
-			$data_buffer .= "<tr></tr><tr><td><b>Balance</b></td><td>" . number_format(($total_cash_received - $total_cash_paid - $total_purchases)) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Purchases(Kgs.)</b></td><td>" . number_format($total_kgs) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Value</b></td><td>" . number_format($total_value) . "</td></tr>";
 			$data_buffer .= "</table></td>";
 			$data_buffer .= "<td><table class='data-table'>";
-			$data_buffer .= "<tr><td><b>Total Purchases</b></td><td>" . number_format($total_purchased_weight) . "</td></tr>";
-			$data_buffer .= "<tr><td><b>Total Dispatches</b></td><td>" . number_format($total_dispatched) . "</td></tr>";
-			$data_buffer .= "<tr></tr><tr><td><b>Balance</b></td><td>" . number_format(($total_purchased_weight - $total_dispatched)) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Loaned</b></td><td>" . number_format($total_loan_value) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Recovered</b></td><td>" . number_format($total_recovered) . "</td></tr>";
+			$data_buffer .= "<tr></tr><tr><td><b>Outstanding Balance</b></td><td>" . number_format(($total_loan_value - $total_recovered)) . "</td></tr>";
 			$data_buffer .= "</table></td></tr></table>";
-			//echo $data_buffer;
+
+//			echo $data_buffer;
 			$log = new System_Log();
 			$log -> Log_Type = "4";
-			$log -> Log_Message = "Downloaded Buying Center Transactions PDF";
+			$log -> Log_Message = "Downloaded FBG Transactions PDF";
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
 			$log -> save();
-			//$this -> generatePDF($data_buffer, $start_date, $end_date);
+			$this -> generatePDF($data_buffer, $start_date, $end_date);
 		} else {
 			$this -> view_transactions_interface();
 		}
 
 	}
-
-	public function echoTitles() {
-		return "<tr><th>Transaction Date</th><th>Doc. Number</th><th>Cash Received</th><th>Cash Paid</th><th>Purchases (Tsh.)</th><th>Purchases (Kgs.)</th><th>Dispatch (Kgs.)</th></tr>";
-	}
+ 
 
 	function generatePDF($data, $start_date, $end_date) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
-		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Buying Center Transactions</h3>";
+		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>FBG Transactions</h3>";
 		$html_title .= "<h5 style='text-align:center;'> from: " . $start_date . " to: " . $end_date . "</h5>";
 
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4');
-		$this -> mpdf -> SetTitle('Depot Transactions');
+		$this -> mpdf -> SetTitle('FBG Transactions');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
-		$report_name = "Buying Center Transactions.pdf";
+		$report_name = "FBG Transactions.pdf";
 		$this -> mpdf -> Output($report_name, 'D');
 	}
 
