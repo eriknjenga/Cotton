@@ -42,6 +42,7 @@ class FBG_Transactions extends MY_Controller {
 			$end_date = $this -> input -> post("end_date");
 			$depot = Depot::getDepot($depot_id);
 			$sql = "SELECT voucher_number as document_number,str_to_date(date,'%m/%d/%Y') as transaction_date,amount as cash_paid, '' as cash_received,'' as dispatch,'' as purchase_value,'' as purchase_kg FROM mopping_payment where depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  union all (select cih as document_number,str_to_date(date,'%m/%d/%Y') as transaction_date,'',amount as cash_received,'','','' from field_cash_disbursement where depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')) union all select  ticket_number as document_number, str_to_date(transaction_date,'%d/%m/%Y'), '', '', net_weight as dispatch,'' ,'' from weighbridge w where w.buying_center_code = (select depot_code from depot where id = '" . $depot_id . "' and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')) union all select dpn as document_number, str_to_date(date,'%m/%d/%Y') as transaction_date,'','','',p.gross_value, p.quantity from purchase p where p.depot = '" . $depot_id . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by transaction_date asc";
+			
 			$query = $this -> db -> query($sql);
 			$depot_transactions = $query -> result_array();
 			//echo the start of the table
@@ -83,7 +84,7 @@ class FBG_Transactions extends MY_Controller {
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
 			$log -> save();
-			$this -> generatePDF($data_buffer, $start_date, $end_date);
+			//$this -> generatePDF($data_buffer, $start_date, $end_date);
 		} else {
 			$this -> view_transactions_interface();
 		}
@@ -111,14 +112,14 @@ class FBG_Transactions extends MY_Controller {
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('depot', 'Depot', 'trim|required|xss_clean');
+		$this -> form_validation -> set_rules('fbg', 'FBG', 'trim|required|xss_clean');
 		$this -> form_validation -> set_rules('start_date', 'Start Date', 'trim|required|xss_clean');
 		$this -> form_validation -> set_rules('end_date', 'End Date', 'trim|required|xss_clean');
 		return $this -> form_validation -> run();
 	}
 
 	public function base_params($data) {
-		$data['title'] = "Buyer Management";
+		$data['title'] = "FBG Management";
 		$data['link'] = "home";
 
 		$this -> load -> view("demo_template", $data);

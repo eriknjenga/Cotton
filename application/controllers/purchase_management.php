@@ -103,6 +103,7 @@ class Purchase_Management extends MY_Controller {
 
 	public function edit_purchase($id) {
 		$purchase = Purchase::getPurchase($id);
+		$data['depot'] = $purchase->Depot_Object;
 		$fbg = $purchase -> FBG;
 		$recipient = FBG::getFbg($fbg);
 		$data['disbursements'] = Disbursement::getFBGDisbursements($fbg);

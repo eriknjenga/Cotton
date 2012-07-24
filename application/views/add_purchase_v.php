@@ -95,7 +95,7 @@
 				$("#purchased_value").attr("value", "");
 				var quantity = $("#quantity").attr("value");
 				var total_value = 0;
-				if(parseInt(quantity) >= 0 && parseInt(most_current_price) > 0) {
+				if(parseInt(quantity) != 0 && parseInt(most_current_price) > 0) {
 				total_value = quantity * most_current_price;
 				$("#purchased_value").attr("value", total_value);
 				}

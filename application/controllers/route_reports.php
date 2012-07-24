@@ -46,7 +46,7 @@ class Route_Reports extends MY_Controller {
 			width: 1000px;
 			}
 			table.data-table td {
-			width: 70px;
+			width: 120px;
 			}
 			</style>
 			";

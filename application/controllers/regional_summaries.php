@@ -46,7 +46,7 @@ class Regional_Summaries extends MY_Controller {
 			width: 1000px;
 			}
 			table.data-table td {
-			width: 80px;
+			width: 100px;
 			}
 			</style>
 			";
@@ -54,6 +54,11 @@ class Regional_Summaries extends MY_Controller {
 		//echo the start of the table
 		$data_buffer .= "<table class='data-table'>";
 		$region_summaries = array();
+		$total_cash_received = 0;
+		$total_cash_paid = 0;
+		$total_purchases_value = 0;
+		$total_purchases_kg = 0;
+		$total_dispatch = 0;
 		foreach ($regions as $region) {
 			$region_summaries[$region -> id] = array();
 			$region_summaries[$region -> id]['total_cash_received'] = 0;
@@ -88,8 +93,18 @@ class Regional_Summaries extends MY_Controller {
 			if ($region_summaries[$region -> id]['total_purchases_value'] > 0 && $region_summaries[$region -> id]['total_purchases_kg'] > 0) {
 				$avg_per_kg = $region_summaries[$region -> id]['total_purchases_value'] / $region_summaries[$region -> id]['total_purchases_kg'];
 			}
+			$total_cash_received += $region_summaries[$region -> id]['total_cash_received'];
+			$total_cash_paid += $region_summaries[$region -> id]['total_cash_paid'];
+			$total_purchases_value += $region_summaries[$region -> id]['total_purchases_value'];
+			$total_purchases_kg += $region_summaries[$region -> id]['total_purchases_kg'];
+			$total_dispatch += $region_summaries[$region -> id]['total_dispatch'];
 			$data_buffer .= "<tr><td>" . $region -> Region_Name . "</td><td>" . number_format($region_summaries[$region -> id]['total_cash_received']) . "</td><td>" . number_format($region_summaries[$region -> id]['total_cash_paid']) . "</td><td>" . number_format($region_summaries[$region -> id]['total_purchases_value']) . "</td><td>" . number_format($region_summaries[$region -> id]['total_purchases_kg']) . "</td><td>" . number_format($region_summaries[$region -> id]['total_dispatch']) . "</td><td>" . number_format($avg_per_kg) . "</td><td>" . number_format(($region_summaries[$region -> id]['total_cash_received'] - $region_summaries[$region -> id]['total_cash_paid'] - $region_summaries[$region -> id]['total_purchases_value'])) . "</td><td>" . number_format(($region_summaries[$region -> id]['total_purchases_kg'] - $region_summaries[$region -> id]['total_dispatch'])) . "</td></tr>";
 		}
+		$avg_per_kg = 0;
+		if ($total_purchases_value > 0 && $total_purchases_kg > 0) {
+			$avg_per_kg = $total_purchases_value / $total_purchases_kg;
+		}
+		$data_buffer .= "<tr></tr><tr><td><b>Grand Totals</b></td><td>" . number_format($total_cash_received) . "</td><td>" . number_format($total_cash_paid) . "</td><td>" . number_format($total_purchases_value) . "</td><td>" . number_format($total_purchases_kg) . "</td><td>" . number_format($total_dispatch) . "</td><td>" . number_format($avg_per_kg) . "</td><td>" . number_format(($total_cash_received - $total_cash_paid - $total_purchases_value)) . "</td><td>" . number_format(($total_purchases_kg - $total_dispatch)) . "</td></tr>";
 		$data_buffer .= "</table>";
 		//echo $data_buffer;
 		$log = new System_Log();
@@ -108,6 +123,11 @@ class Regional_Summaries extends MY_Controller {
 		$status = array("0" => "Open", "2" => "Closed");
 		//echo the start of the table
 		$region_summaries = array();
+		$total_cash_received = 0;
+		$total_cash_paid = 0;
+		$total_purchases_value = 0;
+		$total_purchases_kg = 0;
+		$total_dispatch = 0;
 		foreach ($regions as $region) {
 			$region_summaries[$region -> id] = array();
 			$region_summaries[$region -> id]['total_cash_received'] = "";
@@ -140,11 +160,21 @@ class Regional_Summaries extends MY_Controller {
 		$data_buffer .= "Summaries\nZone\tTotal Cash Received\tTotal Cash Paid\tTotal Purchases (Tsh.)\tTotal Purchases (Kgs.)\tTotal Dispatch (Kgs.)\tAvg. Per KG.\tTotal Cash Balance\tTotal Product Balance\t\n";
 		foreach ($regions as $region) {
 			$avg_per_kg = 0;
+			$total_cash_received += $region_summaries[$region -> id]['total_cash_received'];
+			$total_cash_paid += $region_summaries[$region -> id]['total_cash_paid'];
+			$total_purchases_value += $region_summaries[$region -> id]['total_purchases_value'];
+			$total_purchases_kg += $region_summaries[$region -> id]['total_purchases_kg'];
+			$total_dispatch += $region_summaries[$region -> id]['total_dispatch'];
 			if ($region_summaries[$region -> id]['total_purchases_value'] > 0 && $region_summaries[$region -> id]['total_purchases_kg'] > 0) {
 				$avg_per_kg = $region_summaries[$region -> id]['total_purchases_value'] / $region_summaries[$region -> id]['total_purchases_kg'];
 			}
 			$data_buffer .= $region -> Region_Name . "\t" . $region_summaries[$region -> id]['total_cash_received'] . "\t" . $region_summaries[$region -> id]['total_cash_paid'] . "\t" . $region_summaries[$region -> id]['total_purchases_value'] . "\t" . $region_summaries[$region -> id]['total_purchases_kg'] . "\t" . $region_summaries[$region -> id]['total_dispatch'] . "\t" . $avg_per_kg . "\t" . ($region_summaries[$region -> id]['total_cash_received'] - $region_summaries[$region -> id]['total_cash_paid'] - $region_summaries[$region -> id]['total_purchases_value']) . "\t" . ($region_summaries[$region -> id]['total_purchases_kg'] - $region_summaries[$region -> id]['total_dispatch']) . "\t\n";
 		}
+		$avg_per_kg = 0;
+		if ($total_purchases_value > 0 && $total_purchases_kg > 0) {
+			$avg_per_kg = $total_purchases_value / $total_purchases_kg;
+		}
+		$data_buffer .= "\nGrand Totals\t" . $total_cash_received . "\t" . $total_cash_paid . "\t" .$total_purchases_value. "\t" . $total_purchases_kg . "\t" . $total_dispatch . "\t" . $avg_per_kg . "\t" . ($total_cash_received - $total_cash_paid - $total_purchases_value) . "\t" . ($total_purchases_kg - $total_dispatch) . "\t\n";
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=Zonal Summaries.xls");
 		// Fix for crappy IE bug in download.

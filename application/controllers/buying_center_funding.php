@@ -133,11 +133,11 @@ class Buying_Center_Funding extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Buying Center</th><th>Cash Route</th><th>Last Purchase Date</th><th>Historical Purchases</th><th>Avg. Kgs.</th><th>Procurement Estimate</th><th>Last Price</th><th>Procurement Value</th><th>Cash Balance</th><th>Release Amount</th></tr>";
+		return "<tr><th>Buying Center</th><th>Cash Route</th><th>Last Purchase Date</th><th>Historical Purchases</th><th>Avg. Kgs.</th><th>Procurement Estimate</th><th>Estimated Price</th><th>Procurement Value</th><th>Cash Balance</th><th>Release Amount</th></tr>";
 	}
 
 	public function echoExcelTitles() {
-		return "Buying Center\tCash Route\tLast Purchase Date\tHistorical Purchases\tAvg. Kgs.\tProcurement Estimate\tLast Price\tProcurement Value\tCash Balance\tRelease Amount\t\n";
+		return "Buying Center\tCash Route\tLast Purchase Date\tHistorical Purchases\tAvg. Kgs.\tProcurement Estimate\tEstimated Price\tProcurement Value\tCash Balance\tRelease Amount\t\n";
 	}
 
 	function generatePDF($data, $date, $history, $cycle, $nearest,$price) {

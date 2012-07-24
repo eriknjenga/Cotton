@@ -25,40 +25,57 @@ class Missing_Dpn extends MY_Controller {
 	}
 
 	public function download() {
-		$regions = array();
-		$depot = $this -> input -> post("depot");
 		$season = $this -> input -> post("season");
-		$start = $this -> input -> post("start");
-		$end = $this -> input -> post("end");
-		$start -= 1;
 		$date = date("m/d/Y");
+		$data_buffer = "
+			<style>
+			table.data-table {
+			table-layout: fixed;
+			width: 700px;
+			}
+			table.data-table td {
+			width: 200px; 
+			}
+			</style>
+			";
+		$data_buffer .= "<table class='data-table'><tr><th>Buying Center</th><th>Center Code</th><th>Missing Sequence Numbers</th></tr>";
 		$this -> load -> database();
-		$depot_object = Depot::getDepot($depot);
 		//Retrieve all buying centers that have started reporting
-		$sql_reporting_depots = "select * from (select distinct depot from purchase where season = '$season') reported_depots left join depot d on reported_depots.depot = d.id left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id order by r.id asc";
-		$data_buffer = "";
-		//echo the start of the table
-		$data_buffer .= "<h3>Buying Center: " . $depot_object -> Depot_Name . "</h3>";
-		$data_buffer .= "<table class='data-table'>";
-		$total_purchased = 0;
-		$total_dispatched = 0;
-		$total_balance = 0;
-		$data_buffer .= $this -> echoTitles();
-		//Get data for each zone
-		//$sql = "select sequence_numbers from (select (@start_sq := @start_sq +1) as sequence_numbers  from dps_sequence,(select @start_sq := $start) s  where @start_sq < $end) sequence where sequence_numbers not in (select dpn from purchase p where depot = '$depot' and season = '$season')";
-		$sql = "select sequence_numbers from (select (@start_sq := @start_sq +1) as sequence_numbers from dps_sequence,(select @start_sq := $start) s where @start_sq < (select max(abs(dpn)) from purchase where depot = '$depot' and season = '$season')) sequence where sequence_numbers not in (select dpn from purchase p where depot = '$depot' and season = '$season'  and dpn>start_sq)";
-		$query = $this -> db -> query($sql);
+		$sql_reporting_depots = "select * from (select depot,max(abs(dpn)) as dpn from purchase where season = '$season' group by depot) reported_depots left join depot d on reported_depots.depot = d.id order by depot_name asc";
+		$query = $this -> db -> query($sql_reporting_depots);
+
+		//Loop through all the returned depots
 		foreach ($query->result_array() as $depot_data) {
-			$data_buffer .= "<tr><td>" . $depot_data['sequence_numbers'] . "</td></tr>";
+			if (strlen($depot_data['depot']) > 0) {
+				//echo the start of the table
+
+				//sql to get the current book being used
+				$sql_get_depot_sequence = "select * from dpn_sequence where season = '" . $season . "' and '" . $depot_data['dpn'] . "' between first and last and depot = '" . $depot_data['depot'] . "'";
+				
+				$query = $this -> db -> query($sql_get_depot_sequence);
+				$sequence_data = $query -> row_array();
+				if (isset($sequence_data['first'])) {
+					$sql = "select sequence_numbers from (select (@start_sq := @start_sq +1) as sequence_numbers from dps_sequence,(select @start_sq := " . $sequence_data['first'] . ") s where @start_sq < " . $depot_data['dpn'] . ") sequence where sequence_numbers not in (select dpn from purchase p where depot = '" . $depot_data['depot'] . "' and season = '$season'  and dpn>" . $sequence_data['first'] . ")";
+					
+					$query = $this -> db -> query($sql);
+					if ($query -> num_rows() > 0) {
+						$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['depot_code'] . "</td><td>";
+						foreach ($query->result_array() as $missing_data) {
+							$data_buffer .= $missing_data['sequence_numbers'] . ", ";
+						}
+						$data_buffer .= "</td></tr>";
+					}
+				}
+			}
 		}
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
-		$log -> Log_Message = "Downloaded Missing Buying Center DPS Report PDF";
+		$log -> Log_Message = "Downloaded Missing Buying Center DPN Report PDF";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
-		//$this -> generatePDF($data_buffer, $start, $end, $date);
+		$this -> generatePDF($data_buffer, $season, $date);
 
 	}
 
@@ -66,10 +83,10 @@ class Missing_Dpn extends MY_Controller {
 		return "<tr><th>Missing DPS Numbers</th></tr>";
 	}
 
-	function generatePDF($data, $start, $end, $date) {
+	function generatePDF($data, $season, $date) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Missing DPNs</h3>";
-		$html_title .= "<h5 style='text-align:center;'> Sequence Starting " . ($start + 1) . " to " . $end . " as at " . $date . "</h5>";
+		$html_title .= "<h5 style='text-align:center;'> For the " . $season . " Season as at " . $date . "</h5>";
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4');
 		$this -> mpdf -> SetTitle('Missing DPNs');

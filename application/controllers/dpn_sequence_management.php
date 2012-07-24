@@ -55,17 +55,18 @@ class DPN_Sequence_Management extends MY_Controller {
 			$editing = $this -> input -> post("editing_id");
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
-				$area = Area::getArea($editing);
+				$sequence = DPN_Sequence::getSequence($editing);
 			} else {
-				$area = new Area();
+				$sequence = new DPN_Sequence();
 			}
-			$area -> Area_Code = $this -> input -> post("area_code");
-			$area -> Area_Name = $this -> input -> post("area_name");
-			$area -> Region = $this -> input -> post("region");  
-			$area -> save();
-			redirect("area_management/listing");
+			$sequence -> Depot = $this -> input -> post("depot");
+			$sequence -> First = $this -> input -> post("first");
+			$sequence -> Last = $this -> input -> post("last");  
+			$sequence -> Season = $this -> input -> post("season");  
+			$sequence -> save();
+			redirect("dpn_sequence_management/listing");
 		} else {
-			$this -> new_area();
+			$this -> new_sequence();
 		}
 	}
 
@@ -77,9 +78,10 @@ class DPN_Sequence_Management extends MY_Controller {
 	}
 
 	public function validate_form() {
-		$this -> form_validation -> set_rules('area_code', 'Area Code', 'trim|required|max_length[20]|xss_clean');
-		$this -> form_validation -> set_rules('area_name', 'Area Name', 'trim|required|max_length[100]|xss_clean'); 
-		$this -> form_validation -> set_rules('region', 'Region', 'trim|required|xss_clean'); 
+		$this -> form_validation -> set_rules('depot', 'Buying Center', 'trim|required|xss_clean');
+		$this -> form_validation -> set_rules('season', 'Season', 'trim|required|xss_clean');
+		$this -> form_validation -> set_rules('first', 'First Sequence Number', 'trim|required|max_length[10]|xss_clean'); 
+		$this -> form_validation -> set_rules('last', 'Last Sequence Number', 'trim|required|max_length[10]|xss_clean'); 
 		return $this -> form_validation -> run();
 	}
 

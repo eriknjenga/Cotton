@@ -46,7 +46,7 @@
 			<th>Buyer</th>
 			<th>Quantity</th>
 			<th>Unit Price</th>
-			<th>Cash Payed</th>
+			<th>Cash Paid</th>
 			<th>Action</th>
 		</tr>
 	</thead>
