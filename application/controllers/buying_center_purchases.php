@@ -57,7 +57,8 @@ class Buying_Center_Purchases extends MY_Controller {
 			$sql = "select (case when d.Deleted ='1' then concat(depot_name,' (Closed)') else case when d.Deleted = '0' then depot_name end  end) as depot_name , r.region_name , p.dpn,p.date,p.quantity,p.gross_value,(p.gross_value/p.quantity) as avg_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on d.id = p.depot and str_to_date(p.date,'%m/%d/%Y') = str_to_date('" . $date . "','%m/%d/%Y')  where r.id = '" . $region -> id . "' ";
 			$query = $this -> db -> query($sql);
 			foreach ($query->result_array() as $depot_data) {
-				$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['dpn'] . "</td><td>" . number_format($depot_data['quantity']) . "</td><td>" . number_format($depot_data['gross_value']) . "</td><td>" . number_format(round($depot_data['avg_price'])) . "</td></tr>";
+				//(empty($disbursement['unit_price']) ? '-' : number_format($disbursement['unit_price'] + 0))
+				$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . (empty($depot_data['dpn']) ? '-' :$depot_data['dpn']) . "</td><td>" . (empty($depot_data['quantity']) ? '-' : number_format($depot_data['quantity'] + 0)) . "</td><td>" . (empty($depot_data['gross_value']) ? '-' : number_format($depot_data['gross_value'] + 0)) . "</td><td>" . (empty($depot_data['avg_price']) ? '-' : number_format($depot_data['avg_price'] + 0)) . "</td></tr>";
 				$region_summaries[$region -> id]['total_quantity'] += $depot_data['quantity'];
 				$region_summaries[$region -> id]['total_value'] += $depot_data['gross_value'];
 			}
@@ -69,7 +70,7 @@ class Buying_Center_Purchases extends MY_Controller {
 			if ($region_summaries[$region -> id]['total_value'] > 0 && $region_summaries[$region -> id]['total_quantity'] > 0) {
 				$avg_per_kg = $region_summaries[$region -> id]['total_value'] / $region_summaries[$region -> id]['total_quantity'];
 			}
-			$data_buffer .= "<tr><td>" . $region -> Region_Name . "</td><td>" . number_format($region_summaries[$region -> id]['total_quantity']) . "</td><td>" . number_format($region_summaries[$region -> id]['total_value']) . "</td><td>" . number_format($avg_per_kg) . "</td></tr>";
+			$data_buffer .= "<tr><td>" . $region -> Region_Name . "</td><td>" . (empty($region_summaries[$region -> id]['total_quantity']) ? '-' : number_format($region_summaries[$region -> id]['total_quantity'] + 0)) . "</td><td>" .(empty($region_summaries[$region -> id]['total_value']) ? '-' : number_format($region_summaries[$region -> id]['total_value'] + 0)). "</td><td>" . (empty($avg_per_kg) ? '-' : number_format($avg_per_kg+ 0)). "</td></tr>";
 		}
 		$data_buffer .= "</table>";
 		$log = new System_Log();
@@ -78,6 +79,7 @@ class Buying_Center_Purchases extends MY_Controller {
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
+		//echo $data_buffer;
 		$this -> generatePDF($data_buffer, $date);
 
 	}

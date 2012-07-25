@@ -62,8 +62,13 @@ foreach($regions as $region){
 		</p>
 		<p>
 			<label for="nearest">Nearest</label>
-			<input id="nearest" name="nearest" type="text" value="500000" class="validate[required,custom[integer]]"/>
-			<span class="field_desc">The funding requirement will be rounded off to this value in <b>Tsh.</b> (500,000 by default)</span>
+			<input id="nearest" name="nearest" type="text" value="10000" class="validate[required,custom[integer]]"/>
+			<span class="field_desc">The funding requirement will be rounded off to this value in <b>Tsh.</b> (10,000 by default)</span>
+		</p>
+		<p>
+			<label for="factor">Factor</label>
+			<input id="factor" name="factor" type="text" value="1" class="validate[required]"/>
+			<span class="field_desc">What factor of the requirement is to be issued? By default, it's <b>1.0</b> i.e. 100% of the requirement will be disbursed</span>
 		</p>
 		<input type="submit" name="action" class="button"	value="Download BC Funding PDF" />
 		<input type="submit" name="action" class="button"	value="Download BC Funding Excel" />

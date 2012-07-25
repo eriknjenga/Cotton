@@ -30,10 +30,11 @@ class Buying_Center_Funding extends MY_Controller {
 		$price = $this -> input -> post("price");
 		$action = $this -> input -> post("action");
 		$nearest = $this -> input -> post("nearest");
+		$factor = $this -> input -> post("factor");
 		$region_object = Region::getRegion($region);
 		//Check if the user requested an excel sheet; if so, call the responsible function
 		if ($action == "Download BC Funding Excel") {
-			$this -> downloadExcel($region, $date, $history, $cycle, $nearest,$price);
+			$this -> downloadExcel($region, $date, $history, $cycle, $nearest, $price, $factor);
 			return;
 		}
 		$this -> load -> database();
@@ -49,13 +50,15 @@ class Buying_Center_Funding extends MY_Controller {
 			</style>
 			";
 		//echo the start of the table
+		$data_buffer .= "<h3>Zone: " . $region_object -> Region_Name . "</h3>";
 		$data_buffer .= "<table class='data-table'>";
 		$procurement_estimate_total = 0;
 		$procurement_value_total = 0;
 		$cash_balance_total = 0;
-		$release_total = 0;
-		$data_buffer .= "<tr><td><b>Zone: </b></td><td><b>" . $region_object -> Region_Name . "</b></td></tr>";
+		$release_total = 0;	
+		
 		$data_buffer .= $this -> echoTitles();
+		
 		//Get all the depots in this region
 		$sql_funding = "select depot_summaries.*,(select sum(net_value) from purchase where depot = depot_summaries.depot) as total_purchases,(select sum(amount) from field_cash_disbursement where depot = depot_summaries.depot) as total_received,(select sum(amount) from buying_center_receipt where depot = depot_summaries.depot) as total_returned from (select depot_purchase.*, max(str_to_date(date,'%m/%d/%Y')) as last_purchase_date,sum(quantity) as total_purchase, unit_price as last_price from (select d.id as depot,cash_disbursement_route as route,d.depot_name,quantity, date,unit_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on p.depot = d.id and str_to_date(date,'%m/%d/%Y') between DATE_SUB(str_to_date('" . $date . "','%m/%d/%Y'), INTERVAL " . $history . " day) and str_to_date('" . $date . "','%m/%d/%Y') where r.id = '" . $region . "' and d.deleted = '0' order by str_to_date(date,'%m/%d/%Y') desc) depot_purchase group by depot) depot_summaries";
 		$bc_funding = $this -> db -> query($sql_funding);
@@ -65,17 +68,18 @@ class Buying_Center_Funding extends MY_Controller {
 			$procurement_estimate = ($avg_per_day * $cycle);
 			$procurement_value = ($procurement_estimate * $price);
 			$cash_balance = ($depot_data['total_received'] - $depot_data['total_purchases'] - $depot_data['total_returned']);
-			$release_amount = $procurement_value - $cash_balance;
+			$release_amount = ($procurement_value - $cash_balance) * $factor;
 			if ($release_amount > 0) {
 				$release_amount = ceil($release_amount / $nearest) * $nearest;
 			}
-			$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['route'] . "</td><td>" . $depot_data['last_purchase_date'] . "</td><td>" . number_format($depot_data['total_purchase'] + 0) . "</td><td>" . number_format($avg_per_day + 0) . "</td><td>" . number_format($procurement_estimate + 0) . "</td><td>" . number_format($depot_data['last_price'] + 0) . "</td><td>" . number_format($procurement_value + 0) . "</td><td>" . number_format($cash_balance + 0) . "</td><td>" . number_format($release_amount + 0) . "</td></tr>";
+			//(empty($depot_data['quantity']) ? '-' : number_format($depot_data['quantity'] + 0))
+			$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['route'] . "</td><td>" . (empty($depot_data['last_purchase_date']) ? '-' : $depot_data['last_purchase_date']) . "</td><td>" . (empty($depot_data['total_purchase']) ? '-' : number_format($depot_data['total_purchase'] + 0)) . "</td><td>" . (empty($avg_per_day) ? '-' : number_format($avg_per_day + 0)) . "</td><td>" . (empty($procurement_estimate) ? '-' : number_format($procurement_estimate + 0)) . "</td><td>" . (empty($depot_data['last_price']) ? '-' : number_format($depot_data['last_price'] + 0)) . "</td><td>" . (empty($procurement_value) ? '-' : number_format($procurement_value + 0)) . "</td><td>" . (empty($cash_balance) ? '-' : number_format($cash_balance + 0)) . "</td><td>" . (empty($release_amount) ? '-' : number_format($release_amount + 0)) . "</td></tr>";
 			$procurement_estimate_total += $procurement_estimate;
 			$procurement_value_total += $procurement_value;
 			$cash_balance_total += $cash_balance;
 			$release_total += $release_amount;
 		}
-		$data_buffer .= "<tr></tr><tr><td>Totals: </td><td>-</td><td>-</td><td>-</td><td>-</td><td>" . number_format($procurement_estimate_total + 0) . "</td><td>-</td><td>" . number_format($procurement_value_total + 0) . "</td><td>" . number_format($cash_balance_total + 0) . "</td><td>" . number_format($release_total + 0) . "</td></tr>";
+		$data_buffer .= "<tr><td>Totals: </td><td>-</td><td>-</td><td>-</td><td>-</td><td>" . (empty($procurement_estimate_total) ? '-' : number_format($procurement_estimate_total + 0)) . "</td><td>-</td><td>" . (empty($procurement_value_total) ? '-' : number_format($procurement_value_total + 0)) . "</td><td>" . (empty($cash_balance_total) ? '-' : number_format($cash_balance_total + 0)) . "</td><td>" . (empty($release_total) ? '-' : number_format($release_total + 0)) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -83,11 +87,12 @@ class Buying_Center_Funding extends MY_Controller {
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
-		$this -> generatePDF($data_buffer, $date, $history, $cycle, $nearest,$price);
+		//echo $data_buffer;
+		$this -> generatePDF($data_buffer, $date, $history, $cycle, $nearest,$price,$factor);
 
 	}
 
-	public function downloadExcel($region, $date, $history, $cycle, $nearest,$price) {
+	public function downloadExcel($region, $date, $history, $cycle, $nearest, $price, $factor) {
 		$this -> load -> database();
 		$region_object = Region::getRegion($region);
 		$data_buffer = "";
@@ -106,7 +111,7 @@ class Buying_Center_Funding extends MY_Controller {
 			$procurement_estimate = ($avg_per_day * $cycle);
 			$procurement_value = ($procurement_estimate * $price);
 			$cash_balance = ($depot_data['total_received'] - $depot_data['total_purchases'] - $depot_data['total_returned']);
-			$release_amount = $procurement_value - $cash_balance;
+			$release_amount = ($procurement_value - $cash_balance) * $factor;
 			if ($release_amount > 0) {
 				$release_amount = ceil($release_amount / $nearest) * $nearest;
 			}
@@ -140,10 +145,10 @@ class Buying_Center_Funding extends MY_Controller {
 		return "Buying Center\tCash Route\tLast Purchase Date\tHistorical Purchases\tAvg. Kgs.\tProcurement Estimate\tEstimated Price\tProcurement Value\tCash Balance\tRelease Amount\t\n";
 	}
 
-	function generatePDF($data, $date, $history, $cycle, $nearest,$price) {
+	function generatePDF($data, $date, $history, $cycle, $nearest, $price,$factor) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>BC Funding</h3>";
-		$html_title .= "<h5 style='text-align:center;'> as at: " . $date . " for the next " . $cycle . " days using " . $history . " days historical data and ". $price." as the forecast price. Rounded to the nearest " . number_format($nearest) . "</h5>";
+		$html_title .= "<h5 style='text-align:center;'> as at: " . $date . " for the next " . $cycle . " days using " . $history . " days historical data and " . $price . " as the forecast price and a factor of ".$factor.". Rounded to the nearest " . number_format($nearest) . "</h5>";
 
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4-L');
