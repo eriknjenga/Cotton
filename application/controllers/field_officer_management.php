@@ -45,35 +45,49 @@ class Field_Officer_Management extends MY_Controller {
 	public function edit_officer($id) {
 		$officer = Field_Officer::getOfficer($id);
 		$data['officer'] = $officer;
-		$this->new_officer($data);
+		$this -> new_officer($data);
+	}
+
+	public function print_feos() {
+		$feos = Field_Officer::getAll();
+		$data_buffer = "FEO Code\tName\tNational Id\tZone\t\n";
+		foreach ($feos as $feo) {
+			$data_buffer .= $feo ->Officer_Code . "\t" . $feo -> Officer_Name ."\t" . $feo -> National_Id ."\t" . $feo -> Region_Object->Region_Name . "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Field Extension Officers.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
 	}
 
 	public function save() {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
 		if ($valid) {
-			$editing = $this->input->post("editing_id");
+			$editing = $this -> input -> post("editing_id");
 			//Check if we are editing the record first
-			if(strlen($editing)>0){
+			if (strlen($editing) > 0) {
 				$officer = Field_Officer::getOfficer($editing);
-			}
-			else{
+			} else {
 				$officer = new Field_Officer();
-			}			
+			}
 			$officer -> Officer_Name = $this -> input -> post("officer_name");
 			$officer -> National_Id = $this -> input -> post("national_id");
-			$officer -> Officer_Code = $this -> input -> post("officer_code"); 
-			$officer -> Region = $this -> input -> post("region"); 
+			$officer -> Officer_Code = $this -> input -> post("officer_code");
+			$officer -> Region = $this -> input -> post("region");
 			$officer -> save();
 			redirect("field_officer_management/listing");
 		} else {
 			$this -> new_officer();
 		}
 	}
-	public function delete_officer($id){
+
+	public function delete_officer($id) {
 		$officer = Field_Officer::getOfficer($id);
-		$officer->delete();
-		$previous_page = $this -> session -> userdata('old_url'); 
+		$officer -> delete();
+		$previous_page = $this -> session -> userdata('old_url');
 		redirect($previous_page);
 	}
 
@@ -86,10 +100,10 @@ class Field_Officer_Management extends MY_Controller {
 	}
 
 	public function base_params($data) {
-		$data['title'] = "Field Officer Management"; 
+		$data['title'] = "Field Officer Management";
 		$data['link'] = "field_officer_management";
 
 		$this -> load -> view("demo_template", $data);
-	} 
+	}
 
 }

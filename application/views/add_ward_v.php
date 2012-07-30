@@ -5,14 +5,16 @@
 
 </script>
 <?php
-if (isset($ward)) { 
+if (isset($ward)) {
 	$ward_name = $ward -> Name;
 	$region = $ward -> Region;
+	$district = $ward -> District;
 	$ward_id = $ward -> id;
 } else {
 	$ward_name = "";
 	$ward_id = "";
-	$region = ""; 
+	$region = "";
+	$district = "";
 
 }
 $attributes = array("method" => "post", "id" => "add_ward_input");
@@ -26,7 +28,7 @@ echo validation_errors('
 	<legend>
 		Add New Ward
 	</legend>
-	<input type="hidden" name="editing_id" value="<?php echo $ward_id;?>" /> 
+	<input type="hidden" name="editing_id" value="<?php echo $ward_id;?>" />
 	<p>
 		<label for="ward_name">Ward Name: </label>
 		<input id="ward_name" name="ward_name" type="text" value="<?php echo $ward_name;?>" class="validate[required]"/>
@@ -36,13 +38,29 @@ echo validation_errors('
 		<label for="region">Zone</label>
 		<select name="region" class="dropdown validate[required]" id="region">
 			<option></option>
-			<?php 
-			foreach($regions as $region_object){?>
-				<option value="<?php echo $region_object->id;?>" <?php if($region_object->id == $region){echo "selected";}?>><?php echo $region_object->Region_Name;?></option>
-			<?php }
+			<?php
+foreach($regions as $region_object){
 			?>
+			<option value="<?php echo $region_object -> id;?>" <?php
+				if ($region_object -> id == $region) {echo "selected";
+				}
+			?>><?php echo $region_object -> Region_Name;?></option>
+			<?php }?>
 		</select>
 		<span class="field_desc">Select this ward's zone</span>
+	</p>
+	<p>
+		<label for="district">District</label>
+		<select name="district" class="dropdown validate[required]" id="district">
+			<option></option>
+			<?php
+			foreach($districts as $district_object){?> <option value="<?php echo $district_object -> id;?>" <?php
+				if ($district_object -> id == $district) {echo "selected";
+				}
+			?>><?php echo $district_object -> Name;?></option>
+			<?php }?>
+		</select>
+		<span class="field_desc">Select this ward's district</span>
 	</p>
 	<p>
 		<input class="button" type="submit" value="Submit">

@@ -28,8 +28,8 @@ foreach($regions as $region){
 				<?php }?>
 			</select> 
 		</p>
-		<input type="submit" name="action" class="button"	value="Download Zonal Summary PDF" />
-		<input type="submit" name="action" class="button"	value="Download Zonal Summary Excel" />
+		<input type="submit" name="action" class="button"	value="Download BC Summaries PDF" />
+		<input type="submit" name="action" class="button"	value="Download BC Summaries Excel" />
 	</fieldset>
 	</form>
 </div>

@@ -12,7 +12,7 @@ class Village extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Village") -> orderBy("Name asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Village")->where("Deleted = '0'") -> orderBy("Name asc");
 		$villages = $query -> execute();
 		return $villages;
 	}

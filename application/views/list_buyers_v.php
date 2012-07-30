@@ -27,7 +27,7 @@
 		window.location = url;
 		}
 </script>
-<h1>Buyer Listing</h1>
+<h1>Buyer Listing</h1><a href="<?php echo base_url()."buyer_management/print_buyers";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>
 		<tr>

@@ -18,8 +18,8 @@ class User_Management extends MY_Controller {
 	public function logout() {
 		//destroy the sessions first
 		$this -> session -> sess_destroy();
-		$this->quick_menus->sess_destroy();
-		$this->menus->sess_destroy();
+		$this -> quick_menus -> sess_destroy();
+		$this -> menus -> sess_destroy();
 		redirect("user_management/login");
 	}
 
@@ -152,6 +152,20 @@ class User_Management extends MY_Controller {
 		$this -> new_user($data);
 	}
 
+	public function print_users() {
+		$users = User::getAll();
+		$data_buffer = "Full Name\tAccess Level\t\n";
+		foreach ($users as $user) {
+			$data_buffer .= $user -> Name . "\t" . $user -> Access -> Level_Name . "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Purchase Routes.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
+	}
+
 	public function save() {
 		$editing = $this -> input -> post("editing_id");
 		//Check if we are editing the record first
@@ -259,7 +273,7 @@ class User_Management extends MY_Controller {
 						$log = new System_Log();
 						$log -> Log_Type = "1";
 						$log -> Log_Message = $log_message;
-						$log -> User = $logged_in->id;
+						$log -> User = $logged_in -> id;
 						$log -> Timestamp = date('U');
 						$log -> save();
 						redirect($request_url);

@@ -30,7 +30,7 @@
 <?php 
 $this->load->view("geography_submenu");
 ?>
-<h1>Village Listing</h1>
+<h1>Village Listing</h1><a href="<?php echo base_url()."village_management/print_villages";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>
 		<tr>

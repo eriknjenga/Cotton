@@ -90,6 +90,20 @@ class Depot_Management extends MY_Controller {
 		$this -> new_depot($data);
 	}
 
+	public function print_depots() {
+		$depots = Depot::getAll();
+		$data_buffer = "Depot Code\tDepot Name\tBuyer\tVillage\tCapacity\tDistance\tFBG\tYield Per Acre\tAcreage\tPurchase Route\tCash Disbursement Route\t\n";
+		foreach ($depots as $depot) {
+			$data_buffer .= $depot -> Depot_Code . "\t" . $depot -> Depot_Name . "\t" . $depot -> Buyer_Object -> Name . "\t" . $depot -> Village_Object -> Name . "\t" . $depot -> Capacity . "\t" . $depot -> Distance . "\t" . $depot -> FBG . "\t" . $depot -> Acre_Yield . "\t" . $depot -> Acreage . "\t" . $depot -> Purchase_Route_Object -> Route_Name . "\t" . $depot -> Cash_Disbursement_Route_Object -> Route_Name . "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Buying Centers.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
+	}
+
 	public function save() {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input

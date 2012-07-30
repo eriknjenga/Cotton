@@ -11,7 +11,7 @@ class Weighbridge_Management extends MY_Controller {
 	public function fetch_data() {
 		$this -> load -> library('csvreader');
 
-		$filePath = '/wbridge/weigh.csv';
+		$filePath = '/weigh.csv';
 		$resource = @fopen($filePath, 'r');
 		if (!$resource) {
 			$data['content_view'] = "weighbridge_error";

@@ -34,7 +34,7 @@
 		window.location = delete_url;
 		}
 </script>
-<h1>Buying Centers Listing</h1>
+<h1>Buying Centers Listing</h1><a href="<?php echo base_url()."depot_management/print_depots";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>
 		<tr>

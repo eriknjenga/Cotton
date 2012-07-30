@@ -30,7 +30,7 @@
 <?php 
 $this->load->view("geography_submenu");
 ?>
-<h1>Purchase Route Listing</h1>
+<h1>Purchase Route Listing</h1><a href="<?php echo base_url()."route_management/print_routes";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>
 		<tr>

@@ -42,6 +42,20 @@ class Village_Management extends MY_Controller {
 		$this -> base_params($data);
 	}
 
+	public function print_villages() {
+		$villages = Village::getAll();
+		$data_buffer = "Village Name\tWard\t\n";
+		foreach ($villages as $villages) {
+			$data_buffer .= $villages -> Name . "\t" . $villages -> Ward_Object -> Name . "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Villages.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
+	}
+
 	public function edit_village($id) {
 		$village = Village::getVillage($id);
 		$data['village'] = $village;
@@ -60,7 +74,7 @@ class Village_Management extends MY_Controller {
 				$village = new Village();
 			}
 			$village -> Ward = $this -> input -> post("ward");
-			$village -> Name = $this -> input -> post("village_name"); 
+			$village -> Name = $this -> input -> post("village_name");
 			$village -> save();
 			redirect("village_management/listing");
 		} else {
@@ -77,7 +91,7 @@ class Village_Management extends MY_Controller {
 
 	public function validate_form() {
 		$this -> form_validation -> set_rules('ward', 'Ward', 'trim|required|xss_clean');
-		$this -> form_validation -> set_rules('village_name', 'Village Name', 'trim|required|max_length[100]|xss_clean'); 
+		$this -> form_validation -> set_rules('village_name', 'Village Name', 'trim|required|max_length[100]|xss_clean');
 		return $this -> form_validation -> run();
 	}
 
@@ -88,6 +102,5 @@ class Village_Management extends MY_Controller {
 
 		$this -> load -> view("demo_template", $data);
 	}
-
 
 }

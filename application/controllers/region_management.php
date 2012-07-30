@@ -47,6 +47,20 @@ class Region_Management extends MY_Controller {
 		$this -> new_region($data);
 	}
 
+	public function print_regions() {
+		$regions = Region::getAll();
+		$data_buffer = "Region Code\tRegion Name\t\n";
+		foreach ($regions as $region) {
+			$data_buffer .= $region -> Region_Code . "\t" .$region ->Region_Name. "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Zones.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
+	}
+
 	public function save() {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
@@ -86,10 +100,10 @@ class Region_Management extends MY_Controller {
 		$query = $this -> db -> query($sql);
 		$regional_data = $query -> result_array();
 		$chart = '<chart caption="Zonal Purchase Summaries" xAxisName="Zone" yAxisName="Gross Value (Tsh.)" showValues="0" decimals="0" formatNumberScale="0">';
-		foreach ($regional_data as $data){
-			$chart .= '<set label="'.$data['region_name'].'" value="'.$data['total_purchases'].'"/>';
+		foreach ($regional_data as $data) {
+			$chart .= '<set label="' . $data['region_name'] . '" value="' . $data['total_purchases'] . '"/>';
 		}
-		$chart .="</chart>";
+		$chart .= "</chart>";
 		echo $chart;
 	}
 

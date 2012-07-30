@@ -33,7 +33,7 @@ class Field_Cashier_Management extends MY_Controller {
 	public function new_field_cashier($data = null) {
 		if ($data == null) {
 			$data = array();
-		} 
+		}
 		$data['content_view'] = "add_field_cashier_v";
 		$data['quick_link'] = "add_field_cashier";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
@@ -45,6 +45,20 @@ class Field_Cashier_Management extends MY_Controller {
 		$field_cashier = Field_Cashier::getFieldCashier($id);
 		$data['field_cashier'] = $field_cashier;
 		$this -> new_field_cashier($data);
+	}
+
+	public function print_cashiers() {
+		$cashiers = Field_Cashier::getAll();
+		$data_buffer = "Cashier Code\tFull Name\tNational Id\tPhone Number\t\n";
+		foreach ($cashiers as $cashier) {
+			$data_buffer .= $cashier -> Field_Cashier_Code . "\t" . $cashier -> Field_Cashier_Name ."\t" . $cashier -> National_Id."\t" . $cashier -> Phone_Number. "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Field Cashiers.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
 	}
 
 	public function save() {
@@ -83,7 +97,7 @@ class Field_Cashier_Management extends MY_Controller {
 		return $this -> form_validation -> run();
 	}
 
-	public function base_params($data) { 
+	public function base_params($data) {
 		$data['link'] = "field_cashier_management";
 
 		$this -> load -> view("demo_template", $data);

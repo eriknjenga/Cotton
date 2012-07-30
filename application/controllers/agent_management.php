@@ -47,6 +47,20 @@ class Agent_Management extends MY_Controller {
 		$this -> new_agent($data);
 	}
 
+	public function print_agents() {
+		$agents = Agent::getAll();
+		$data_buffer = "Agent Code\tFirst Name\tSurname\tNational Id\t\n";
+		foreach ($agents as $agent) {
+			$data_buffer .= $agent -> Agent_Code . "\t" . $agent -> First_Name . "\t" . $agent -> Surname . "\t" . $agent -> National_Id . "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Input Agents.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
+	}
+
 	public function save() {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
@@ -58,11 +72,11 @@ class Agent_Management extends MY_Controller {
 			if (strlen($editing) > 0) {
 				$agent = Agent::getAgent($editing);
 				$log -> Log_Type = "2";
-				$log -> Log_Message = "Edited Agent Record From {Code: '" . $agent -> Agent_Code . "' First_Name: '" . $agent -> First_Name . "' Surname: '" . $agent -> Surname . "' National ID: '" . $agent -> National_Id . "'} to ".$details_desc;
+				$log -> Log_Message = "Edited Agent Record From {Code: '" . $agent -> Agent_Code . "' First_Name: '" . $agent -> First_Name . "' Surname: '" . $agent -> Surname . "' National ID: '" . $agent -> National_Id . "'} to " . $details_desc;
 			} else {
 				$agent = new Agent();
 				$log -> Log_Type = "1";
-				$log -> Log_Message = "Created Agent Record ".$details_desc;
+				$log -> Log_Message = "Created Agent Record " . $details_desc;
 			}
 			$agent -> Agent_Code = $this -> input -> post("agent_code");
 			$agent -> First_Name = $this -> input -> post("first_name");

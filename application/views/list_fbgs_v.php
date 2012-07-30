@@ -27,7 +27,7 @@
 		window.location = url;
 		}
 </script>
-<h1><?php echo $listing_title;?></h1>
+<h1><?php echo $listing_title;?></h1><a href="<?php echo base_url()."fbg_management/print_fbgs";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>
 		<tr>

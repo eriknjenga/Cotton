@@ -35,6 +35,7 @@ class Ward_Management extends MY_Controller {
 			$data = array();
 		}
 		$data['regions'] = Region::getAll();
+		$data['districts'] = District::getAll();
 		$data['content_view'] = "add_ward_v";
 		$data['quick_link'] = "add_ward";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
@@ -46,6 +47,20 @@ class Ward_Management extends MY_Controller {
 		$ward = Ward::getWard($id);
 		$data['ward'] = $ward;
 		$this -> new_ward($data);
+	}
+
+	public function print_wards() {
+		$wards = Ward::getAll();
+		$data_buffer = "Ward Name\tDistrict\tZone\t\n";
+		foreach($wards as $ward){
+			$data_buffer .= $ward->Name."\t".$ward->District_Object->Name."\t".$ward->Region_Object->Region_Name."\n";			
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Wards.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
 	}
 
 	public function save() {
@@ -60,7 +75,8 @@ class Ward_Management extends MY_Controller {
 				$ward = new Ward();
 			}
 			$ward -> Region = $this -> input -> post("region");
-			$ward -> Name = $this -> input -> post("ward_name"); 
+			$ward -> District = $this -> input -> post("district");
+			$ward -> Name = $this -> input -> post("ward_name");
 			$ward -> save();
 			redirect("ward_management/listing");
 		} else {
@@ -77,7 +93,7 @@ class Ward_Management extends MY_Controller {
 
 	public function validate_form() {
 		$this -> form_validation -> set_rules('region', 'Zone', 'trim|required|xss_clean');
-		$this -> form_validation -> set_rules('ward_name', 'Ward Name', 'trim|required|max_length[100]|xss_clean'); 
+		$this -> form_validation -> set_rules('ward_name', 'Ward Name', 'trim|required|max_length[100]|xss_clean');
 		return $this -> form_validation -> run();
 	}
 
@@ -88,6 +104,5 @@ class Ward_Management extends MY_Controller {
 
 		$this -> load -> view("demo_template", $data);
 	}
-
 
 }

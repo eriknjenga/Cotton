@@ -50,6 +50,12 @@ class User extends Doctrine_Record {
 		return $total[0]['Total_Users'];
 	}
 
+	public function getAll() {
+		$query = Doctrine_Query::create() -> select("*") -> from("User") -> where("Active = '1'");
+		$users = $query -> execute();
+		return $users;
+	}
+
 	public function getPagedUsers($offset, $items) {
 		$query = Doctrine_Query::create() -> select("*") -> from("User") -> where("Active = '1'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$users = $query -> execute(array());

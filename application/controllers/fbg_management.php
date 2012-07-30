@@ -3,7 +3,7 @@ class FBG_Management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$this -> load -> library('pagination');
-		$this->load->database();
+		$this -> load -> database();
 	}
 
 	public function index() {
@@ -40,9 +40,9 @@ class FBG_Management extends MY_Controller {
 		if (strlen($search_term) == 0) {
 			redirect("fbg_management/search_fbg");
 		}
-		$this->load->database();
-		$search_term =urldecode($search_term);
-		$db_search_term = $this->db->escape_str(urldecode($search_term));
+		$this -> load -> database();
+		$search_term = urldecode($search_term);
+		$db_search_term = $this -> db -> escape_str(urldecode($search_term));
 		$search_term = urlencode($search_term);
 		$items_per_page = 10;
 		$number_of_fbgs = FBG::getTotalSearchedFbgs($db_search_term);
@@ -57,7 +57,7 @@ class FBG_Management extends MY_Controller {
 			$data['pagination'] = $this -> pagination -> create_links();
 		}
 		$data['fbgs'] = $fbgs;
-		$data['listing_title'] = "FBG Search Results For <b>' ".urldecode($search_term)."</b> '";
+		$data['listing_title'] = "FBG Search Results For <b>' " . urldecode($search_term) . "</b> '";
 		$data['title'] = "Farmer Business Groups";
 		$data['content_view'] = "list_fbgs_v";
 		$data['styles'] = array("pagination.css");
@@ -71,7 +71,7 @@ class FBG_Management extends MY_Controller {
 		$data['field_officers'] = Field_Officer::getAll();
 		$data['content_view'] = "add_fbg_v";
 		$data['quick_link'] = "add_fbg";
-		$data['scripts'] = array("validationEngine-en.js", "validator.js","jquery.ui.autocomplete.js");
+		$data['scripts'] = array("validationEngine-en.js", "validator.js", "jquery.ui.autocomplete.js");
 		$data['styles'] = array("validator.css");
 		$this -> base_params($data);
 	}
@@ -90,8 +90,8 @@ class FBG_Management extends MY_Controller {
 		if (strlen($search_term) == 0) {
 			redirect("fbg_management/search_fbg");
 		}
-		$this->load->database();
-		$db_search_term = $this->db->escape_str($search_term);
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
 		//Limit search results to 10
 		$fbgs = FBG::getPagedSearchedFbgs($db_search_term, 0, 10);
 		$final_results = array();
@@ -105,10 +105,10 @@ class FBG_Management extends MY_Controller {
 	}
 
 	public function autocomplete_village() {
-		$this->load->database();
-		$search_term = $this -> input -> post("term"); 
+		$this -> load -> database();
+		$search_term = $this -> input -> post("term");
 		//Limit search results to 10
-		$villages = Village::getPagedSearchedVillages($this->db->escape_str($search_term), 0, 10);
+		$villages = Village::getPagedSearchedVillages($this -> db -> escape_str($search_term), 0, 10);
 		$final_results = array();
 		$counter = 0;
 		foreach ($villages as $village) {
@@ -123,6 +123,20 @@ class FBG_Management extends MY_Controller {
 		$fbg = FBG::getFbg($id);
 		$data['fbg'] = $fbg;
 		$this -> new_fbg($data);
+	}
+
+	public function print_fbgs() {
+		$fbgs = FBG::getAll();
+		$data_buffer = "Contract Number\tGroup Name\tField Extension Officer\tHectares Available\tChairman Name\tChairman Phone\tSecretary Name\tSecretary Phone\tVillage\t\n";
+		foreach ($fbgs as $fbg) {
+			$data_buffer .= $fbg -> CPC_Number . "\t" . $fbg -> Group_Name ."\t" . $fbg -> Officer_Object->Officer_Name ."\t" . $fbg -> Hectares_Available ."\t" . $fbg -> Chairman_Name ."\t" . $fbg -> Chairman_Phone ."\t" . $fbg -> Secretary_Name ."\t" . $fbg -> Secretary_Phone ."\t" . $fbg -> Village_Object->Name . "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System FBGs.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
 	}
 
 	public function save() {

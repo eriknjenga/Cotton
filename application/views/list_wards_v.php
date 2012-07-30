@@ -30,11 +30,12 @@
 <?php 
 $this->load->view("geography_submenu");
 ?>
-<h1>Ward Listing</h1>
+<h1>Ward Listing</h1><a href="<?php echo base_url()."ward_management/print_wards";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>
 		<tr>
 			<th>Name</th>
+			<th>District</th>
 			<th>Zone</th>
 			<th>Action</th>
 		</tr>
@@ -54,6 +55,9 @@ $class = "odd";
 		">
 		<td>
 		<?php echo $ward -> Name;?>
+		</td>
+		<td>
+		<?php echo $ward -> District_Object->Name;?>
 		</td>
 		<td>
 		<?php echo $ward -> Region_Object->Region_Name;?>

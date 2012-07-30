@@ -99,6 +99,9 @@
 				total_value = quantity * most_current_price;
 				$("#purchased_value").attr("value", total_value);
 				}
+				else if(parseInt(quantity) == 0){
+					$("#purchased_value").attr("value", 0);
+				}
 				}
 </script>
 <?php
@@ -127,7 +130,7 @@ if (isset($purchase)) {
 	$dpn = "";
 	$date = "";
 	$depot_id = $depot -> id;
-	$quantity = "";
+	$quantity = "0";
 	$price = "";
 	$total_value = "0";
 	$season = "";

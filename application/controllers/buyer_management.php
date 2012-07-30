@@ -64,7 +64,20 @@ class Buyer_Management extends MY_Controller {
 		$data['buyer'] = $buyer;
 		$this -> new_buyer($data);
 	}
-
+	public function print_buyers() {
+		$buyers = Buyer::getAll();
+		$data_buffer = "Buyer Code\tFull Name\tNational Id\tPhone Number\t\n";
+		foreach ($buyers as $buyer) {
+			$data_buffer .= $buyer -> Buyer_Code . "\t" . $buyer -> Name . "\t" . $buyer -> National_Id . "\t" . $buyer -> Phone_Number . "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Buyers.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
+	}
+	
 	public function save() {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input

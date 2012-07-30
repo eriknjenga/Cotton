@@ -30,7 +30,7 @@
 <?php 
 $this->load->view("geography_submenu");
 ?>
-<h1>Zone Listing</h1>
+<h1>Zone Listing</h1><a href="<?php echo base_url()."region_management/print_regions";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>
 		<tr>

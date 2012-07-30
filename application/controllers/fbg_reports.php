@@ -46,6 +46,9 @@ class FBG_Reports extends MY_Controller {
 			table.data-table td {
 			width: 70px;
 			}
+			.right-align{
+				text-align:right;
+			}
 			</style>
 			";
 		$total_debt = 0;
@@ -65,19 +68,19 @@ class FBG_Reports extends MY_Controller {
 			$query = $this -> db -> query($sql);
 			foreach ($query->result_array() as $fbg_data) {
 				$total_outstanding = $fbg_data['total_borrowed'] - $fbg_data['total_recovered'];
-				$data_buffer .= "<tr><td>" . $fbg_data['cpc_number'] . "</td><td>" . $fbg_data['group_name'] . "</td><td>" . $fbg_data['chairman_name'] . "</td><td>" . $fbg_data['village'] . "</td><td>" . number_format(($fbg_data['total_borrowed'] + 0)) . "</td><td>" . number_format(($fbg_data['total_recovered'] + 0)) . "</td><td>" . number_format($total_outstanding + 0) . "</td></tr>";
+				$data_buffer .= "<tr><td>" . $fbg_data['cpc_number'] . "</td><td>" . $fbg_data['group_name'] . "</td><td>" . $fbg_data['chairman_name'] . "</td><td>" . $fbg_data['village'] . "</td><td class='right-align'>" . (empty($fbg_data['total_borrowed']) ? '-' : number_format($fbg_data['total_borrowed'] + 0)) . "</td><td class='right-align'>" . (empty($fbg_data['total_recovered']) ? '-' : number_format($fbg_data['total_recovered'] + 0)) . "</td><td class='right-align'>" . (empty($total_outstanding) ? '-' : number_format($total_outstanding + 0)) . "</td></tr>";
 				$region_summaries[$region -> id]['total_debt'] += $fbg_data['total_borrowed'];
 				$region_summaries[$region -> id]['total_recoveries'] += $fbg_data['total_recovered'];
 				$region_summaries[$region -> id]['total_debt_owing'] += $total_outstanding;
 			}
-			$data_buffer .= "<tr><td>Totals</td><td>-</td><td>-</td><td>-</td><td>" . number_format($region_summaries[$region -> id]['total_debt'] + 0) . "</td><td>" . number_format($region_summaries[$region -> id]['total_recoveries'] + 0) . "</td><td>" . number_format($region_summaries[$region -> id]['total_debt_owing'] + 0) . "</td></tr>";
+			$data_buffer .= "<tr><td>Totals</td><td>-</td><td>-</td><td>-</td><td class='right-align'>" . number_format($region_summaries[$region -> id]['total_debt'] + 0) . "</td><td class='right-align'>" . number_format($region_summaries[$region -> id]['total_recoveries'] + 0) . "</td><td class='right-align'>" . number_format($region_summaries[$region -> id]['total_debt_owing'] + 0) . "</td></tr>";
 			$total_debt += $region_summaries[$region -> id]['total_debt'];
 			$total_recoveries += $region_summaries[$region -> id]['total_recoveries'];
 			$total_debt_owing += $region_summaries[$region -> id]['total_debt_owing'];
 		}
 		$data_buffer .= "</table>";
 		$data_buffer .= "<h3>Summaries</h3><table class='data-table'><tr><th></th><th>Total Debt</th><th>Total Recoveries</th><th>Total Debt Owing</th></tr>";
-		$data_buffer .= "<tr><td>Totals</td><td>" . number_format($total_debt + 0) . "</td><td>" . number_format($total_recoveries + 0) . "</td><td>" . number_format($total_debt_owing + 0) . "</td></tr>";
+		$data_buffer .= "<tr><td>Totals</td><td class='right-align'>" . number_format($total_debt + 0) . "</td><td class='right-align'>" . number_format($total_recoveries + 0) . "</td><td class='right-align'>" . number_format($total_debt_owing + 0) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -146,7 +149,7 @@ class FBG_Reports extends MY_Controller {
 
 	function generatePDF($data, $date) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
-		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Debtors Aged Analysis</h3>";
+		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>FBG Debt Analysis</h3>";
 		$html_title .= "<h3 style='text-align:center;'> as at: " . $date . "</h3>";
 
 		$this -> load -> library('mpdf');

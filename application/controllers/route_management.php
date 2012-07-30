@@ -47,6 +47,20 @@ class Route_Management extends MY_Controller {
 		$this -> new_route($data);
 	}
 
+	public function print_routes() {
+		$routes = Route::getAll();
+		$data_buffer = "Route Code\tRoute Name\t\n";
+		foreach ($routes as $route) {
+			$data_buffer .= $route -> Route_Code . "\t" . $route -> Route_Name . "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Purchase Routes.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
+	}
+
 	public function save() {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input

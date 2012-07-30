@@ -27,7 +27,7 @@
 		window.location = url;
 		}
 </script>
-<h1>Agent Listing</h1>
+<h1>Agent Listing</h1><a href="<?php echo base_url()."agent_management/print_agents";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>
 		<tr>

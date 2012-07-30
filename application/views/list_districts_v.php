@@ -18,8 +18,8 @@
 	} );
 
 	$(".delete").click(function(){
-	url = "<?php echo base_url().'field_officer_management/delete_officer/'?>
-		" +$(this).attr("field_officer");
+	url = "<?php echo base_url().'district_management/delete_district/'?>
+		" +$(this).attr("district");
 		$("#confirm_delete").dialog('open');
 		});
 		});
@@ -27,22 +27,23 @@
 		window.location = url;
 		}
 </script>
-<h1>Field Officer Listing</h1><a href="<?php echo base_url()."field_officer_management/print_feos";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
+<?php 
+$this->load->view("geography_submenu");
+?>
+<h1>District Listing</h1><a href="<?php echo base_url()."district_management/print_districts";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>
 		<tr>
-			<th>Officer Code</th>
-			<th>Officer Name</th>
-			<th>National ID</th> 
-			<th>Zone</th> 
+			<th>Name</th>
+			<th>Zone</th>
 			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-if (isset($officers[0])) {
+if (isset($districts[0])) {
 $counter = 1;
-foreach ($officers as $officer) {
+foreach ($districts as $district) {
 $rem = $counter % 2;
 if ($rem == 0) {
 $class = "even";
@@ -52,22 +53,14 @@ $class = "odd";
 		?><tr class="<?php echo $class;?>
 		">
 		<td>
-		<?php echo $officer -> Officer_Code;?>
+		<?php echo $district -> Name;?>
 		</td>
 		<td>
-		<?php echo $officer -> Officer_Name;?>
+		<?php echo $district -> Region_Object->Region_Name;?>
 		</td>
-		<td>
-		<?php echo $officer -> National_Id;?>
-		</td> 
-		<td>
-		<?php echo $officer -> Region_Object->Region_Name;?>
-		</td> 
-		<td><a href="<?php echo base_url()."field_officer_management/edit_officer/".$officer->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" field_officer = "<?php echo $officer -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
+		<td><a href="<?php echo base_url()."district_management/edit_district/".$district->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" district = "<?php echo $district -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>
-		<?php
-
-		$counter++;
+		<?php $counter++;
 		}
 		}
 		?>
