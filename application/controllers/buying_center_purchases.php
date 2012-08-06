@@ -58,7 +58,7 @@ class Buying_Center_Purchases extends MY_Controller {
 			$data_buffer .= "<tr><td><b>Zone: </b></td><td><b>" . $region -> Region_Name . "</b></td></tr>";
 			$data_buffer .= $this -> echoTitles();
 			//Get data for each zone
-			$sql = "select (case when d.Deleted ='1' then concat(depot_name,' (Closed)') else case when d.Deleted = '0' then depot_name end  end) as depot_name , r.region_name , p.dpn,p.date,p.quantity,p.gross_value,(p.gross_value/p.quantity) as avg_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on d.id = p.depot and str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  where r.id = '" . $region -> id . "' order by depot_name,dpn asc ";
+			$sql = "select (case when d.Deleted ='1' then concat(depot_name,' (Closed)') else case when d.Deleted = '0' then depot_name end  end) as depot_name , r.region_name , p.dpn,p.date,(p.quantity+p.free_farmer_quantity) as quantity,(p.gross_value+p.free_farmer_value) as gross_value,(p.gross_value/p.quantity) as avg_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on p.batch_status = '2' and d.id = p.depot and str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  where r.id = '" . $region -> id . "' order by depot_name,dpn asc ";
 			$query = $this -> db -> query($sql);
 			foreach ($query->result_array() as $depot_data) {
 				//(empty($disbursement['unit_price']) ? '-' : number_format($disbursement['unit_price'] + 0))
@@ -99,7 +99,7 @@ class Buying_Center_Purchases extends MY_Controller {
 			$data_buffer .= "Zone: \t" . $region -> Region_Name . "\t\n";
 			$data_buffer .= $this -> echoExcelTitles();
 			//Get data for each zone
-			$sql = "select (case when d.Deleted ='1' then concat(depot_name,' (Closed)') else case when d.Deleted = '0' then depot_name end  end) as depot_name , r.region_name , p.dpn,p.date,p.quantity,p.gross_value,(p.gross_value/p.quantity) as avg_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on d.id = p.depot and str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  where r.id = '" . $region -> id . "' order by depot_name,dpn asc ";
+			$sql = "select (case when d.Deleted ='1' then concat(depot_name,' (Closed)') else case when d.Deleted = '0' then depot_name end  end) as depot_name , r.region_name , p.dpn,p.date,(p.quantity+p.free_farmer_quantity) as quantity,(p.gross_value+p.free_farmer_value) as gross_value,(p.gross_value/p.quantity) as avg_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on d.id = p.depot and str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  where r.id = '" . $region -> id . "' order by depot_name,dpn asc ";
 			$query = $this -> db -> query($sql);
 			foreach ($query->result_array() as $depot_data) {
 				$data_buffer .= $depot_data['depot_name'] . "\t" . $depot_data['dpn'] . "\t" . $depot_data['quantity'] . "\t" . $depot_data['gross_value'] . "\t" . $depot_data['avg_price'] . "\t\n";

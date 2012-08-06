@@ -42,11 +42,11 @@
 		<tr>
 			<th>DPN No.</th>
 			<th>Date</th>
+			<th>Depot</th>
 			<th>FBG</th>
-			<th>Buyer</th>
-			<th>Quantity</th>
-			<th>Unit Price</th>
-			<th>Cash Paid</th>
+			<th>FBG Gross</th>
+			<th>FBG Net</th>
+			<th>Free Farmer Value</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -70,19 +70,19 @@ $class = "odd";
 		<?php echo $purchase -> Date;?>
 		</td>
 		<td>
+		<?php echo $purchase -> Depot_Object->Depot_Name;?>
+		</td>
+		<td>
 		<?php echo $purchase -> FBG_Object->Group_Name;?>
 		</td>
 		<td>
-		<?php echo $purchase -> Buyer_Object->Name;?>
-		</td>
-		<td>
-		<?php echo $purchase -> Quantity;?>
-		</td>
-				<td>
-		<?php echo $purchase -> Unit_Price;?>
+		<?php echo $purchase -> Gross_Value;?>
 		</td>
 		<td>
 		<?php echo $purchase -> Net_Value;?>
+		</td>
+		<td>
+		<?php echo $purchase -> Free_Farmer_Value;?>
 		</td>
 		<td><?php if($purchase->Batch_Status == 0){?><a href="<?php echo base_url()."purchase_management/edit_purchase/".$purchase->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" purchase = "<?php echo $purchase -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><?php } else {echo "Closed/Posted Transaction";}?></td>
 		</tr>

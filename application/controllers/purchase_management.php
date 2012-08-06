@@ -36,7 +36,7 @@ class Purchase_Management extends MY_Controller {
 		if ($depot_object -> Deleted == '2') {
 			$data['depot'] = $depot_object;
 			$data['content_view'] = "chief_accountant_authorization_v";
-			$data['request_url'] = "purchase_management/authorize_purchase/".$depot;
+			$data['request_url'] = "purchase_management/authorize_purchase/" . $depot;
 			$data['message'] = "This Buying Center is marked as closed";
 			$data['quick_link'] = "new_purchase";
 			$data['scripts'] = array("validationEngine-en.js", "validator.js", "jquery.ui.autocomplete.js");
@@ -53,7 +53,7 @@ class Purchase_Management extends MY_Controller {
 		$depot_object = Depot::getDepot($depot);
 		$data['depot'] = $depot_object;
 		$data['content_view'] = "chief_accountant_authorization_v";
-		$data['request_url'] = "purchase_management/authorize_purchase/".$depot;
+		$data['request_url'] = "purchase_management/authorize_purchase/" . $depot;
 		$data['message'] = "Authorization Failed. This could be caused by, Invalid credentials, wrong access level or the user has been disabled. Consult your Administrator and try again!";
 		$data['quick_link'] = "new_purchase";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js", "jquery.ui.autocomplete.js");
@@ -74,11 +74,11 @@ class Purchase_Management extends MY_Controller {
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {
-			$this->search_depot();
+			$this -> search_depot();
 		}
 		$data['batch_information'] = "You are entering records into batch number: <b>" . $this -> session -> userdata('purchases_batch') . "</b>";
 		$depot_object = $data['depot'];
-		$depot_zone =  $depot_object->Village_Object->Ward_Object->Region_Object->id;
+		$depot_zone = $depot_object -> Village_Object -> Ward_Object -> Region_Object -> id;
 		$data['prices'] = Cotton_Price::getCottonPrices($depot_zone);
 		$data['content_view'] = "add_purchase_v";
 		$data['quick_link'] = "new_purchase";
@@ -103,7 +103,7 @@ class Purchase_Management extends MY_Controller {
 
 	public function edit_purchase($id) {
 		$purchase = Purchase::getPurchase($id);
-		$data['depot'] = $purchase->Depot_Object;
+		$data['depot'] = $purchase -> Depot_Object;
 		$fbg = $purchase -> FBG;
 		$recipient = FBG::getFbg($fbg);
 		$data['disbursements'] = Disbursement::getFBGDisbursements($fbg);
@@ -121,8 +121,11 @@ class Purchase_Management extends MY_Controller {
 			$date = $this -> input -> post("date");
 			$quantity = $this -> input -> post("quantity");
 			$total_value = $this -> input -> post("purchased_value");
+			$free_farmer_quantity = $this -> input -> post("free_farmer");
+			$free_farmer_value = $this -> input -> post("free_farmer_value");
 			$season = $this -> input -> post("season");
 			$fbg = $this -> input -> post("fbg_id");
+			$fbg_name = $this -> input -> post("fbg");
 			$depot = $this -> input -> post("depot");
 			$loan_recovery = $this -> input -> post("loan_recovery");
 			$farmer_registration = $this -> input -> post("farmer_registration");
@@ -131,12 +134,21 @@ class Purchase_Management extends MY_Controller {
 			$net_value = $this -> input -> post("net_value");
 			$price = $this -> input -> post("price");
 			$batch = $this -> session -> userdata('purchases_batch');
-
+			 
+			//If the user has deleted the fbg name, reset all the fbg variables 
+			if ($fbg_name == '') {
+				$fbg = '';
+				$loan_recovery = 0;
+				$farmer_registration = 0;
+				$other_recoveries = 0;
+				$quantity = 0;
+				$total_value = 0;
+			}
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$log -> Log_Type = "2";
 				$purchase = Purchase::getPurchase($editing);
-				$message = "Edited Purchase Record From {FGB: '" . $purchase -> FBG_Object -> Group_Name . "' DPN: '" . $purchase -> DPN . "' Date: '" . $purchase -> Date . "' $purchase: '" . $purchase -> Depot_Object -> Depot_Name . "' Quantity: '" . $purchase -> Quantity . "' Unit Price: '" . $purchase -> Unit_Price . "' Season: '" . $purchase -> Season . "' Loan Recovery: '" . $purchase -> Loan_Recovery . "' Farmer Registration Fee: '" . $purchase -> Farmer_Reg_Fee . "' Other Recoveries: '" . $purchase -> Other_Recoveries . "' Buyer: '" . $purchase -> Buyer_Object -> Name . "' Net_Value: '" . $purchase -> Net_Value . "' Gross_Value: '" . $purchase -> Gross_Value . "'} to ";
+				$message = "Edited Purchase Record From {FGB: '" . $purchase -> FBG_Object -> Group_Name . "' DPN: '" . $purchase -> DPN . "' Date: '" . $purchase -> Date . "' $purchase: '" . $purchase -> Depot_Object -> Depot_Name . "' FBG Quantity: '" . $purchase -> Quantity . "'Free Farmer Quantity: '" . $purchase -> Free_Farmer_Quantity . "' Unit Price: '" . $purchase -> Unit_Price . "' Season: '" . $purchase -> Season . "' Loan Recovery: '" . $purchase -> Loan_Recovery . "' Farmer Registration Fee: '" . $purchase -> Farmer_Reg_Fee . "' Other Recoveries: '" . $purchase -> Other_Recoveries . "' Buyer: '" . $purchase -> Buyer_Object -> Name . "' Net_Value: '" . $purchase -> Net_Value . "' Gross_Value: '" . $purchase -> Gross_Value . "' Free Farmer Total Value: '" . $purchase -> Free_Farmer_Value . "' } to ";
 			} else {
 				$log -> Log_Type = "1";
 				$purchase = new Purchase();
@@ -148,6 +160,8 @@ class Purchase_Management extends MY_Controller {
 			$purchase -> Date = $date;
 			$purchase -> Depot = $depot;
 			$purchase -> Quantity = $quantity;
+			$purchase -> Free_Farmer_Quantity = $free_farmer_quantity;
+			$purchase -> Free_Farmer_Value = $free_farmer_value;
 			$purchase -> Unit_Price = $price;
 			$purchase -> Gross_Value = $total_value;
 			$purchase -> Net_Value = $net_value;
@@ -160,7 +174,7 @@ class Purchase_Management extends MY_Controller {
 			$purchase -> Timestamp = date('U');
 			$purchase -> save();
 			$purchase = Purchase::getPurchase($purchase -> id);
-			$message .= "{FGB: '" . $purchase -> FBG_Object -> Group_Name . "' DPN: '" . $purchase -> DPN . "' Date: '" . $purchase -> Date . "' $purchase: '" . $purchase -> Depot_Object -> Depot_Name . "' Quantity: '" . $purchase -> Quantity . "' Unit Price: '" . $purchase -> Unit_Price . "' Season: '" . $purchase -> Season . "' Loan Recovery: '" . $purchase -> Loan_Recovery . "' Farmer Registration Fee: '" . $purchase -> Farmer_Reg_Fee . "' Other Recoveries: '" . $purchase -> Other_Recoveries . "' Buyer: '" . $purchase -> Buyer_Object -> Name . "' Net_Value: '" . $purchase -> Net_Value . "' Gross_Value: '" . $purchase -> Gross_Value . "'}";
+			$message .= "{FGB: '" . $purchase -> FBG_Object -> Group_Name . "' DPN: '" . $purchase -> DPN . "' Date: '" . $purchase -> Date . "' $purchase: '" . $purchase -> Depot_Object -> Depot_Name . "' FBG Quantity: '" . $purchase -> Quantity . "'Free Farmer Quantity: '" . $purchase -> Free_Farmer_Quantity . "' Unit Price: '" . $purchase -> Unit_Price . "' Season: '" . $purchase -> Season . "' Loan Recovery: '" . $purchase -> Loan_Recovery . "' Farmer Registration Fee: '" . $purchase -> Farmer_Reg_Fee . "' Other Recoveries: '" . $purchase -> Other_Recoveries . "' Buyer: '" . $purchase -> Buyer_Object -> Name . "' Net_Value: '" . $purchase -> Net_Value . "' Gross_Value: '" . $purchase -> Gross_Value . "' Free Farmer Total Value: '" . $purchase -> Free_Farmer_Value . "'}";
 			$log -> Log_Message = $message;
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
@@ -186,7 +200,7 @@ class Purchase_Management extends MY_Controller {
 		$purchase -> delete();
 		$log = new System_Log();
 		$log -> Log_Type = "3";
-		$log -> Log_Message = "Deleted Purchase Record {FGB: '" . $purchase -> FBG_Object -> Group_Name . "' DPN: '" . $purchase -> DPN . "' Date: '" . $purchase -> Date . "' $purchase: '" . $purchase -> Depot_Object -> Depot_Name . "' Quantity: '" . $purchase -> Quantity . "' Unit Price: '" . $purchase -> Unit_Price . "' Season: '" . $purchase -> Season . "' Loan Recovery: '" . $purchase -> Loan_Recovery . "' Farmer Registration Fee: '" . $purchase -> Farmer_Reg_Fee . "' Other Recoveries: '" . $purchase -> Other_Recoveries . "' Buyer: '" . $purchase -> Buyer_Object -> Name . "' Net_Value: '" . $purchase -> Net_Value . "' Gross_Value: '" . $purchase -> Gross_Value . "'}";
+		$log -> Log_Message = "Deleted Purchase Record {FGB: '" . $purchase -> FBG_Object -> Group_Name . "' DPN: '" . $purchase -> DPN . "' Date: '" . $purchase -> Date . "' $purchase: '" . $purchase -> Depot_Object -> Depot_Name . "' FBG Quantity: '" . $purchase -> Quantity . "'Free Farmer Quantity: '" . $purchase -> Free_Farmer_Quantity . "' Unit Price: '" . $purchase -> Unit_Price . "' Season: '" . $purchase -> Season . "' Loan Recovery: '" . $purchase -> Loan_Recovery . "' Farmer Registration Fee: '" . $purchase -> Farmer_Reg_Fee . "' Other Recoveries: '" . $purchase -> Other_Recoveries . "' Buyer: '" . $purchase -> Buyer_Object -> Name . "' Net_Value: '" . $purchase -> Net_Value . "' Gross_Value: '" . $purchase -> Gross_Value . "' Free Farmer Total Value: '" . $purchase -> Free_Farmer_Value . "'}";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();

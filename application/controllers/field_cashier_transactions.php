@@ -23,7 +23,6 @@ class Field_Cashier_Transactions extends MY_Controller {
 
 	public function download() {
 		$this -> load -> database();
-
 		$valid = true;
 		if ($valid) {
 			$data_buffer = "

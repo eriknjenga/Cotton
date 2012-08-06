@@ -71,7 +71,7 @@ class Batch_Management extends MY_Controller {
 			$data['content_view'] = "list_supervisor_batches_v";
 		} else if ($user_indicator == "inputs_supervisor") {
 			$data['content_view'] = "list_supervisor_batches_v";
-		} else { 
+		} else {
 			$number_of_batches = Transaction_Batch::getTotalBatches($user);
 			$batches = Transaction_Batch::getPagedBatches($offset, $items_per_page, $user);
 			$data['content_view'] = "list_batches_v";
@@ -271,7 +271,7 @@ class Batch_Management extends MY_Controller {
 			$log -> Timestamp = date('U');
 			$log -> save();
 			//Open the batch
-			$this->enter_batch($transaction_batch->id);
+			$this -> enter_batch($transaction_batch -> id);
 			redirect("batch_management/listing");
 		} else {
 			$this -> new_batch();
@@ -345,9 +345,23 @@ class Batch_Management extends MY_Controller {
 	public function print_batch($batch_id) {
 		$batch = Transaction_Batch::getBatch($batch_id);
 		$transaction_type = $batch -> Transaction_Type_Object -> Indicator;
-		$data_buffer = "";
 		$report_footer = "";
+		$total_transactions = 0;
 		//echo the start of the table
+		$data_buffer = "
+			<style>
+			table.data-table {
+			table-layout: fixed;
+			width: 1000px;
+			}
+			table.data-table td {
+			width: 80px;
+			}
+			.amount{
+				text-align:right;
+			}
+			</style>
+			";
 		$data_buffer .= "<table class='data-table'>";
 
 		//If they are input disbursements
@@ -356,10 +370,11 @@ class Batch_Management extends MY_Controller {
 			$disbursements = Disbursement::getBatchDisbursements($batch_id);
 			$data_buffer .= "<tr><th>FGB</th><th>Invoice</th><th>Date</th><th>Farm Input</th><th>Quantity</th><th>Total Value</th><th>Agent</th><th>Timestamp</th></tr>";
 			foreach ($disbursements as $disbursement) {
-				$data_buffer .= "<tr><td>" . $disbursement -> FBG_Object -> Group_Name . "</td><td>" . $disbursement -> Invoice_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td>" . number_format($disbursement -> Quantity+0) . "</td><td>" . number_format($disbursement -> Total_Value+0) . "</td> <td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
+				$total_transactions++;
+				$data_buffer .= "<tr><td>" . $disbursement -> FBG_Object -> Group_Name . "</td><td>" . $disbursement -> Invoice_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td class='amount'>" . number_format($disbursement -> Quantity + 0) . "</td><td class='amount'>" . number_format($disbursement -> Total_Value + 0) . "</td> <td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
 				$total_inputs_value += $disbursement -> Total_Value;
 			}
-			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($total_inputs_value+0) . "</b></td><td>-</td><td>-</td></tr>";
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;' class='amount'><b>" . number_format($total_inputs_value + 0) . "</b></td><td>-</td><td>-</td></tr>";
 		}
 		if ($transaction_type == "purchases") {
 			$batch_gross_total = 0;
@@ -368,109 +383,117 @@ class Batch_Management extends MY_Controller {
 			$other_recovery_total = 0;
 			$loan_recovery_total = 0;
 			$quantity_total = 0;
+			$batch_free_farmer_quantity = 0;
+			$batch_free_farmer_value = 0;
 			$purchases = Purchase::getBatchPurchases($batch_id);
-			$data_buffer .= "<tr><th>FGB</th><th>DPN</th><th>Date</th><th>Buying Center</th><th>Quantity</th><th>Unit Price</th><th>Loan Recovery</th><th>Farmer Reg. Fee</th><th>Other Recoveries</th><th>Buyer</th><th>Gross Value</th><th>Net Value</th></tr>";
+			$data_buffer .= "<tr><th>FGB</th><th>DPN</th><th>Date</th><th>Buying Center</th><th>Quantity</th><th>Unit Price</th><th>Loan Recovery</th><th>Farmer Reg. Fee</th><th>Other Recoveries</th><th>Buyer</th><th>Gross Value</th><th>Net Value</th><th>Free Farmer Quantity</th><th>Free Farmer Value</th></tr>";
 			foreach ($purchases as $purchase) {
-				$data_buffer .= "<tr><td>" . $purchase -> FBG_Object -> Group_Name . "</td><td>" . $purchase -> DPN . "</td><td>" . $purchase -> Date . "</td><td>" . $purchase -> Depot_Object -> Depot_Name . "</td><td>" . number_format($purchase -> Quantity+0) . "</td><td>" . number_format($purchase -> Unit_Price+0) . "</td><td>" . number_format($purchase -> Loan_Recovery) . "</td><td>" . number_format($purchase -> Farmer_Reg_Fee) . "</td><td>" . number_format($purchase -> Other_Recoveries) . "</td><td>" . $purchase -> Buyer_Object -> Name . "</td><td>" . number_format($purchase -> Gross_Value+0) . "</td><td>" . number_format($purchase -> Net_Value+0) . "</td></tr>";
+				$total_transactions++;
+				$data_buffer .= "<tr><td>" . $purchase -> FBG_Object -> Group_Name . "</td><td>" . $purchase -> DPN . "</td><td>" . $purchase -> Date . "</td><td>" . $purchase -> Depot_Object -> Depot_Name . "</td><td class='amount'>" . number_format($purchase -> Quantity + 0) . "</td><td class='amount'>" . number_format($purchase -> Unit_Price + 0) . "</td><td class='amount'>" . number_format($purchase -> Loan_Recovery) . "</td><td class='amount'>" . number_format($purchase -> Farmer_Reg_Fee) . "</td><td class='amount'>" . number_format($purchase -> Other_Recoveries) . "</td><td>" . $purchase -> Buyer_Object -> Name . "</td><td class='amount'>" . number_format($purchase -> Gross_Value + 0) . "</td><td class='amount'>" . number_format($purchase -> Net_Value + 0) . "</td><td class='amount'>" . number_format($purchase -> Free_Farmer_Quantity + 0) . "</td><td class='amount'>" . number_format($purchase -> Free_Farmer_Value + 0) . "</td></tr>";
 				$batch_gross_total += $purchase -> Gross_Value;
 				$batch_net_total += $purchase -> Net_Value;
 				$farmer_reg_total += $purchase -> Farmer_Reg_Fee;
 				$other_recovery_total += $purchase -> Other_Recoveries;
 				$loan_recovery_total += $purchase -> Loan_Recovery;
 				$quantity_total += $purchase -> Quantity;
+				$batch_free_farmer_quantity +=  $purchase -> Free_Farmer_Quantity;
+				$batch_free_farmer_value +=  $purchase -> Free_Farmer_Value;
 			}
-			$data_buffer .= "<tr><td><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($quantity_total) . "</b></td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($loan_recovery_total) . "</b></td><td style='border-top:2px solid black;'><b>" . number_format($farmer_reg_total) . "</b></td><td style='border-top:2px solid black;'><b>" . number_format($other_recovery_total) . "</b></td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($batch_gross_total) . "</b></td><td style='border-top:2px solid black;'><b>" . number_format($batch_net_total) . "</b></td></tr>";
+			$data_buffer .= "<tr><td><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;' class='amount'><b>" . number_format($quantity_total) . "</b></td><td>-</td><td style='border-top:2px solid black;' class='amount'><b>" . number_format($loan_recovery_total) . "</b></td><td style='border-top:2px solid black;' class='amount'><b>" . number_format($farmer_reg_total) . "</b></td><td style='border-top:2px solid black;' class='amount'><b>" . number_format($other_recovery_total) . "</b></td><td>-</td><td style='border-top:2px solid black;' class='amount'><b>" . number_format($batch_gross_total) . "</b></td><td style='border-top:2px solid black;' class='amount'><b>" . number_format($batch_net_total) . "</b></td><td style='border-top:2px solid black;' class='amount'><b>" . number_format($batch_free_farmer_quantity) . "</b></td><td style='border-top:2px solid black;' class='amount'><b>" . number_format($batch_free_farmer_value) . "</b></td></tr>";
 		}
 		if ($transaction_type == "agent_input_disbursements") {
 			$total_inputs_value = 0;
 			$disbursements = Agent_Input_Issue::getBatchDisbursements($batch_id);
 			$data_buffer .= "<tr><th>Agent</th><th>Delivery Note Number</th><th>Date</th><th>Farm Input</th><th>Quantity</th><th>Total Value</th><th>Timestamp</th></tr>";
 			foreach ($disbursements as $disbursement) {
-				$data_buffer .= "<tr><td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . $disbursement -> Delivery_Note_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td>" . number_format($disbursement -> Quantity+0) . "</td><td>" . number_format($disbursement -> Total_Value+0) . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
+				$total_transactions++;
+				$data_buffer .= "<tr><td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . $disbursement -> Delivery_Note_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td class='amount>" . number_format($disbursement -> Quantity + 0) . "</td><td class='amount>" . number_format($disbursement -> Total_Value + 0) . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
 				$total_inputs_value += $disbursement -> Total_Value;
 			}
-			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($total_inputs_value+0) . "</b></td><td>-</td></tr>";
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;' class='amount><b>" . number_format($total_inputs_value + 0) . "</b></td><td>-</td></tr>";
 		}
 		if ($transaction_type == "buying_center_receipts") {
 			$total_receipts_value = 0;
 			$receipts = Buying_Center_Receipt::getBatchReceipts($batch_id);
 			$data_buffer .= "<tr><th>Buying Center</th><th>Receipt Number</th><th>Date</th><th>Amount</th><th>Timestamp</th></tr>";
 			foreach ($receipts as $receipt) {
-				$data_buffer .= "<tr><td>" . $receipt -> Depot_Object -> Depot_Name . "</td><td>" . $receipt -> Receipt_Number . "</td><td>" . $receipt -> Date . "</td><td>" . number_format($receipt -> Amount+0) . "</td><td>" . date("d/m/Y H:i:s", $receipt -> Timestamp) . "</td></tr>";
+				$total_transactions++;
+				$data_buffer .= "<tr><td>" . $receipt -> Depot_Object -> Depot_Name . "</td><td>" . $receipt -> Receipt_Number . "</td><td>" . $receipt -> Date . "</td><td class='amount>" . number_format($receipt -> Amount + 0) . "</td><td>" . date("d/m/Y H:i:s", $receipt -> Timestamp) . "</td></tr>";
 				$total_receipts_value += $receipt -> Amount;
 			}
-			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($total_receipts_value+0) . "</b></td><td>-</td></tr>";
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;' class='amount><b>" . number_format($total_receipts_value + 0) . "</b></td><td>-</td></tr>";
 		}
 		if ($transaction_type == "cash_receipts") {
 			$total_receipts_value = 0;
 			$receipts = Cash_Receipt::getBatchReceipts($batch_id);
 			$data_buffer .= "<tr><th>Field Cashier</th><th>Receipt Number</th><th>Date</th><th>Amount</th><th>Timestamp</th></tr>";
 			foreach ($receipts as $receipt) {
-				$data_buffer .= "<tr><td>" . $receipt -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $receipt -> Receipt_Number . "</td><td>" . $receipt -> Date . "</td><td>" . number_format($receipt -> Amount+0) . "</td><td>" . date("d/m/Y H:i:s", $receipt -> Timestamp) . "</td></tr>";
+				$total_transactions++;
+				$data_buffer .= "<tr><td>" . $receipt -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $receipt -> Receipt_Number . "</td><td>" . $receipt -> Date . "</td><td class='amount>" . number_format($receipt -> Amount + 0) . "</td><td>" . date("d/m/Y H:i:s", $receipt -> Timestamp) . "</td></tr>";
 				$total_receipts_value += $receipt -> Amount;
 			}
-			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($total_receipts_value+0) . "</b></td><td>-</td></tr>";
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;' class='amount><b>" . number_format($total_receipts_value + 0) . "</b></td><td>-</td></tr>";
 		}
 		if ($transaction_type == "cihc") {
 			$total_disbursements_value = 0;
 			$disbursements = Cash_Disbursement::getBatchDisbursements($batch_id);
 			$data_buffer .= "<tr><th>Field Cashier</th><th>CIH(c) Number</th><th>Date</th><th>Amount</th></tr>";
 			foreach ($disbursements as $disbursement) {
-				$data_buffer .= "<tr><td>" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $disbursement -> CIH . "</td><td>" . $disbursement -> Date . "</td><td>" . number_format($disbursement -> Amount+0) . "</td></tr>";
+				$total_transactions++;
+				$data_buffer .= "<tr><td>" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $disbursement -> CIH . "</td><td>" . $disbursement -> Date . "</td><td class='amount>" . number_format($disbursement -> Amount + 0) . "</td></tr>";
 				$total_disbursements_value += $disbursement -> Amount;
 			}
-			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($total_disbursements_value) . "</b></td></tr>";
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;' class='amount><b>" . number_format($total_disbursements_value) . "</b></td></tr>";
 		}
 		if ($transaction_type == "cihb") {
 			$total_disbursements_value = 0;
 			$disbursements = Field_Cash_Disbursement::getBatchDisbursements($batch_id);
 			$data_buffer .= "<tr><th>Buying Center</th><th>Field Cashier</th><th>CIH(b)</th><th>Receipt</th><th>Date</th><th>Amount</th><th>Details</th></tr>";
 			foreach ($disbursements as $disbursement) {
-				$data_buffer .= "<tr><td>" . $disbursement -> Depot_Object -> Depot_Name . "</td><td>" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $disbursement -> CIH . "</td><td>" . $disbursement -> Receipt . "</td><td>" . $disbursement -> Date . "</td><td>" . number_format($disbursement -> Amount+0) . "</td><td>" . $disbursement -> Details . "</td></tr>";
+				$total_transactions++;
+				$data_buffer .= "<tr><td>" . $disbursement -> Depot_Object -> Depot_Name . "</td><td>" . $disbursement -> Field_Cashier_Object -> Field_Cashier_Name . "</td><td>" . $disbursement -> CIH . "</td><td>" . $disbursement -> Receipt . "</td><td>" . $disbursement -> Date . "</td><td class='amount>" . number_format($disbursement -> Amount + 0) . "</td><td>" . $disbursement -> Details . "</td></tr>";
 				$total_disbursements_value += $disbursement -> Amount;
 			}
-			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($total_disbursements_value+0) . "</b></td><td>-</td></tr>";
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;' class='amount><b>" . number_format($total_disbursements_value + 0) . "</b></td><td>-</td></tr>";
 		}
 		if ($transaction_type == "input_transfers") {
 			$total_inputs_value = 0;
 			$disbursements = Region_Input_Issue::getBatchDisbursements($batch_id);
 			$data_buffer .= "<tr><th>Zone</th><th>Agent</th><th>Delivery Note Number</th><th>Date</th><th>Farm Input</th><th>Quantity</th><th>Total Value</th><th>Timestamp</th></tr>";
 			foreach ($disbursements as $disbursement) {
-				$data_buffer .= "<tr><td>" . $disbursement -> Region_Object -> Region_Name . "</td><td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . $disbursement -> Delivery_Note_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td>" . number_format($disbursement -> Quantity+0) . "</td><td>" . number_format($disbursement -> Total_Value+0) . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
+				$total_transactions++;
+				$data_buffer .= "<tr><td>" . $disbursement -> Region_Object -> Region_Name . "</td><td>" . $disbursement -> Agent_Object -> First_Name . " " . $disbursement -> Agent_Object -> Surname . "</td><td>" . $disbursement -> Delivery_Note_Number . "</td><td>" . $disbursement -> Date . "</td><td>" . $disbursement -> Farm_Input_Object -> Product_Name . "</td><td class='amount>" . number_format($disbursement -> Quantity + 0) . "</td><td class='amount>" . number_format($disbursement -> Total_Value + 0) . "</td><td>" . date("d/m/Y H:i:s", $disbursement -> Timestamp) . "</td></tr>";
 				$total_inputs_value += $disbursement -> Total_Value;
 			}
-			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($total_inputs_value+0) . "</b></td><td>-</td></tr>";
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style='border-top:2px solid black;' class='amount><b>" . number_format($total_inputs_value + 0) . "</b></td><td>-</td></tr>";
 		}
 		if ($transaction_type == "mopping_payments") {
 			$total_amount = 0;
 			$payments = Mopping_Payment::getBatchPayments($batch_id);
 			$data_buffer .= "<tr><th>Voucher Number</th><th>Buying Center</th><th>Date</th><th>Amount</th></tr>";
 			foreach ($payments as $payment) {
-				$data_buffer .= "<tr><td>" . $payment -> Voucher_Number . "</td><td>" . $payment -> Depot_Object -> Depot_Name . "</td><td> " . $payment -> Date . "</td><td>" . number_format($payment -> Amount+0) . "</td></tr>";
+				$total_transactions++;
+				$data_buffer .= "<tr><td>" . $payment -> Voucher_Number . "</td><td>" . $payment -> Depot_Object -> Depot_Name . "</td><td> " . $payment -> Date . "</td><td class='amount>" . number_format($payment -> Amount + 0) . "</td></tr>";
 				$total_amount += $payment -> Amount;
 			}
-			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;'><b>" . number_format($total_amount+0) . "</b></td></tr>";
+			$data_buffer .= "<tr><td><span><b>Totals: </b></td><td>-</td><td>-</td><td style='border-top:2px solid black;' class='amount><b>" . number_format($total_amount + 0) . "</b></td></tr>";
 		}
 		$data_buffer .= "</table>";
 		//echo $data_buffer;
-		$this -> generatePDF($data_buffer, $batch);
+		$this -> generatePDF($data_buffer, $batch,$total_transactions);
 
 	}
 
-	function generatePDF($data, $batch) {
+	function generatePDF($data, $batch,$total_transactions=0) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
-		$html_title .= "<h2 style='text-align:center; text-decoration:underline;'>Alliance Ginneries</h2>";
-		$html_title .= "<h1 style='text-align:center; text-decoration:underline;'>Batch Details (" . $batch -> Transaction_Type_Object -> Name . "," . $batch -> id . ") </h1>";
-		$html_title .= "<h3 style='text-align:center;'> entered by: " . $batch -> User_Object -> Name . "</h3>";
+		$html_title .= "<h3 style='text-align:center; text-decoration:underline;'>Batch Details (" . $batch -> Transaction_Type_Object -> Name . "," . $batch -> id . ") </h3>";
+		$html_title .= "<h5 style='text-align:center;'> entered by: " . $batch -> User_Object -> Name . " (".$total_transactions." transactions)</h5>";
 
 		$this -> load -> library('mpdf');
-		$this -> mpdf = new mPDF('', 'A4-L', 0, '', 15, 15, 16, 16, 9, 9, '');
-		$this -> mpdf -> SetTitle('Regional Summaries');
+		$this -> mpdf = new mPDF('c', 'A4-L');
+		$this -> mpdf -> SetTitle('Transaction Batch');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
-		$this -> mpdf -> WriteHTML('<br/>');
-		$this -> mpdf -> WriteHTML('<br/>');
-		$this -> mpdf -> WriteHTML('<br/>');
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "Batch Details.pdf";

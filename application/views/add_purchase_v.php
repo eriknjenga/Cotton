@@ -17,7 +17,18 @@
 	</style>
 <script type="text/javascript">
 					$(function() {
-		$("#purchase_form").validationEngine();
+	$(".submit").click(function(){ 
+			var free_totals = checkFreeTotals();
+			var fbg_totals = checkFbgTotals();
+			if(free_totals == true && fbg_totals == true){
+				$("#purchase_form").validationEngine(); 
+			}
+			else{
+				return false;
+			}
+			
+		});
+		
 		$("#fbg").autocomplete({
 			source : "<?php echo base_url();?>fbg_management/autocomplete_fbg",
 				minLength : 1,
@@ -33,6 +44,11 @@
 				changeMonth : true
 				});
 				$("#quantity").keyup(function() {
+				var date_object = $("#date");
+				updateCottonPrice(date_object);
+				updateNetCalculations();
+				});
+				$("#purchased_value").keyup(function() {
 				var date_object = $("#date");
 				updateCottonPrice(date_object);
 				updateNetCalculations();
@@ -62,8 +78,56 @@
 				var gross_total = $("#purchased_value").attr("value");
 				var total_deductions = parseInt($("#loan_recovery").attr("value")) + parseInt($("#farmer_registration").attr("value")) + parseInt($("#other_recoveries").attr("value"));
 				$("#total_deductions").attr("value", total_deductions);
+				if(parseInt(gross_total) != '') {
 				$("#net_value").attr("value", parseInt(gross_total) - parseInt(total_deductions));
-
+				//$("#purchased_value").attr("value", total_value);
+				}
+				}
+				function checkFreeTotals() {
+				var quantity = $("#free_farmer").attr("value");
+				var unit_price = $("#price").attr("value");
+				var total_value = $("#free_farmer_value").attr("value");
+				//Check if there are actual values in these variables
+				if(parseInt(quantity)% 1 === 0 && parseInt(unit_price) % 1 === 0 &&parseInt(total_value)% 1 === 0) {
+					$theoretical_total = quantity*unit_price;
+					if($theoretical_total != total_value){ 
+						$("#free_discrepancy_message").html("The wrong quantity or total value was indicated for the free farmer section");
+						$("#free_discrepancy_container").slideDown("slow");
+						return false;
+					}
+					else{
+						$("#free_discrepancy_container").slideUp("slow");
+						return true;
+					}
+				}
+				else{
+					$("#free_discrepancy_message").html("Confirm the transaction date to pick the correct unit price");
+					$("#free_discrepancy_container").slideDown("slow");
+					return false;
+				}
+				}
+				function checkFbgTotals() {
+				var quantity = $("#quantity").attr("value");
+				var unit_price = $("#price").attr("value");
+				var total_value = $("#purchased_value").attr("value");
+				//Check if there are actual values in these variables
+				if(parseInt(quantity)% 1 === 0 && parseInt(unit_price) % 1 === 0 &&parseInt(total_value)% 1 === 0) {
+					$theoretical_total = quantity*unit_price;
+					if($theoretical_total != total_value){
+						$("#fbg_discrepancy_message").html("The wrong quantity or total value was indicated for the fbg section");
+						$("#fbg_discrepancy_container").slideDown("slow");
+						return false;
+					}
+					else{
+						$("#fbg_discrepancy_container").slideUp("slow");
+						return true;
+					}
+				}
+				else{ 
+					$("#fbg_discrepancy_message").html("Confirm the transaction date to pick the correct unit price");
+					$("#fbg_discrepancy_container").slideDown("slow");
+					return false;
+				}
 				}
 
 				function updateCottonPrice(date_object) {
@@ -92,18 +156,29 @@
 				});
 				$("#price").attr("value", most_current_price);
 				//Clear out the 'total value' field
-				$("#purchased_value").attr("value", "");
+				//$("#purchased_value").attr("value", "");
 				var quantity = $("#quantity").attr("value");
 				var total_value = 0;
 				if(parseInt(quantity) != 0 && parseInt(most_current_price) > 0) {
 				total_value = quantity * most_current_price;
-				$("#purchased_value").attr("value", total_value);
+				//$("#purchased_value").attr("value", total_value);
 				}
 				else if(parseInt(quantity) == 0){
 					$("#purchased_value").attr("value", 0);
 				}
 				}
 </script>
+<style>
+	.dps_details{
+		width: 42%;
+		float:left;
+		margin:5px;
+	} 
+	.details_panel{
+		width: 100%; 
+		overflow: hidden;
+	}
+</style>
 <?php
 if (isset($purchase)) {
 	$depot = $purchase -> Depot_Object;
@@ -123,6 +198,8 @@ if (isset($purchase)) {
 	$buyer_id = $purchase -> Buyer;
 	$buyer = $purchase -> Buyer_Object -> Name;
 	$batch = $purchase -> Batch;
+	$free_farmer = $purchase -> Free_Farmer_Quantity;
+	$free_farmer_value = $purchase -> Free_Farmer_Value;
 
 } else {
 	$fbg = "";
@@ -141,6 +218,8 @@ if (isset($purchase)) {
 	$buyer = $depot -> Buyer_Object -> Name;
 	$buyer_id = $depot -> Buyer;
 	$batch = "";
+	$free_farmer = "0";
+	$free_farmer_value = "0";
 
 }
 $total_deductions = $loan_recovery + $farmer_registration + $other_recoveries;
@@ -158,6 +237,7 @@ if(isset($batch_information)){
 		<?php echo $batch_information;?>
 	</p>
 </div>
+
 <?php }
 
 ?>
@@ -166,6 +246,7 @@ if(isset($batch_information)){
 <input type="hidden" name="editing_id" value="<?php echo $purchase_id;?>" />
 <input type="hidden" name="depot" value="<?php echo $depot_id;?>" />
 <input type="hidden" name="fbg_id" id="fbg_id" value="<?php echo $fbg;?>" />
+<input name="buyer" id="buyer_id" type="hidden" value="<?php echo $buyer_id;?>" style="width:100px;"/>
 <input type="hidden" id="cotton_prices" prices="<?php
 foreach ($prices as $price_object) {
 	echo $price_object -> Price . ',';
@@ -177,76 +258,106 @@ foreach ($prices as $price_object) {
 }
 ?>" />
 <input type="hidden" value="" id="product_price"/>
-<fieldset>
-	<legend>
-		Recording Purchases For <b><?php echo $depot -> Depot_Name . " (" . $depot -> Village_Object -> Name . ")";?></b>
-	</legend>
-	<p>
+<div class="details_panel">
+<div class="dps_details">
+	<label><b>Buying Center</b></label>
+	<label style="width: auto"><?php echo $depot -> Depot_Name . " (" . $depot -> Village_Object -> Name . ")";?></label>
+	</div>
+	<div class="dps_details">
 		<label><b>Buyer at Site</b> </label>
-		<label><?php echo $depot -> Buyer_Object -> Name . " (" . $depot -> Buyer_Object -> Buyer_Code . ")";?></label>
-	</p>
-</fieldset>
-<p>
-	<label for="fbg">FBG</label>
-	<input id="fbg" name="fbg" type="text" value="<?php echo $fbg_name;?>" />
-	<span class="field_desc">Enter the relevant <b>FBG</b> for this transaction</span>
-</p>
-<p>
+		<label style="width: auto"><?php echo $depot -> Buyer_Object -> Name . " (" . $depot -> Buyer_Object -> Buyer_Code . ")";?></label>
+	</div>
+	</div>
+	<div class="details_panel">
+<div class="dps_details">
+	<p>
 	<label for="dpn">DPN</label>
-	<input id="dpn" name="dpn" type="text" value="<?php echo $dpn;?>" class="dpn validate[required]"/>
-	<span class="field_desc">Enter the <b>DPN</b> for this transaction</span>
+	<input id="dpn" name="dpn" type="text" value="<?php echo $dpn;?>" class="dpn validate[required]"/> 
 </p>
 <p>
+	<label for="season">Season</label>
+	<input class="season validate[required]" name="season" id="season" type="text" value="<?php echo $season;?>"/> 
+</p>
+</div>
+<div class="dps_details">
+	<p>
 	<label for="date">Transaction Date</label>
-	<input class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>"/>
-	<span class="field_desc">Enter the <b>Date</b> for this transaction</span>
-</p>
-
-<p>
-	<label for="quantity">Quantity</label>
-	<input name="quantity" id="quantity"  type="text" value="<?php echo $quantity;?>"/>
-	<span class="field_desc">Enter the <b>Quantity</b> purchased</span>
+	<input class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>"/> 
 </p>
 <p>
 	<label for="price">Unit Price</label>
 	<input readonly="" name="price" id="price"  type="text" value="<?php echo $price;?>" />
-	<span class="field_desc">Enter the <b>price</b> that the produce was purchased for</span>
+	<span class="field_desc">(Dependent on the date)</span>
+</p>
+</div>
+</div>
+
+
+
+<div class="details_panel">
+<fieldset class="dps_details">
+<legend>Free-farmer Purchases</legend>	
+<p>
+	<label for="free_farmer">Total Quantity</label>
+	<input name="free_farmer" id="free_farmer"  type="text" value="<?php echo $free_farmer;?>" class="validate[required,custom[integer]]"/> 
 </p>
 <p>
-	<label for="season">Season</label>
-	<input class="season" name="season" id="season" type="text" value="<?php echo $season;?>"/>
-	<span class="field_desc">Enter the <b>season</b> that the produce was purchased</span>
+	<label for="free_farmer">Total Value</label>
+	<input name="free_farmer_value" id="free_farmer_value"  type="text" value="<?php echo $free_farmer_value;?>" class="validate[required]"/> 
 </p>
+</fieldset>
+<fieldset class="dps_details">
+<legend>FBG Purchases</legend>
+<p>
+	<label for="fbg">FBG</label>
+	<input id="fbg" name="fbg" type="text" value="<?php echo $fbg_name;?>" /> 
+</p>
+<p>
+	<label for="quantity">FBG Quantity</label>
+	<input name="quantity" id="quantity"  type="text" value="<?php echo $quantity;?>" class="validate[required,custom[integer]]"/> 
+</p>	
 <p>
 	<label for="loan_recovery">Loan Recovery</label>
-	<input  class="loan_recovery" name="loan_recovery" id="loan_recovery" type="text" value="<?php echo $loan_recovery;?>"/>
-	<span class="field_desc">Enter the <b>loan recovery</b> amount that was deducted from the total amount payable to the FBG</span>
+	<input name="loan_recovery" id="loan_recovery" type="text" value="<?php echo $loan_recovery;?>" class="loan_recovery validate[required,custom[integer]]"/> 
 </p>
 <p>
-	<label for="farmer_registration">Farmer Registration Fees</label>
-	<input class="farmer_registration" name="farmer_registration" id="farmer_registration" type="text" value="<?php echo $farmer_registration;?>"/>
-	<span class="field_desc">Enter the <b>farmer registration fees</b> that were deducted from the total amount payable to the FBG</span>
+	<label for="farmer_registration">Farmer Reg. Fees</label>
+	<input name="farmer_registration" id="farmer_registration" type="text" value="<?php echo $farmer_registration;?>" class="farmer_registration validate[required,custom[integer]]"/> 
 </p>
 <p>
 	<label for="other_recoveries">Other Recoveries</label>
-	<input class="other_recoveries" name="other_recoveries" id="other_recoveries" type="text" value="<?php echo $other_recoveries;?>"/>
-	<span class="field_desc">Enter any <b>other recoveries</b> that were deducted from the total amount payable to the FBG</span>
+	<input name="other_recoveries" id="other_recoveries" type="text" value="<?php echo $other_recoveries;?>" class="other_recoveries validate[required,custom[integer]]"/> 
 </p>
 <p>
-	<label for="buyer">Buyer: </label>
-	<input readonly="" class="buyer"  id="buyer" type="text" value="<?php echo $buyer;?>" style="width:100px;"/>
-	<input name="buyer" id="buyer_id" type="hidden" value="<?php echo $buyer_id;?>" style="width:100px;"/>
-	<label for="purchased_value">Purchased Value: </label>
-	<input class="purchased_value" name="purchased_value" id="purchased_value" type="text" value="<?php echo $total_value;?>" style="width:100px;"/>
-	<label for="total_deductions">Total Deductions: </label>
-	<input class="total_deductions" name="total_deductions" id="total_deductions" type="text" value="<?php echo $total_deductions;?>" style="width:100px;"/>
-	<label for="net_value">Net Value: </label>
-	<input class="net_value" name="net_value" id="net_value" type="text" value="<?php echo $net_value;?>" style="width:100px;"/>
+	<label for="purchased_value">Total Value</label>
+	<input name="purchased_value" id="purchased_value" type="text" value="<?php echo $total_value;?>"   class="purchased_value validate[required,custom[integer]]"/>
 </p>
+<p>
+	<label for="total_deductions">Total Deductions: </label>
+	<input name="total_deductions" id="total_deductions" type="text" value="<?php echo $total_deductions;?>" class="total_deductions validate[required,custom[integer]]" />
+</p>
+<p>
+	<label for="net_value">Net Value: </label>
+	<input name="net_value" id="net_value" type="text" value="<?php echo $net_value;?>"  class="net_value validate[required,custom[integer]]"/>
+</p>
+</fieldset>
+</div>
+<div class="message error close" id="free_discrepancy_container" style="display:none">
+	<h2>Free Farmer Discrepancy Detected</h2>
+	<p id="free_discrepancy_message">
+		 
+	</p>
+</div>
+<div class="message error close" id="fbg_discrepancy_container" style="display:none">
+	<h2>FBG Discrepancy Detected</h2>
+	<p id="fbg_discrepancy_message">
+		 
+	</p>
+</div>
 <p>
 	<input class="button" type="reset" value="Reset">
-	<input class="button" type="submit" value="Save & Add New From Buying Center" name="submit">
-	<input class="button" type="submit" value="Save & View List" name="submit">
+	<input class="button submit" type="submit" value="Save & Add New From Buying Center" name="submit">
+	<input class="button submit" type="submit" value="Save & View List" name="submit">
 </p>
 </fieldset> <!-- End of fieldset -->
 </form>
