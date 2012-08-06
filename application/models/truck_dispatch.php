@@ -3,12 +3,13 @@ class Truck_Dispatch extends Doctrine_Record {
 	public function setTableDefinition() {
 		$this -> hasColumn('Depot', 'varchar', 10);
 		$this -> hasColumn('Date', 'varchar', 15);
-		$this -> hasColumn('Truck', 'varchar', 50);
+		$this -> hasColumn('Truck', 'varchar', 10);
 	}
 
 	public function setUp() {
 		$this -> setTableName('truck_dispatch');
 		$this -> hasOne('Depot as Depot_Object', array('local' => 'Depot', 'foreign' => 'id'));
+		$this -> hasOne('Truck as Truck_Object', array('local' => 'Truck', 'foreign' => 'id'));
 	}
 
 	public function getTotalDispatches() {

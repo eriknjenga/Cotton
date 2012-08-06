@@ -39,6 +39,9 @@ class Dormant_Buying_Centers extends MY_Controller {
 			table.data-table td {
 			width: 120px;
 			}
+			.amount{
+				text-align:right;
+			}
 			</style>
 			";
 		//echo the start of the table
@@ -48,15 +51,15 @@ class Dormant_Buying_Centers extends MY_Controller {
 		$total_balance = 0;
 		$data_buffer .= $this -> echoTitles();
 		//Get data for each zone
-		$sql = "select depot_summary.*, (coalesce(total_purchases,0)-coalesce(total_dispatched,0)) as product_balance,datediff(str_to_date('" . $date . "','%m/%d/%Y') , str_to_date(last_purchase,'%m/%d/%Y')) as days_dormant from(select d.id,depot_name,v.name as village,w.name as ward,r.region_name as zone,(select date from purchase p where depot = d.id order by date desc limit 1) last_purchase,(select sum(quantity) from purchase p where depot = d.id) total_purchases,(select sum(net_weight) from weighbridge w where buying_center_code = d.depot_code and weighing_type = '2') total_dispatched from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id  where d.deleted = '0') depot_summary having days_dormant>='" . $days . "' order by days_dormant desc";
+		$sql = "select depot_summary.*, (coalesce(total_purchases,0)-coalesce(total_dispatched,0)) as product_balance,datediff(str_to_date('" . $date . "','%m/%d/%Y') , str_to_date(last_purchase,'%m/%d/%Y')) as days_dormant,dpn from(select d.id,depot_name,depot_code,purchase_route,(select date from purchase p where depot = d.id order by date desc limit 1) last_purchase,(select dpn from purchase p where depot = d.id order by date desc limit 1) dpn,(select sum(quantity) from purchase p where depot = d.id) total_purchases,(select sum(net_weight) from weighbridge w where buying_center_code = d.depot_code and weighing_type = '2') total_dispatched from depot d where d.deleted = '0') depot_summary having days_dormant>='" . $days . "' order by days_dormant desc";
 		$query = $this -> db -> query($sql);
 		foreach ($query->result_array() as $depot_data) {
-			$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['village'] . "</td><td>" . $depot_data['ward'] . "</td><td>" . $depot_data['zone'] . "</td><td>" . $depot_data['last_purchase'] . "</td><td>" . number_format($depot_data['total_purchases']+0) . "</td><td>" . number_format($depot_data['total_dispatched']+0) . "</td><td>" . number_format($depot_data['product_balance']+0) . "</td><td>" . $depot_data['days_dormant'] . "</td></tr>";
+			$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['depot_code'] . "</td><td>" . $depot_data['purchase_route'] . "</td><td>" .(empty($depot_data['last_purchase'] ) ? '-' : $depot_data['last_purchase']) . "</td><td>" . (empty($depot_data['dpn'] ) ? '-' : $depot_data['dpn']). "</td><td class='amount'>" . (empty($depot_data['total_purchases'] ) ? '-' : number_format($depot_data['total_purchases'] + 0)). "</td><td class='amount'>" . (empty($depot_data['total_dispatched'] ) ? '-' : number_format($depot_data['total_dispatched'] + 0)). "</td><td class='amount'>" . (empty($depot_data['product_balance'] ) ? '-' : number_format($depot_data['product_balance'] + 0)). "</td><td class='amount'>" . $depot_data['days_dormant'] . "</td></tr>";
 			$total_purchased += $depot_data['total_purchases'];
 			$total_dispatched += $depot_data['total_dispatched'];
 			$total_balance += $depot_data['product_balance'];
 		}
-		$data_buffer .= "<tr></tr><tr><td>Totals:</td><td>-</td><td>-</td><td>-</td><td>-</td><td>" . number_format($total_purchased+0) . "</td><td>" . number_format($total_dispatched+0) . "</td><td>" . number_format($total_balance+0) . "</td><td>-</td></tr>";
+		$data_buffer .= "<tr></tr><tr><td>Totals:</td><td>-</td><td>-</td><td>-</td><td>-</td><td class='amount'>" . number_format($total_purchased+0) . "</td><td class='amount'>" . number_format($total_dispatched+0) . "</td><td class='amount'>" . number_format($total_balance+0) . "</td><td>-</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -64,6 +67,7 @@ class Dormant_Buying_Centers extends MY_Controller {
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();
+		//echo $data_buffer;
 		$this -> generatePDF($data_buffer, $date, $days);
 
 	}
@@ -77,10 +81,10 @@ class Dormant_Buying_Centers extends MY_Controller {
 		$date = date("m/d/Y");
 		$data_buffer .= $this -> echoExcelTitles();
 		//Get data for each zone
-		$sql = "select depot_summary.*, (coalesce(total_purchases,0)-coalesce(total_dispatched,0)) as product_balance,datediff(str_to_date('" . $date . "','%m/%d/%Y') , str_to_date(last_purchase,'%m/%d/%Y')) as days_dormant from(select d.id,depot_name,v.name as village,w.name as ward,r.region_name as zone,(select date from purchase p where depot = d.id order by date desc limit 1) last_purchase,(select sum(quantity) from purchase p where depot = d.id) total_purchases,(select sum(net_weight) from weighbridge w where buying_center_code = d.depot_code and weighing_type = '2') total_dispatched from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id  where d.deleted = '0') depot_summary having days_dormant>='" . $days . "' order by days_dormant desc";
+		$sql = "select depot_summary.*, (coalesce(total_purchases,0)-coalesce(total_dispatched,0)) as product_balance,datediff(str_to_date('" . $date . "','%m/%d/%Y') , str_to_date(last_purchase,'%m/%d/%Y')) as days_dormant,dpn from(select d.id,depot_name,depot_code,purchase_route,(select date from purchase p where depot = d.id order by date desc limit 1) last_purchase,(select dpn from purchase p where depot = d.id order by date desc limit 1) dpn,(select sum(quantity) from purchase p where depot = d.id) total_purchases,(select sum(net_weight) from weighbridge w where buying_center_code = d.depot_code and weighing_type = '2') total_dispatched from depot d where d.deleted = '0') depot_summary having days_dormant>='" . $days . "' order by days_dormant desc";
 		$query = $this -> db -> query($sql);
 		foreach ($query->result_array() as $depot_data) {
-			$data_buffer .= $depot_data['depot_name'] . "\t" . $depot_data['village'] . "\t" . $depot_data['ward'] . "\t" . $depot_data['zone'] . "\t" . $depot_data['last_purchase'] . "\t" . $depot_data['total_purchases'] . "\t" . $depot_data['total_dispatched'] . "\t" . $depot_data['product_balance'] . "\t" . $depot_data['days_dormant'] . "\t\n";
+			$data_buffer .= $depot_data['depot_name'] . "\t" . $depot_data['depot_code'] . "\t" . $depot_data['purchase_route'] . "\t" . $depot_data['last_purchase'] . "\t". $depot_data['dpn'] . "\t" . $depot_data['total_purchases'] . "\t" . $depot_data['total_dispatched'] . "\t" . $depot_data['product_balance'] . "\t" . $depot_data['days_dormant'] . "\t\n";
 			$total_purchased += $depot_data['total_purchases'];
 			$total_dispatched += $depot_data['total_dispatched'];
 			$total_balance += $depot_data['product_balance'];
@@ -103,11 +107,11 @@ class Dormant_Buying_Centers extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Buying Center</th><th>Village</th><th>Ward</th><th>Zone</th><th>Last Purchase Date</th><th>Total Purchases</th><th>Total Dispatched</th><th>Product Balance</th><th>Days Dormant</th></tr>";
+		return "<tr><th>Buying Center</th><th>Center Code</th><th>Route</th><th>Last Purchase Date</th><th>Last DPN</th><th>Total Purchases</th><th>Total Dispatched</th><th>Product Balance</th><th>Days Dormant</th></tr>";
 	}
 
 	public function echoExcelTitles() {
-		return "Buying Center\tVillage\tWard\tZone\tLast Purchase Date\tTotal Purchases\tTotal Dispatched\tProduct Balance\tDays Dormant\t\n";
+		return "Buying Center\tCenter Code\tRoute\tLast Purchase Date\tLast DPN\tTotal Purchases\tTotal Dispatched\tProduct Balance\tDays Dormant\t\n";
 	}
 
 	function generatePDF($data, $date, $days) {

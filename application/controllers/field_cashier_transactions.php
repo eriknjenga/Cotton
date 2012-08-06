@@ -35,13 +35,16 @@ class Field_Cashier_Transactions extends MY_Controller {
 			table.data-table td {
 			width: 100px;
 			}
+			.amount{
+				text-align:right;
+			}
 			</style>
 			";
 			$field_cashier = $this -> input -> post("field_cashier");
 			$start_date = $this -> input -> post("start_date");
 			$end_date = $this -> input -> post("end_date");
 			$cashier_details = Field_Cashier::getFieldCashier($field_cashier);
-			$sql = "SELECT cih as document_number , str_to_date(date,'%m/%d/%Y') as transaction_date, amount as cash_received, '' as cash_paid, 'Center Distribution' as message,'' as bcr FROM cash_disbursement where field_cashier  = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  union all (select cih as document_number,str_to_date(date,'%m/%d/%Y') as transaction_date,'',amount as cash_paid,concat('Cash Paid To ',d.depot_name) as message,receipt as bcr from field_cash_disbursement f left join depot d on f.depot = d.id where field_cashier = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y'))  union all (select receipt_number as document_number,str_to_date(date,'%m/%d/%Y') as transaction_date,'',amount as cash_paid,'Cash Return' as message,'' as bcr from cash_receipt where field_cashier = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y'))  order by transaction_date asc";
+			$sql = "SELECT 'CIH C' as document_type,cih as document_number , date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as transaction_date, amount as cash_received, '' as cash_paid, 'Center Distribution' as message,'' as bcr FROM cash_disbursement where field_cashier  = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  union all (select 'CIH B' as document_type,cih as document_number,date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y')  as transaction_date,'',amount as cash_paid,d.depot_name as message,receipt as bcr from field_cash_disbursement f left join depot d on f.depot = d.id where field_cashier = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y'))  union all (select 'Receipt' as document_number,receipt_number as document_number,date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as transaction_date,'',amount as cash_paid,'Cash Return' as message,'' as bcr from cash_receipt where field_cashier = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y'))  order by str_to_date(transaction_date,'%d/%m/%Y') desc";
 			$balance_sql = "select total_received - (total_paid+total_returned) as balance from (select (select sum(amount) from cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') < str_to_date('" . $start_date . "','%m/%d/%Y')) as total_received,(select sum(amount) from field_cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') < str_to_date ('" . $start_date . "','%m/%d/%Y')) as total_paid,(select sum(amount) from cash_receipt where field_cashier = '$field_cashier' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') < str_to_date ('" . $start_date . "','%m/%d/%Y')) as total_returned) balances";
 			$balance_query = $this -> db -> query($balance_sql);
 			$cashier_balance = $balance_query -> result_array();
@@ -61,13 +64,13 @@ class Field_Cashier_Transactions extends MY_Controller {
 				$total_cash_paid += $transaction['cash_paid'];
 				$balance += $transaction['cash_received'];
 				$balance -= $transaction['cash_paid'];
-				$data_buffer .= "<tr><td>" . $transaction['transaction_date'] . "</td><td>" . $transaction['document_number'] . "</td><td>" . $transaction['bcr'] . "</td><td>" . $transaction['message'] . "</td><td>" . number_format($transaction['cash_received'] + 0) . "</td><td>" . number_format($transaction['cash_paid'] + 0) . "</td><td>" . number_format($balance + 0) . "</td></tr>";
+				$data_buffer .= "<tr><td>" . $transaction['transaction_date'] . "</td><td>" . $transaction['document_type'] . "</td><td>" . $transaction['document_number'] . "</td><td>" .(empty($transaction['bcr'] ) ? '-' : $transaction['bcr'] + 0) . "</td><td>" . $transaction['message'] . "</td><td class='amount'>" . (empty($transaction['cash_received'] ) ? '-' : number_format($transaction['cash_received'] + 0)). "</td><td class='amount'>" . (empty($transaction['cash_paid'] ) ? '-' : number_format($transaction['cash_paid'] + 0)). "</td><td class='amount'>" . number_format($balance + 0) . "</td></tr>";
 			}
 			$data_buffer .= "</table>";
 			$data_buffer .= "<h3>Cash Summary</h3><table class='data-table'>";
-			$data_buffer .= "<tr><td><b>Total Cash Received</b></td><td>" . number_format($total_cash_received) . "</td></tr>";
-			$data_buffer .= "<tr><td><b>Total Cash Distributed/Returned</b></td><td>" . number_format($total_cash_paid) . "</td></tr>";
-			$data_buffer .= "<tr></tr><tr><td><b>Balance</b></td><td>" . number_format($balance) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Cash Received</b></td><td class='amount'>" . number_format($total_cash_received) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Cash Distributed/Returned</b></td><td class='amount'>" . number_format($total_cash_paid) . "</td></tr>";
+			$data_buffer .= "<tr></tr><tr><td><b>Balance</b></td><td class='amount'>" . number_format($balance) . "</td></tr>";
 			$data_buffer .= "</table>";
 			//echo $data_buffer;
 			$log = new System_Log();
@@ -84,7 +87,7 @@ class Field_Cashier_Transactions extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Transaction Date</th><th>Doc. Number</th><th>BCR</th><th>Details</th><th>Cash Received</th><th>Cash Paid</th><th>Balance</th></tr>";
+		return "<tr><th>Transaction Date</th><th>Doc Type</th><th>Doc. Number</th><th>BCR</th><th>Details</th><th>Cash Received</th><th>Cash Paid</th><th>Balance</th></tr>";
 	}
 
 	function generatePDF($data, $start_date, $end_date) {

@@ -44,7 +44,7 @@ foreach($depots as $depot){
 				<option value="<?php echo $depot -> id;?>" <?php
 				if ($depot -> id == $depot_id) {echo "selected";
 				}
-				?>><?php echo $depot -> Depot_Name . " (" . $depot -> Village_Object -> Name . ") (" . $depot -> Depot_Code . ")";?></option>
+				?>><?php echo $depot -> Depot_Name . " (" . $depot -> Depot_Code . ")";?></option>
 				<?php }?>
 			</select>
 		</p>
@@ -54,7 +54,17 @@ foreach($depots as $depot){
 		</p>
 		<p>
 			<label for="truck">Truck Number</label>
-			<input id="truck" name="truck" type="text" value="<?php echo $truck;?>" class="validate[required]"/>
+			<select name="truck" id="truck" class="validate[required]">
+				<option></option>
+				<?php
+foreach($trucks as $truck_object){
+				?>
+				<option value="<?php echo $truck_object -> id;?>" <?php
+				if ($truck_object -> id == $truck) {echo "selected";
+				}
+				?>><?php echo $truck_object -> Number_Plate . " (" . $truck_object -> Capacity . "T)";?></option>
+				<?php }?>
+			</select>
 		</p>
 		<input type="submit" name="assign" class="button"	value="Save Dispatch Info" />
 	</fieldset>

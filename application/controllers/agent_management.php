@@ -117,7 +117,8 @@ class Agent_Management extends MY_Controller {
 
 	public function base_params($data) {
 		$data['title'] = "Agent Management";
-		$data['link'] = "agent_management";
+		$data['sub_link'] = "agent_management";
+		$data['link'] = "people_management";
 
 		$this -> load -> view("demo_template", $data);
 	}

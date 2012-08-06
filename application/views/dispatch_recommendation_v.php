@@ -45,6 +45,12 @@
 		</p>
 		<input type="submit" name="action" class="button"	value="Download Dispatch Recommendation PDF" />
 		<input type="submit" name="action" class="button"	value="Download Dispatch Recommendation Excel" />
+		<?php
+$indicator = $this -> session -> userdata('management_type'); 
+if($indicator == "transport_manager"){
+		?>
+		<input type="submit" name="action" class="button"	value="Act on Dispatch Recommendation" />
+		<?php }?>
 	</fieldset>
 	</form>
 </div>

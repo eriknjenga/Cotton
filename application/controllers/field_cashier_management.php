@@ -97,9 +97,9 @@ class Field_Cashier_Management extends MY_Controller {
 		return $this -> form_validation -> run();
 	}
 
-	public function base_params($data) {
-		$data['link'] = "field_cashier_management";
-
+	public function base_params($data) { 
+		$data['sub_link'] = "field_cashier_management";
+		$data['link'] = "people_management";
 		$this -> load -> view("demo_template", $data);
 	}
 

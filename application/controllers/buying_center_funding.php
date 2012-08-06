@@ -47,6 +47,9 @@ class Buying_Center_Funding extends MY_Controller {
 			table.data-table td {
 			width: 70px;
 			}
+			.right{
+				text-align: right;
+			}
 			</style>
 			";
 		//echo the start of the table
@@ -73,13 +76,13 @@ class Buying_Center_Funding extends MY_Controller {
 				$release_amount = ceil($release_amount / $nearest) * $nearest;
 			}
 			//(empty($depot_data['quantity']) ? '-' : number_format($depot_data['quantity'] + 0))
-			$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['route'] . "</td><td>" . (empty($depot_data['last_purchase_date']) ? '-' : $depot_data['last_purchase_date']) . "</td><td>" . (empty($depot_data['total_purchase']) ? '-' : number_format($depot_data['total_purchase'] + 0)) . "</td><td>" . (empty($avg_per_day) ? '-' : number_format($avg_per_day + 0)) . "</td><td>" . (empty($procurement_estimate) ? '-' : number_format($procurement_estimate + 0)) . "</td><td>" . (empty($depot_data['last_price']) ? '-' : number_format($depot_data['last_price'] + 0)) . "</td><td>" . (empty($procurement_value) ? '-' : number_format($procurement_value + 0)) . "</td><td>" . (empty($cash_balance) ? '-' : number_format($cash_balance + 0)) . "</td><td>" . (empty($release_amount) ? '-' : number_format($release_amount + 0)) . "</td></tr>";
+			$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['route'] . "</td><td>" . (empty($depot_data['last_purchase_date']) ? '-' : $depot_data['last_purchase_date']) . "</td><td class='right'>" . (empty($depot_data['total_purchase']) ? '-' : number_format($depot_data['total_purchase'] + 0)) . "</td><td class='right'>" . (empty($avg_per_day) ? '-' : number_format($avg_per_day + 0)) . "</td><td class='right'>" . (empty($procurement_estimate) ? '-' : number_format($procurement_estimate + 0)) . "</td><td class='right'>" . (empty($depot_data['last_price']) ? '-' : number_format($depot_data['last_price'] + 0)) . "</td><td class='right'>" . (empty($procurement_value) ? '-' : number_format($procurement_value + 0)) . "</td><td class='right'>" . (empty($cash_balance) ? '-' : number_format($cash_balance + 0)) . "</td><td class='right'>" . (empty($release_amount) ? '-' : number_format($release_amount + 0)) . "</td></tr>";
 			$procurement_estimate_total += $procurement_estimate;
 			$procurement_value_total += $procurement_value;
 			$cash_balance_total += $cash_balance;
 			$release_total += $release_amount;
 		}
-		$data_buffer .= "<tr><td>Totals: </td><td>-</td><td>-</td><td>-</td><td>-</td><td>" . (empty($procurement_estimate_total) ? '-' : number_format($procurement_estimate_total + 0)) . "</td><td>-</td><td>" . (empty($procurement_value_total) ? '-' : number_format($procurement_value_total + 0)) . "</td><td>" . (empty($cash_balance_total) ? '-' : number_format($cash_balance_total + 0)) . "</td><td>" . (empty($release_total) ? '-' : number_format($release_total + 0)) . "</td></tr>";
+		$data_buffer .= "<tr><td>Totals: </td><td>-</td><td>-</td><td>-</td><td>-</td><td class='right'>" . (empty($procurement_estimate_total) ? '-' : number_format($procurement_estimate_total + 0)) . "</td><td>-</td><td class='right'>" . (empty($procurement_value_total) ? '-' : number_format($procurement_value_total + 0)) . "</td><td class='right'>" . (empty($cash_balance_total) ? '-' : number_format($cash_balance_total + 0)) . "</td><td class='right'>" . (empty($release_total) ? '-' : number_format($release_total + 0)) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -138,17 +141,17 @@ class Buying_Center_Funding extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Buying Center</th><th>Cash Route</th><th>Last Purchase Date</th><th>Historical Purchases</th><th>Avg. Kgs.</th><th>Procurement Estimate</th><th>Estimated Price</th><th>Procurement Value</th><th>Cash Balance</th><th>Release Amount</th></tr>";
+		return "<tr><th>Buying Center</th><th>Cash Route</th><th>Last Purchase Date</th><th>Historical Purchases</th><th>Avg. Kgs.</th><th>Projected Estimate</th><th>Projected Price</th><th>Procurement Value</th><th>Cash Balance</th><th>Release Amount</th></tr>";
 	}
 
 	public function echoExcelTitles() {
-		return "Buying Center\tCash Route\tLast Purchase Date\tHistorical Purchases\tAvg. Kgs.\tProcurement Estimate\tEstimated Price\tProcurement Value\tCash Balance\tRelease Amount\t\n";
+		return "Buying Center\tCash Route\tLast Purchase Date\tHistorical Purchases\tAvg. Kgs.\tProjected Estimate\tProjected Price\tProcurement Value\tCash Balance\tRelease Amount\t\n";
 	}
 
 	function generatePDF($data, $date, $history, $cycle, $nearest, $price,$factor) {
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>BC Funding</h3>";
-		$html_title .= "<h5 style='text-align:center;'> as at: " . $date . " for the next " . $cycle . " days using " . $history . " days historical data and " . $price . " as the forecast price and a factor of ".$factor.". Rounded to the nearest " . number_format($nearest) . "</h5>";
+		$html_title .= "<h5 style='text-align:center;'> as at: " . $date . " for the next " . $cycle . " days using " . $history . " days historical data and " . $price . " as the projected price and a factor of ".$factor.". Rounded to the nearest " . number_format($nearest) . "</h5>";
 
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4-L');

@@ -35,6 +35,7 @@ class Truck_Dispatch_Management extends MY_Controller {
 			$data = array();
 		}
 		$data['depots'] = Depot::getAll();
+		$data['trucks'] = Truck::getAll();
 		$data['content_view'] = "add_dispatch_v";
 		$data['quick_link'] = "add_dispatch";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
@@ -67,6 +68,25 @@ class Truck_Dispatch_Management extends MY_Controller {
 		} else {
 			$this -> new_dispatch();
 		}
+	}
+
+	public function save_batch() {
+		//var_dump($this->input->post());
+		$depots = $this -> input -> post("depot");
+		$trucks = $this -> input -> post("truck_choice");
+		$date = date('m/d/Y');
+		$counter = 0;
+		foreach ($trucks as $choice) {
+			if (strlen($choice) > 0) {
+				$dispatch = new Truck_Dispatch();
+				$dispatch -> Depot = $depots[$counter];
+				$dispatch -> Truck = $choice;
+				$dispatch -> Date = $date;
+				$dispatch -> save();
+			}
+			$counter++;
+		}
+		redirect("truck_dispatch_management/listing");
 	}
 
 	public function delete_dispatch($id) {

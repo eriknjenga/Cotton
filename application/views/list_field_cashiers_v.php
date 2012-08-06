@@ -27,6 +27,9 @@
 		window.location = url;
 		}
 </script>
+<?php 
+$this->load->view("people_submenu");
+?>
 <h1>Field Cashier Listing</h1><a href="<?php echo base_url()."field_cashier_management/print_cashiers";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>

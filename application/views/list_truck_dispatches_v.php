@@ -57,7 +57,7 @@ $class = "odd";
 		<?php echo $dispatch -> Date;?>
 		</td>
 		<td>
-		<?php echo $dispatch -> Truck;?>
+		<?php echo $dispatch -> Truck_Object->Number_Plate;?>
 		</td>
 		<td><a href="<?php echo base_url()."truck_dispatch_management/edit_dispatch/".$dispatch->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" dispatch = "<?php echo $dispatch -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a></td>
 		</tr>

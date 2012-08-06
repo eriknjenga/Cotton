@@ -31,13 +31,13 @@ class Buyer_Management extends MY_Controller {
 	}
 
 	public function autocomplete_buyer() {
-		$this->load->database();
+		$this -> load -> database();
 		$search_term = $this -> input -> post("term");
 		if (strlen($search_term) == 0) {
 			redirect("buyer_management/search_buyer");
 		}
 		//Limit search results to 10
-		$buyers = Buyer::getPagedSearchedBuyers($this->db->escape_str($search_term), 0, 10);
+		$buyers = Buyer::getPagedSearchedBuyers($this -> db -> escape_str($search_term), 0, 10);
 		$final_results = array();
 		$counter = 0;
 		foreach ($buyers as $buyer) {
@@ -64,6 +64,7 @@ class Buyer_Management extends MY_Controller {
 		$data['buyer'] = $buyer;
 		$this -> new_buyer($data);
 	}
+
 	public function print_buyers() {
 		$buyers = Buyer::getAll();
 		$data_buffer = "Buyer Code\tFull Name\tNational Id\tPhone Number\t\n";
@@ -77,7 +78,7 @@ class Buyer_Management extends MY_Controller {
 		header("Cache-Control: ");
 		echo $data_buffer;
 	}
-	
+
 	public function save() {
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
@@ -131,7 +132,8 @@ class Buyer_Management extends MY_Controller {
 
 	public function base_params($data) {
 		$data['title'] = "Buyer Management";
-		$data['link'] = "buyer_management";
+		$data['sub_link'] = "buyer_management";
+		$data['link'] = "people_management";
 
 		$this -> load -> view("demo_template", $data);
 	}

@@ -27,6 +27,9 @@
 		window.location = url;
 		}
 </script>
+<?php 
+$this->load->view("people_submenu");
+?>
 <h1>Field Officer Listing</h1><a href="<?php echo base_url()."field_officer_management/print_feos";?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a>
 <table class="fullwidth">
 	<thead>

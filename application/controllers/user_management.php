@@ -97,7 +97,7 @@ class User_Management extends MY_Controller {
 				}
 				//looks good. Continue!
 				else {
-					$session_data = array('user_id' => $logged_in -> id, 'user_indicator' => $logged_in -> Access -> Indicator, 'access_level' => $logged_in -> Access_Level, 'full_name' => $logged_in -> Name);
+					$session_data = array('user_id' => $logged_in -> id, 'user_indicator' => $logged_in -> Access -> Indicator, 'management_type' => $logged_in -> Access -> Management_Type, 'access_level' => $logged_in -> Access_Level, 'full_name' => $logged_in -> Name);
 					$this -> session -> set_userdata($session_data);
 
 					redirect("home_controller");
@@ -289,7 +289,8 @@ class User_Management extends MY_Controller {
 
 	public function base_params($data) {
 		$data['title'] = "User Management";
-		$data['link'] = "user_management";
+		$data['sub_link'] = "user_management";
+		$data['link'] = "people_management";
 
 		$this -> load -> view("demo_template", $data);
 	}
