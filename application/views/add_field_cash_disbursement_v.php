@@ -90,7 +90,7 @@ foreach($depots as $depot_object){
 					<option value="<?php echo $depot_object -> id;?>" <?php
 					if ($depot_object -> id == $depot) {echo "selected";
 					}
-						?>><?php echo $depot_object -> Depot_Name;?></option>
+						?>><?php echo $depot_object -> Depot_Name." - ".$depot_object -> Depot_Code;?></option>
 					<?php
 					$counter++;
 					}
