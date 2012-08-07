@@ -72,7 +72,7 @@ echo validation_errors('
 	<input type="hidden" name="village_id" id="village_id" value="<?php echo $village_id;?>" />
 	<p>
 		<label for="cpc_number">FBG Contract Number: </label>
-		<input id="cpc_number" name="cpc_number" type="text" value="<?php echo $cpc_number;?>" class="validate[required]" />
+		<input id="cpc_number" name="cpc_number" type="text" value="<?php echo $cpc_number;?>" />
 		<span class="field_desc">Enter the FBG Contract Number for this FBG</span>
 	</p>
 	<p>
@@ -105,7 +105,7 @@ echo validation_errors('
 	</p>
 	<p>
 		<label for="field_officer">Field Extension Officer</label>
-		<select name="field_officer" class="dropdown validate[required]" id="feo">
+		<select name="field_officer" class="dropdown" id="feo">
 			<option></option>
 			<?php
 foreach($field_officers as $officer){
@@ -120,12 +120,12 @@ foreach($field_officers as $officer){
 	</p>
 <p>
 	<label for="village">Village</label>
-	<input id="village" name="village" type="text" value="<?php echo $village;?>" class="village validate[required]"/>
+	<input id="village" name="village" type="text" value="<?php echo $village;?>" class="village"/>
 	<span class="field_desc">Enter the village where this FBG comes from</span>
 </p>
 	<p>
 		<label for="hectares_available">Hectares Available: </label>
-		<input id="hectares_available" name="hectares_available" type="text" value="<?php echo $hectares_available;?>" class="validate[required]"/>
+		<input id="hectares_available" name="hectares_available" type="text" value="<?php echo $hectares_available;?>"/>
 		<span class="field_desc">Enter the hectares offered by this FBG</span>
 	</p>
 	<p>
