@@ -17,7 +17,8 @@
 	</style>
 <script type="text/javascript">
 					$(function() {
-	$(".submit").click(function(){ 
+	$("#purchase_form").validationEngine();
+	/*$(".submit").click(function(){ 
 			var free_totals = checkFreeTotals();
 			var fbg_totals = checkFbgTotals();
 			if(free_totals == true && fbg_totals == true){
@@ -27,7 +28,7 @@
 				return false;
 			}
 			
-		});
+		});*/
 		
 		$("#fbg").autocomplete({
 			source : "<?php echo base_url();?>fbg_management/autocomplete_fbg",
@@ -178,6 +179,10 @@
 		width: 100%; 
 		overflow: hidden;
 	}
+	#grand_totals{
+		width: 100%;
+		overflow: hidden; 
+	}
 </style>
 <?php
 if (isset($purchase)) {
@@ -200,6 +205,9 @@ if (isset($purchase)) {
 	$batch = $purchase -> Batch;
 	$free_farmer = $purchase -> Free_Farmer_Quantity;
 	$free_farmer_value = $purchase -> Free_Farmer_Value;
+	$adjustment = $purchase -> Adjustment;
+	$grand_total_quantity = $purchase -> Grand_Total_Quantity;
+	$grand_total_value = $purchase -> Grand_Total_Value;
 
 } else {
 	$fbg = "";
@@ -220,6 +228,9 @@ if (isset($purchase)) {
 	$batch = "";
 	$free_farmer = "0";
 	$free_farmer_value = "0";
+	$adjustment = "0";
+	$grand_total_quantity = "";
+	$grand_total_value = "";
 
 }
 $total_deductions = $loan_recovery + $farmer_registration + $other_recoveries;
@@ -260,6 +271,7 @@ foreach ($prices as $price_object) {
 <input type="hidden" value="" id="product_price"/>
 <div class="details_panel">
 <div class="dps_details">
+	
 	<label><b>Buying Center</b></label>
 	<label style="width: auto"><?php echo $depot -> Depot_Name . " (" . $depot -> Village_Object -> Name . ")";?></label>
 	</div>
@@ -271,7 +283,7 @@ foreach ($prices as $price_object) {
 	<div class="details_panel">
 <div class="dps_details">
 	<p>
-	<label for="dpn">DPN</label>
+	<label for="dpn">DPS Number</label>
 	<input id="dpn" name="dpn" type="text" value="<?php echo $dpn;?>" class="dpn validate[required]"/> 
 </p>
 <p>
@@ -281,13 +293,17 @@ foreach ($prices as $price_object) {
 </div>
 <div class="dps_details">
 	<p>
-	<label for="date">Transaction Date</label>
+	<label for="date">DPS Date</label>
 	<input class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>"/> 
 </p>
 <p>
 	<label for="price">Unit Price</label>
 	<input readonly="" name="price" id="price"  type="text" value="<?php echo $price;?>" />
 	<span class="field_desc">(Dependent on the date)</span>
+</p>
+<p>
+	<label for="adjustment">Adjustment Entry?</label>
+	<input class="adjustment" name="adjustment" id="adjustment" type="checkbox" value="1" <?php if($adjustment == '1'){echo "checked";}?>/> 
 </p>
 </div>
 </div>
@@ -300,10 +316,12 @@ foreach ($prices as $price_object) {
 <p>
 	<label for="free_farmer">Total Quantity</label>
 	<input name="free_farmer" id="free_farmer"  type="text" value="<?php echo $free_farmer;?>" class="validate[required,custom[integer]]"/> 
+	<span class="field_desc">Kgs.</span>
 </p>
 <p>
 	<label for="free_farmer">Total Value</label>
 	<input name="free_farmer_value" id="free_farmer_value"  type="text" value="<?php echo $free_farmer_value;?>" class="validate[required]"/> 
+	<span class="field_desc">Tsh.</span>
 </p>
 </fieldset>
 <fieldset class="dps_details">
@@ -315,32 +333,52 @@ foreach ($prices as $price_object) {
 <p>
 	<label for="quantity">FBG Quantity</label>
 	<input name="quantity" id="quantity"  type="text" value="<?php echo $quantity;?>" class="validate[required,custom[integer]]"/> 
+	<span class="field_desc">Kgs.</span>
 </p>	
+<p>
+	<label for="purchased_value">Total Value</label>
+	<input name="purchased_value" id="purchased_value" type="text" value="<?php echo $total_value;?>"   class="purchased_value validate[required,custom[integer]]"/>
+	<span class="field_desc">Tsh.</span>
+</p>
 <p>
 	<label for="loan_recovery">Loan Recovery</label>
 	<input name="loan_recovery" id="loan_recovery" type="text" value="<?php echo $loan_recovery;?>" class="loan_recovery validate[required,custom[integer]]"/> 
+	<span class="field_desc">Tsh.</span>
 </p>
 <p>
 	<label for="farmer_registration">Farmer Reg. Fees</label>
 	<input name="farmer_registration" id="farmer_registration" type="text" value="<?php echo $farmer_registration;?>" class="farmer_registration validate[required,custom[integer]]"/> 
+	<span class="field_desc">Tsh.</span>
 </p>
 <p>
 	<label for="other_recoveries">Other Recoveries</label>
 	<input name="other_recoveries" id="other_recoveries" type="text" value="<?php echo $other_recoveries;?>" class="other_recoveries validate[required,custom[integer]]"/> 
+	<span class="field_desc">Tsh.</span>
 </p>
-<p>
-	<label for="purchased_value">Total Value</label>
-	<input name="purchased_value" id="purchased_value" type="text" value="<?php echo $total_value;?>"   class="purchased_value validate[required,custom[integer]]"/>
-</p>
+
 <p>
 	<label for="total_deductions">Total Deductions: </label>
 	<input name="total_deductions" id="total_deductions" type="text" value="<?php echo $total_deductions;?>" class="total_deductions validate[required,custom[integer]]" />
+	<span class="field_desc">Tsh.</span>
 </p>
 <p>
 	<label for="net_value">Net Value: </label>
 	<input name="net_value" id="net_value" type="text" value="<?php echo $net_value;?>"  class="net_value validate[required,custom[integer]]"/>
+	<span class="field_desc">Tsh.</span>
 </p>
 </fieldset>
+</div>
+<div id="grand_totals">
+	<p style="float:left; margin-right:10px;">
+	<label for="grand_total_quantity">Grand Total Quantity</label>
+	<input id="grand_total_quantity" name="grand_total_quantity" type="text" value="<?php echo $grand_total_quantity;?>" class="grand_total_quantity"/> 
+	<span class="field_desc">Kgs.</span>
+</p>
+<p style="float:left; margin-right:10px;">
+	<label for="grand_total_value">Grand Total Value</label>
+	<input class="grand_total_value" name="grand_total_value" id="grand_total_value" type="text" value="<?php echo $grand_total_value;?>"/> 
+	<span class="field_desc">Tsh.</span>
+</p>
 </div>
 <div class="message error close" id="free_discrepancy_container" style="display:none">
 	<h2>Free Farmer Discrepancy Detected</h2>

@@ -16,12 +16,14 @@ if (isset($receipt)) {
 	$field_cashier = $receipt -> Field_Cashier;
 	$receipt_id = $receipt -> id;
 	$date = $receipt -> Date;
+	$adjustment = $receipt -> Adjustment;
 } else {
 	$amount = "";
 	$receipt_id = "";
 	$receipt_number = "";
 	$field_cashier = "";
 	$date = "";
+	$adjustment = "0";
 
 }
 $attributes = array("method" => "post", "id" => "cash_receipt_input");
@@ -74,6 +76,13 @@ foreach($field_cashiers as $field_cashier_object){
 		<label for="amount">Amount Returned: </label>
 		<input id="amount" name="amount" type="text" value="<?php echo $amount;?>" class="validate[required,custom[integer]]"/>
 		<span class="field_desc">Enter the amount returned</span>
+	</p>
+	<p>
+		<label for="adjustment">Adjustment Entry?</label>
+		<input class="adjustment" name="adjustment" id="adjustment" type="checkbox" value="1" <?php
+		if ($adjustment == '1') {echo "checked";
+		}
+		?>/>
 	</p>
 	<p>
 		<input class="button" type="reset" value="Reset">

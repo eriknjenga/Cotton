@@ -101,6 +101,17 @@ class Purchase_Management extends MY_Controller {
 		$this -> load -> view("demo_template", $data);
 	}
 
+	public function search_dps() {
+		$search_term = $this -> input -> post("search_value");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$dps = Purchase::getSearchedDps($db_search_term);
+		$data['dps'] = $dps;
+		$data['listing_title'] = "Dps Search Results For <b>' " . $search_term . "</b>";
+		$data['content_view'] = "list_dps_search_results_v";
+		$this -> base_params($data);
+	}
+
 	public function edit_purchase($id) {
 		$purchase = Purchase::getPurchase($id);
 		$data['depot'] = $purchase -> Depot_Object;
@@ -112,6 +123,7 @@ class Purchase_Management extends MY_Controller {
 	}
 
 	public function save() {
+		//var_dump($this->input->post());
 		$valid = $this -> validate_form();
 		//If the fields have been validated, save the input
 		if ($valid) {
@@ -134,8 +146,11 @@ class Purchase_Management extends MY_Controller {
 			$net_value = $this -> input -> post("net_value");
 			$price = $this -> input -> post("price");
 			$batch = $this -> session -> userdata('purchases_batch');
-			 
-			//If the user has deleted the fbg name, reset all the fbg variables 
+			$adjustment = $this -> input -> post("adjustment");
+			$grand_total_value = $this -> input -> post("grand_total_value");
+			$grand_total_quantity = $this -> input -> post("grand_total_quantity");
+
+			//If the user has deleted the fbg name, reset all the fbg variables
 			if ($fbg_name == '') {
 				$fbg = '';
 				$loan_recovery = 0;
@@ -171,6 +186,9 @@ class Purchase_Management extends MY_Controller {
 			$purchase -> Other_Recoveries = $other_recoveries;
 			$purchase -> Buyer = $buyer;
 			$purchase -> Batch = $batch;
+			$purchase -> Adjustment = $adjustment;
+			$purchase -> Grand_Total_Quantity = $grand_total_quantity;
+			$purchase -> Grand_Total_Value = $grand_total_value;
 			$purchase -> Timestamp = date('U');
 			$purchase -> save();
 			$purchase = Purchase::getPurchase($purchase -> id);
@@ -191,7 +209,9 @@ class Purchase_Management extends MY_Controller {
 				redirect($link);
 			}
 		} else {
-			echo "Could not save. Error occured!";
+			$saved_depot = $this -> session -> userdata('saved_depot');
+			//$url = "purchase_management/record_purchase/" . $saved_depot;
+			$this -> record_purchase($saved_depot);
 		}
 	}
 
@@ -212,7 +232,33 @@ class Purchase_Management extends MY_Controller {
 		$this -> form_validation -> set_rules('dpn', 'Daily Purchases Number', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('depot', 'Buying Center', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('date', 'Date', 'trim|required|max_length[100]|xss_clean');
-		return $this -> form_validation -> run();
+		$temp_validation = $this -> form_validation -> run();
+		if ($temp_validation) {
+			$this -> form_validation -> set_rules('dpn', 'Duplicate DPS Number', 'trim|required|callback_dpn_duplication');
+			return $this -> form_validation -> run();
+		} else {
+			return $temp_validation;
+		}
+	}
+
+	public function dpn_duplication($dpn) {
+		$season = $this -> input -> post("season");
+		$adjustment = $this -> input -> post("adjustment");
+		$editing = $this -> input -> post("editing_id");
+		//If this is an adjustment or a record update, then there's no need to check for duplication
+		if ($adjustment == "1" || strlen($editing) > 0) {
+			return TRUE;
+		}
+		// Else, check for duplications
+		else {
+			$duplicate = Purchase::checkDuplicate($dpn, $season);
+			if ($duplicate == 0) {
+				return TRUE;
+			} else if ($duplicate > 0) {
+				$this -> form_validation -> set_message('dpn_duplication', 'A DPS with the same number already exists!');
+				return FALSE;
+			}
+		}
 	}
 
 	function getDailyTrend() {

@@ -22,6 +22,9 @@ class Purchase extends Doctrine_Record {
 		$this -> hasColumn('Timestamp', 'varchar', 32);
 		$this -> hasColumn('Batch', 'varchar', 20);
 		$this -> hasColumn('Batch_Status', 'varchar', 2);
+		$this -> hasColumn('Adjustment', 'varchar', 1);
+		$this -> hasColumn('Grand_Total_Value', 'varchar', 10);
+		$this -> hasColumn('Grand_Total_Quantity', 'varchar', 10);
 
 	}
 
@@ -30,6 +33,7 @@ class Purchase extends Doctrine_Record {
 		$this -> hasOne('FBG as FBG_Object', array('local' => 'FBG', 'foreign' => 'id'));
 		$this -> hasOne('Buyer as Buyer_Object', array('local' => 'Buyer', 'foreign' => 'id'));
 		$this -> hasOne('Depot as Depot_Object', array('local' => 'Depot', 'foreign' => 'id'));
+		$this -> hasOne('Transaction_Batch as Batch_Object', array('local' => 'Batch', 'foreign' => 'id'));
 	}
 
 	public function getTotalPurchases($batch) {
@@ -64,6 +68,18 @@ class Purchase extends Doctrine_Record {
 
 	public function getBatchPurchases($batch_id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Purchase") -> where("Batch = '$batch_id'");
+		$purchases = $query -> execute();
+		return $purchases;
+	}
+
+	public function checkDuplicate($dpn, $season) {
+		$query = Doctrine_Query::create() -> select("count(*) as Records") -> from("Purchase") -> where("DPN = '$dpn' and Season = '$season' and Adjustment != '1'");
+		$purchases = $query -> execute();
+		return $purchases[0] -> Records;
+	}
+
+	public function getSearchedDps($dps) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Purchase") -> where("DPN = '$dps'");
 		$purchases = $query -> execute();
 		return $purchases;
 	}

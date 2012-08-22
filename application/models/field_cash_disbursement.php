@@ -10,12 +10,14 @@ class Field_Cash_Disbursement extends Doctrine_Record {
 		$this -> hasColumn('Details', 'text');
 		$this -> hasColumn('Batch', 'varchar', 10);
 		$this -> hasColumn('Batch_Status', 'varchar', 5);
+		$this -> hasColumn('Adjustment', 'varchar', 1);
 	}
 
 	public function setUp() {
 		$this -> setTableName('field_cash_disbursement');
-		$this -> hasOne('Field_Cashier as Field_Cashier_Object', array('local' => 'Field_Cashier', 'foreign' => 'id')); 
+		$this -> hasOne('Field_Cashier as Field_Cashier_Object', array('local' => 'Field_Cashier', 'foreign' => 'id'));
 		$this -> hasOne('Depot as Depot_Object', array('local' => 'Depot', 'foreign' => 'id'));
+		$this -> hasOne('Transaction_Batch as Batch_Object', array('local' => 'Batch', 'foreign' => 'id'));
 	}
 
 	public function getTotalDisbursements($batch) {
@@ -46,6 +48,23 @@ class Field_Cash_Disbursement extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cash_Disbursement");
 		$disbursements = $query -> execute();
 		return $disbursements;
+	}
+
+	public function checkDuplicate($cih) {
+		$query = Doctrine_Query::create() -> select("count(*) as Records") -> from("Field_Cash_Disbursement") -> where("CIH = '$cih' and Adjustment != '1'");
+		$disbursments = $query -> execute();
+		return $disbursments[0] -> Records;
+	}
+
+	public function getSearchedCih($cih) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cash_Disbursement") -> where("CIH = '$cih'");
+		$cih = $query -> execute();
+		return $cih;
+	}
+	public function getSearchedBcr($bcr) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cash_Disbursement") -> where("Receipt = '$bcr'");
+		$cih = $query -> execute();
+		return $cih;
 	}
 
 }

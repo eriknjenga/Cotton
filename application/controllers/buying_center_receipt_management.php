@@ -28,10 +28,18 @@ class Buying_Center_Receipt_Management extends MY_Controller {
 		$data['styles'] = array("pagination.css");
 		$this -> base_params($data);
 	}
-
+	public function search_receipt() {
+		$search_term = $this -> input -> post("search_value6");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$receipt = Buying_Center_Receipt::getSearchedReceipt($db_search_term);
+		$data['receipt'] = $receipt;
+		$data['content_view'] = "list_bc_return_search_results_v";
+		$this -> base_params($data);
+	}
 	public function new_receipt($data = null) {
 		$batch = $this -> session -> userdata('buying_center_receipt_batch');
-		if (strlen($batch) == 0) { 
+		if (strlen($batch) == 0) {
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {
@@ -42,7 +50,7 @@ class Buying_Center_Receipt_Management extends MY_Controller {
 		$data['scripts'] = array("validationEngine-en.js", "validator.js");
 		$data['styles'] = array("validator.css");
 		$data['batch_information'] = "You are entering records into batch number: <b>" . $this -> session -> userdata('buying_center_receipt_batch') . "</b>";
-		 
+
 		$data['depots'] = Depot::getAll();
 		$this -> base_params($data);
 	}
@@ -65,6 +73,7 @@ class Buying_Center_Receipt_Management extends MY_Controller {
 			$amount = $this -> input -> post("amount");
 			$depot = $this -> input -> post("depot");
 			$batch = $this -> session -> userdata('buying_center_receipt_batch');
+			$adjustment = $this -> input -> post("adjustment"); 
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$receipt = Buying_Center_Receipt::getReceipt($editing);
@@ -82,6 +91,7 @@ class Buying_Center_Receipt_Management extends MY_Controller {
 			$receipt -> Depot = $depot;
 			$receipt -> Timestamp = date('U');
 			$receipt -> Batch = $batch;
+			$receipt -> Adjustment = $adjustment;
 			$receipt -> save();
 			$message .= "{Buying Center: '" . $receipt -> Depot_Object -> Depot_Name . "' Receipt Number: '" . $receipt -> Receipt_Number . "' Date: '" . $receipt -> Date . "' Amount: '" . $receipt -> Amount . "' Batch '" . $receipt -> Batch . "'}";
 			$log -> Log_Message = $message;
@@ -114,12 +124,37 @@ class Buying_Center_Receipt_Management extends MY_Controller {
 		redirect($previous_page);
 	}
 
+	public function receipt_duplication($receipt) {
+		$adjustment = $this -> input -> post("adjustment");
+		$editing = $this -> input -> post("editing_id");
+		//If this is an adjustment or a record update, then there's no need to check for duplication
+		if ($adjustment == "1" || strlen($editing) > 0) {
+			return TRUE;
+		}
+		// Else, check for duplications
+		else {
+			$duplicate = Buying_Center_Receipt::checkDuplicate($receipt);
+			if ($duplicate == 0) {
+				return TRUE;
+			} else if ($duplicate > 0) {
+				$this -> form_validation -> set_message('receipt_duplication', 'A Cash Receipt with the same number already exists!');
+				return FALSE;
+			}
+		}
+	}
+
 	public function validate_form() {
 		$this -> form_validation -> set_rules('depot', 'Buying Center', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('receipt_number', 'Receipt Number', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('date', 'Transaction Date', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('amount', 'Amount Returned', 'trim|required|xss_clean');
-		return $this -> form_validation -> run();
+		$temp_validation = $this -> form_validation -> run();
+		if ($temp_validation) {
+			$this -> form_validation -> set_rules('receipt_number', 'Duplicate Receipt Number', 'trim|required|callback_receipt_duplication');
+			return $this -> form_validation -> run();
+		} else {
+			return $temp_validation;
+		}
 
 	}
 

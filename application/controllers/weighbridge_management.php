@@ -8,6 +8,16 @@ class Weighbridge_Management extends MY_Controller {
 		$this -> fetch_data();
 	}
 
+	public function search_ticket() {
+		$search_term = $this -> input -> post("search_value7");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$ticket = Weighbridge::getSearchedTicket($db_search_term);
+		$data['ticket'] = $ticket;
+		$data['content_view'] = "list_weighbridge_ticket_search_results_v";
+		$this -> load -> view("demo_template", $data);
+	}
+
 	public function fetch_data() {
 		$this -> load -> library('csvreader');
 

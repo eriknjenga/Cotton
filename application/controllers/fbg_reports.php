@@ -41,10 +41,10 @@ class FBG_Reports extends MY_Controller {
 			<style>
 			table.data-table {
 			table-layout: fixed;
-			width: 1000px;
+			width: 700px;
 			}
 			table.data-table td {
-			width: 70px;
+			width: 120px;
 			}
 			.right-align{
 				text-align:right;
@@ -153,7 +153,7 @@ class FBG_Reports extends MY_Controller {
 		$html_title .= "<h3 style='text-align:center;'> as at: " . $date . "</h3>";
 
 		$this -> load -> library('mpdf');
-		$this -> mpdf = new mPDF('c', 'A4-L');
+		$this -> mpdf = new mPDF('c', 'A4');
 		$this -> mpdf -> SetTitle('Debtors Analysis');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;

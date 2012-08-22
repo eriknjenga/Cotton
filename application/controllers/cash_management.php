@@ -31,9 +31,20 @@ class Cash_Management extends MY_Controller {
 
 	}
 
+	public function search_cih() {
+		$search_term = $this -> input -> post("search_value2");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$cih = Cash_Disbursement::getSearchedCih($db_search_term);
+		$data['cih'] = $cih;
+		$data['listing_title'] = "CIH Search Results For <b>' " . $search_term . "</b>";
+		$data['content_view'] = "list_cihc_search_results_v";
+		$this -> base_params($data);
+	}
+
 	public function issue_cash($data = null) {
 		$batch = $this -> session -> userdata('cihc_batch');
-		if (strlen($batch) == 0) { 
+		if (strlen($batch) == 0) {
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {
@@ -77,6 +88,7 @@ class Cash_Management extends MY_Controller {
 			$disbursement -> Amount = $this -> input -> post("amount");
 			$disbursement -> CIH = $this -> input -> post("cih");
 			$disbursement -> Date = $this -> input -> post("date");
+			$disbursement -> Adjustment = $this -> input -> post("adjustment");
 			$disbursement -> Batch = $this -> session -> userdata('cihc_batch');
 			$disbursement -> save();
 			$log -> User = $this -> session -> userdata('user_id');
@@ -92,6 +104,25 @@ class Cash_Management extends MY_Controller {
 			}
 		} else {
 			$this -> issue_cash();
+		}
+	}
+
+	public function cih_duplication($cih) {
+		$adjustment = $this -> input -> post("adjustment");
+		$editing = $this -> input -> post("editing_id");
+		//If this is an adjustment or a record update, then there's no need to check for duplication
+		if ($adjustment == "1" || strlen($editing) > 0) {
+			return TRUE;
+		}
+		// Else, check for duplications
+		else {
+			$duplicate = Cash_Disbursement::checkDuplicate($cih);
+			if ($duplicate == 0) {
+				return TRUE;
+			} else if ($duplicate > 0) {
+				$this -> form_validation -> set_message('cih_duplication', 'A CIH(c) with the same number already exists!');
+				return FALSE;
+			}
 		}
 	}
 
@@ -112,7 +143,13 @@ class Cash_Management extends MY_Controller {
 		$this -> form_validation -> set_rules('field_cashier', 'Field Cashier', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('amount', 'Amount Disbursed', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('cih', 'CIH Voucher', 'trim|required|max_length[50]|xss_clean');
-		return $this -> form_validation -> run();
+		$temp_validation = $this -> form_validation -> run();
+		if ($temp_validation) {
+			$this -> form_validation -> set_rules('cih', 'Duplicate CIH(c) Number', 'trim|required|callback_cih_duplication');
+			return $this -> form_validation -> run();
+		} else {
+			return $temp_validation;
+		}
 	}
 
 	public function base_params($data) {

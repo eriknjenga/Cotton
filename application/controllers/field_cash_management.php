@@ -31,15 +31,37 @@ class Field_Cash_Management extends MY_Controller {
 
 	}
 
+	public function search_cih() {
+		$search_term = $this -> input -> post("search_value3");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$cih = Field_Cash_Disbursement::getSearchedCih($db_search_term);
+		$data['cih'] = $cih;
+		$data['listing_title'] = "CIH Search Results For <b>' " . $search_term . "</b>";
+		$data['content_view'] = "list_cihb_search_results_v";
+		$this -> base_params($data);
+	}
+
+	public function search_bcr() {
+		$search_term = $this -> input -> post("search_value4");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$cih = Field_Cash_Disbursement::getSearchedBcr($db_search_term);
+		$data['cih'] = $cih;
+		$data['listing_title'] = "CIH Search Results For <b>' " . $search_term . "</b>";
+		$data['content_view'] = "list_cihb_search_results_v";
+		$this -> base_params($data);
+	}
+
 	public function new_payment($data = null) {
 		$batch = $this -> session -> userdata('cihb_batch');
-		if (strlen($batch) == 0) { 
+		if (strlen($batch) == 0) {
 			redirect("batch_management/no_batch");
 		}
 		if ($data == null) {
 			$data = array();
 		}
-		$data['field_cashiers'] = Field_Cashier::getAll(); 
+		$data['field_cashiers'] = Field_Cashier::getAll();
 		$data['depots'] = Depot::getAll();
 		$data['content_view'] = "add_field_cash_disbursement_v";
 		$data['quick_link'] = "new_payment";
@@ -62,7 +84,7 @@ class Field_Cash_Management extends MY_Controller {
 			$editing = $this -> input -> post("editing_id");
 			$log = new System_Log();
 			$temp_disb = new Field_Cash_Disbursement();
-			$temp_disb -> Field_Cashier = $this -> input -> post("field_cashier"); 
+			$temp_disb -> Field_Cashier = $this -> input -> post("field_cashier");
 			$temp_disb -> Depot = $this -> input -> post("depot");
 			$details_desc = "{Field Cashier: '" . $temp_disb -> Field_Cashier_Object -> Field_Cashier_Name . "' Depot: '" . $temp_disb -> Depot_Object -> Depot_Name . "' Amount: '" . $this -> input -> post("amount") . "' Details: '" . $this -> input -> post("details") . "' CIH(b) Voucher: '" . $this -> input -> post("cih") . "' Receipt: '" . $this -> input -> post("receipt") . "' Date: '" . $this -> input -> post("date") . "'}";
 			//Check if we are editing the record first
@@ -83,6 +105,7 @@ class Field_Cash_Management extends MY_Controller {
 			$disbursement -> Date = $this -> input -> post("date");
 			$disbursement -> Details = $this -> input -> post("details");
 			$disbursement -> Batch = $this -> session -> userdata('cihb_batch');
+			$disbursement -> Adjustment = $this -> input -> post("adjustment");
 			$disbursement -> save();
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
@@ -119,7 +142,32 @@ class Field_Cash_Management extends MY_Controller {
 		$this -> form_validation -> set_rules('receipt', 'Buying Center Receipt', 'trim|required|max_length[20]|xss_clean');
 		$this -> form_validation -> set_rules('amount', 'Amount Disbursed', 'trim|required|max_length[100]|xss_clean');
 		$this -> form_validation -> set_rules('cih', 'CIH Voucher', 'trim|required|max_length[50]|xss_clean');
-		return $this -> form_validation -> run();
+		$temp_validation = $this -> form_validation -> run();
+		if ($temp_validation) {
+			$this -> form_validation -> set_rules('cih', 'Duplicate CIH(b) Number', 'trim|required|callback_cih_duplication');
+			return $this -> form_validation -> run();
+		} else {
+			return $temp_validation;
+		}
+	}
+
+	public function cih_duplication($cih) {
+		$adjustment = $this -> input -> post("adjustment");
+		$editing = $this -> input -> post("editing_id");
+		//If this is an adjustment or a record update, then there's no need to check for duplication
+		if ($adjustment == "1" || strlen($editing) > 0) {
+			return TRUE;
+		}
+		// Else, check for duplications
+		else {
+			$duplicate = Field_Cash_Disbursement::checkDuplicate($cih);
+			if ($duplicate == 0) {
+				return TRUE;
+			} else if ($duplicate > 0) {
+				$this -> form_validation -> set_message('cih_duplication', 'A CIH(b) with the same number already exists!');
+				return FALSE;
+			}
+		}
 	}
 
 	public function base_params($data) {

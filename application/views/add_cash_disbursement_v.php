@@ -16,12 +16,14 @@ if (isset($disbursement)) {
 	$cih = $disbursement -> CIH;
 	$disbursement_id = $disbursement -> id;
 	$date = $disbursement -> Date;
+	$adjustment = $disbursement -> Adjustment;
 } else {
 	$amount = "";
 	$field_cashier = "";
 	$cih = "";
 	$disbursement_id = "";
 	$date = "";
+	$adjustment = "0";
 
 }
 $attributes = array("method" => "post", "id" => "disburse_cash_input");
@@ -74,6 +76,13 @@ foreach($field_cashiers as $field_cashier_object){
 		<label for="amount">Amount Issued: </label>
 		<input id="amount" name="amount" type="text" value="<?php echo $amount;?>" class="validate[required,custom[integer]]"/>
 		<span class="field_desc">Enter the amount issued</span>
+	</p>
+	<p>
+		<label for="adjustment">Adjustment Entry?</label>
+		<input class="adjustment" name="adjustment" id="adjustment" type="checkbox" value="1" <?php
+			if ($adjustment == '1') {echo "checked";
+			}
+		?>/>
 	</p>
 	<p>
 		<input class="button" type="reset" value="Reset">

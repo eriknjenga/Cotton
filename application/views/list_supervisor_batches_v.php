@@ -27,6 +27,22 @@
 		window.location = url;
 		}
 </script>
+<div id="top_container">
+	<div style="float: left; width:500px;padding:5px;">
+		<?php
+		$attributes = array("method" => "post");
+		echo form_open('batch_management/search', $attributes);
+		echo validation_errors('
+		<p class="form_error">
+			', '
+		</p>
+		');
+		?> <label for="batch_id">Batch Id: </label>
+		<input id="batch_id"  name="batch_id" type="text"/>
+		<input class="button" type="submit" value="Go to Batch">
+	</form>
+	</div>
+</div>
 <h1>Batch Listing</h1>
 <table class="fullwidth">
 	<thead>

@@ -16,12 +16,14 @@ if (isset($receipt)) {
 	$depot = $receipt -> Depot;
 	$receipt_id = $receipt -> id;
 	$date = $receipt -> Date;
+	$adjustment = $receipt -> Adjustment;
 } else {
 	$amount = "";
 	$receipt_id = "";
 	$receipt_number = "";
 	$date = "";
 	$depot = "";
+	$adjustment = "0";
 
 }
 $attributes = array("method" => "post", "id" => "buying_center_receipt_input");
@@ -65,7 +67,7 @@ foreach($depots as $depot_object){
 			<option value="<?php echo $depot_object -> id;?>" <?php
 			if ($depot_object -> id == $depot) {echo "selected";
 			}
-			?>><?php echo $depot_object -> Depot_Name;?></option>
+			?>><?php echo $depot_object -> Depot_Name . " (".$depot_object -> Depot_Code.")";?></option>
 			<?php
 			$counter++;
 			}
@@ -77,6 +79,13 @@ foreach($depots as $depot_object){
 		<label for="amount">Amount Returned: </label>
 		<input id="amount" name="amount" type="text" value="<?php echo $amount;?>" class="validate[required,custom[integer]]"/>
 		<span class="field_desc">Enter the amount returned</span>
+	</p>
+		<p>
+		<label for="adjustment">Adjustment Entry?</label>
+		<input class="adjustment" name="adjustment" id="adjustment" type="checkbox" value="1" <?php
+		if ($adjustment == '1') {echo "checked";
+		}
+		?>/>
 	</p>
 	<p>
 		<input class="button" type="reset" value="Reset">

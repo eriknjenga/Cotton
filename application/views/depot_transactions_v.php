@@ -40,7 +40,7 @@
 				<?php
 foreach($depots as $depot){
 				?>
-				<option value="<?php echo $depot -> id;?>"><?php echo $depot -> Depot_Name." (".$depot -> Village_Object->Name.")";?></option>
+				<option value="<?php echo $depot -> id;?>"><?php echo $depot -> Depot_Name." (".$depot -> Depot_Code.")";?></option>
 				<?php }?>
 			</select>
 			</p>

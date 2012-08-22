@@ -43,7 +43,7 @@ class Transaction_Batch extends Doctrine_Record {
 	//For the general supervisor. Get batches that are not open
 	public function getTotalClosedBatches() {
 		$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch") -> where("Status != '0'");
-		
+
 		$total = $query -> execute();
 		return $total[0]['Total_Batches'];
 	}
@@ -62,7 +62,7 @@ class Transaction_Batch extends Doctrine_Record {
 	}
 
 	public function getPagedSystemBatches($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch")-> offset($offset) -> limit($items) -> orderBy("id Desc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$batches = $query -> execute(array());
 		return $batches;
 	}
@@ -84,6 +84,24 @@ class Transaction_Batch extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("User = '$user' and Status = '0' and Transaction_Type = '$transaction_type'");
 		$batches = $query -> execute();
 		return $batches;
+	}
+
+	public function getSearchedUserBatch($batch, $user) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("Id = '$batch' and User='$user'");
+		$batch = $query -> execute();
+		return $batch;
+	}
+
+	public function getSearchedAdminBatch($batch) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("Id = '$batch'");
+		$batch = $query -> execute();
+		return $batch;
+	}
+
+	public function getSearchedSupervisorBatch($batch) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("Id = '$batch' and Status != '0'");
+		$batch = $query -> execute();
+		return $batch;
 	}
 
 }

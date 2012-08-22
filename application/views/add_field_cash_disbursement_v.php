@@ -19,6 +19,7 @@ if (isset($disbursement)) {
 	$date = $disbursement -> Date;
 	$details = $disbursement -> Details;
 	$depot = $disbursement -> Depot;
+	$adjustment = $disbursement -> Adjustment;
 } else {
 	$amount = "";
 	$field_cashier = "";
@@ -28,6 +29,7 @@ if (isset($disbursement)) {
 	$date = "";
 	$details = "";
 	$depot = "";
+	$adjustment = "0";
 
 }
 $attributes = array("method" => "post", "id" => "disburse_cash_input");
@@ -107,6 +109,13 @@ foreach($depots as $depot_object){
 		<label for="details">Additional Details: </label>
 		<input id="details" name="details" type="text" value="<?php echo $details;?>"/>
 		<span class="field_desc">Enter any other details</span>
+	</p>
+		<p>
+		<label for="adjustment">Adjustment Entry?</label>
+		<input class="adjustment" name="adjustment" id="adjustment" type="checkbox" value="1" <?php
+			if ($adjustment == '1') {echo "checked";
+			}
+		?>/>
 	</p>
 	<p>
 		<input class="button" type="reset" value="Reset">
