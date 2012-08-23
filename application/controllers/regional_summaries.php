@@ -64,14 +64,14 @@ class Regional_Summaries extends MY_Controller {
 		$total_dispatch = 0;
 		foreach ($regions as $region) {
 			$region_summaries[$region -> id] = array();
-			$region_summaries[$region -> id]['total_cash_received'] = 0; 
+			$region_summaries[$region -> id]['total_cash_received'] = 0;
 			$region_summaries[$region -> id]['total_purchases_value'] = 0;
 			$region_summaries[$region -> id]['total_purchases_kg'] = 0;
 			$region_summaries[$region -> id]['total_dispatch'] = 0;
 			$data_buffer .= "<tr><td><b>Zone: </b></td><td colspan='10'><b>" . $region -> Region_Name . "</b></td></tr>";
 			$data_buffer .= $this -> echoTitles();
 			//Get all the depots in this region
-			$sql_region_depots = "select d.id as depot,cash_disbursement_route,d.deleted from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id where r.id = '" . $region -> id . "' order by distance asc";
+			$sql_region_depots = "select (select sum(quantity+free_farmer_quantity) from purchase where batch_status = '2') as total_purchases, d.id as depot,distance,cash_disbursement_route,d.deleted from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id where r.id = '" . $region -> id . "' order by distance asc";
 			$region_depots = $this -> db -> query($sql_region_depots);
 			//Get data for each depot
 			foreach ($region_depots->result_array() as $depot) {
@@ -79,8 +79,9 @@ class Regional_Summaries extends MY_Controller {
 					$sql = "select center_summaries.*,purchases_value/purchases_kg as avg_per_kg, cash_received -purchases_value as cash_balance,purchases_kg - dispatch as product_balance from(select cash_summary.*,sum(w.net_weight) as dispatch from (select depot_summary.* from (select depot_purchases.*,sum(c.amount) as cash_received from(select depot_name,depot_code,depot,date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as last_transaction_date,sum(quantity) as purchases_kg,sum(gross_value) as purchases_value,unit_price as last_price from (select depot_details.*,date,(quantity+free_farmer_quantity) as quantity,(gross_value+free_farmer_value) as gross_value,unit_price from (select depot_name,depot_code,id as depot from depot where id = '" . $depot['depot'] . "') depot_details left join purchase p on p.depot = depot_details.depot and p.batch_status = '2' order by date desc) purchases_summary) depot_purchases left join field_cash_disbursement c on depot_purchases.depot = c.depot and c.batch_status = '2') depot_summary) cash_summary left join weighbridge w on w.buying_center_code = depot_code where w.weighing_type = '2') center_summaries";
 					$query = $this -> db -> query($sql);
 					$depot_data = $query -> row_array();
-					$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['depot_code'] . "</td><td>" . $status[$depot['deleted']] . "</td><td>" . $depot['cash_disbursement_route'] . "</td><td>" . (empty($depot_data['last_transaction_date']) ? '-' : $depot_data['last_transaction_date']) . "</td><td class='amount'>" . (empty($depot_data['cash_received'] ) ? '-' : number_format($depot_data['cash_received']  + 0)). "</td><td class='amount'>" . (empty($depot_data['purchases_value'] ) ? '-' : number_format($depot_data['purchases_value']  + 0)) . "</td><td class='amount'>" . (empty($depot_data['purchases_kg'] ) ? '-' : number_format($depot_data['purchases_kg']  + 0)) . "</td><td class='amount'>" . (empty($depot_data['dispatch'] ) ? '-' : number_format($depot_data['dispatch'] + 0)). "</td><td class='amount'>" . (empty($depot_data['avg_per_kg']) ? '-' : number_format($depot_data['avg_per_kg']+ 0)). "</td><td class='amount'>" . (empty($depot_data['cash_balance'] ) ? '-' : number_format($depot_data['cash_balance'] + 0)) . "</td><td class='amount'>" . (empty($depot_data['product_balance'] ) ? '-' : number_format($depot_data['product_balance'] + 0)) . "</td><td class='amount'>" . (empty($depot_data['last_price'] ) ? '-' : number_format($depot_data['last_price'] + 0)) . "</td></tr>";
-					$region_summaries[$region -> id]['total_cash_received'] += $depot_data['cash_received']; 
+						$avg_distance = number_format((($depot_data['purchases_kg'] * $depot['distance']) / $depot['total_purchases']), 3);
+					$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['depot_code'] . "</td><td>" . $status[$depot['deleted']] . "</td><td>" . $depot['cash_disbursement_route'] . "</td><td>" . $avg_distance . "</td><td>" . (empty($depot_data['last_transaction_date']) ? '-' : $depot_data['last_transaction_date']) . "</td><td class='amount'>" . (empty($depot_data['cash_received']) ? '-' : number_format($depot_data['cash_received'] + 0)) . "</td><td class='amount'>" . (empty($depot_data['purchases_value']) ? '-' : number_format($depot_data['purchases_value'] + 0)) . "</td><td class='amount'>" . (empty($depot_data['purchases_kg']) ? '-' : number_format($depot_data['purchases_kg'] + 0)) . "</td><td class='amount'>" . (empty($depot_data['dispatch']) ? '-' : number_format($depot_data['dispatch'] + 0)) . "</td><td class='amount'>" . (empty($depot_data['avg_per_kg']) ? '-' : number_format($depot_data['avg_per_kg'] + 0)) . "</td><td class='amount'>" . (empty($depot_data['cash_balance']) ? '-' : number_format($depot_data['cash_balance'] + 0)) . "</td><td class='amount'>" . (empty($depot_data['product_balance']) ? '-' : number_format($depot_data['product_balance'] + 0)) . "</td><td class='amount'>" . (empty($depot_data['last_price']) ? '-' : number_format($depot_data['last_price'] + 0)) . "</td></tr>";
+					$region_summaries[$region -> id]['total_cash_received'] += $depot_data['cash_received'];
 					$region_summaries[$region -> id]['total_purchases_value'] += $depot_data['purchases_value'];
 					$region_summaries[$region -> id]['total_purchases_kg'] += $depot_data['purchases_kg'];
 					$region_summaries[$region -> id]['total_dispatch'] += $depot_data['dispatch'];
@@ -94,11 +95,11 @@ class Regional_Summaries extends MY_Controller {
 			if ($region_summaries[$region -> id]['total_purchases_value'] > 0 && $region_summaries[$region -> id]['total_purchases_kg'] > 0) {
 				$avg_per_kg = $region_summaries[$region -> id]['total_purchases_value'] / $region_summaries[$region -> id]['total_purchases_kg'];
 			}
-			$total_cash_received += $region_summaries[$region -> id]['total_cash_received']; 
+			$total_cash_received += $region_summaries[$region -> id]['total_cash_received'];
 			$total_purchases_value += $region_summaries[$region -> id]['total_purchases_value'];
 			$total_purchases_kg += $region_summaries[$region -> id]['total_purchases_kg'];
 			$total_dispatch += $region_summaries[$region -> id]['total_dispatch'];
-			$data_buffer .= "<tr><td>" . $region -> Region_Name . "</td><td class='amount'>" . number_format($region_summaries[$region -> id]['total_cash_received']) . "</td><td class='amount'>" . number_format($region_summaries[$region -> id]['total_purchases_value']) . "</td><td class='amount'>" . number_format($region_summaries[$region -> id]['total_purchases_kg']) . "</td><td class='amount'>" . number_format($region_summaries[$region -> id]['total_dispatch']) . "</td><td class='amount'>" . number_format($avg_per_kg) . "</td><td class='amount'>" . number_format(($region_summaries[$region -> id]['total_cash_received']  - $region_summaries[$region -> id]['total_purchases_value'])) . "</td><td class='amount'>" . number_format(($region_summaries[$region -> id]['total_purchases_kg'] - $region_summaries[$region -> id]['total_dispatch'])) . "</td></tr>";
+			$data_buffer .= "<tr><td>" . $region -> Region_Name . "</td><td class='amount'>" . number_format($region_summaries[$region -> id]['total_cash_received']) . "</td><td class='amount'>" . number_format($region_summaries[$region -> id]['total_purchases_value']) . "</td><td class='amount'>" . number_format($region_summaries[$region -> id]['total_purchases_kg']) . "</td><td class='amount'>" . number_format($region_summaries[$region -> id]['total_dispatch']) . "</td><td class='amount'>" . number_format($avg_per_kg) . "</td><td class='amount'>" . number_format(($region_summaries[$region -> id]['total_cash_received'] - $region_summaries[$region -> id]['total_purchases_value'])) . "</td><td class='amount'>" . number_format(($region_summaries[$region -> id]['total_purchases_kg'] - $region_summaries[$region -> id]['total_dispatch'])) . "</td></tr>";
 		}
 		$avg_per_kg = 0;
 		if ($total_purchases_value > 0 && $total_purchases_kg > 0) {
@@ -130,24 +131,24 @@ class Regional_Summaries extends MY_Controller {
 		$total_dispatch = 0;
 		foreach ($regions as $region) {
 			$region_summaries[$region -> id] = array();
-			$region_summaries[$region -> id]['total_cash_received'] = ""; 
+			$region_summaries[$region -> id]['total_cash_received'] = "";
 			$region_summaries[$region -> id]['total_purchases_value'] = "";
 			$region_summaries[$region -> id]['total_purchases_kg'] = "";
 			$region_summaries[$region -> id]['total_dispatch'] = "";
 			$data_buffer .= "Zone: \t" . $region -> Region_Name . "\t\n";
 			$data_buffer .= $this -> echoExcelTitles();
 			//Get all the depots in this region
-			$sql_region_depots = "select d.id as depot,cash_disbursement_route,d.deleted from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id where r.id = '" . $region -> id . "' order by distance asc";
+			$sql_region_depots = "select (select sum(quantity+free_farmer_quantity) from purchase where batch_status = '2') as total_purchases, d.id as depot,distance,cash_disbursement_route,d.deleted from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id where r.id = '" . $region -> id . "' order by distance asc";
 			$region_depots = $this -> db -> query($sql_region_depots);
 			//Get data for each depot
 			foreach ($region_depots->result_array() as $depot) {
 				if ($depot['deleted'] != "1") {
 					$sql = "select center_summaries.*,purchases_value/purchases_kg as avg_per_kg, cash_received -purchases_value as cash_balance,purchases_kg - dispatch as product_balance from(select cash_summary.*,sum(w.net_weight) as dispatch from (select depot_summary.* from (select depot_purchases.*,sum(c.amount) as cash_received from(select depot_name,depot_code,depot,date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as last_transaction_date,sum(quantity) as purchases_kg,sum(gross_value) as purchases_value,unit_price as last_price from (select depot_details.*,date,(quantity+free_farmer_quantity) as quantity,(gross_value+free_farmer_value) as gross_value,unit_price from (select depot_name,depot_code,id as depot from depot where id = '" . $depot['depot'] . "') depot_details left join purchase p on p.depot = depot_details.depot and p.batch_status = '2' order by date desc) purchases_summary) depot_purchases left join field_cash_disbursement c on depot_purchases.depot = c.depot and c.batch_status = '2') depot_summary) cash_summary left join weighbridge w on w.buying_center_code = depot_code where w.weighing_type = '2') center_summaries";
-
 					$query = $this -> db -> query($sql);
 					$depot_data = $query -> row_array();
-					$data_buffer .= $depot_data['depot_name'] . "\t".$depot_data['depot_code'] . "\t" . $status[$depot['deleted']] . "\t".$depot['cash_disbursement_route'] ."\t". $depot_data['last_transaction_date'] . "\t" . $depot_data['cash_received'] . "\t" . $depot_data['purchases_value'] . "\t" . $depot_data['purchases_kg'] . "\t" . $depot_data['dispatch'] . "\t" . $depot_data['avg_per_kg'] . "\t" . $depot_data['cash_balance'] . "\t" . $depot_data['product_balance'] . "\t" . $depot_data['last_price'] . "\t\n";
-					$region_summaries[$region -> id]['total_cash_received'] += $depot_data['cash_received']; 
+					$avg_distance = number_format((($depot_data['purchases_kg'] * $depot['distance']) / $depot['total_purchases']), 3);
+					$data_buffer .= $depot_data['depot_name'] . "\t" . $depot_data['depot_code'] . "\t" . $status[$depot['deleted']] . "\t" . $depot['cash_disbursement_route']   . "\t" . $avg_distance . "\t" . $depot_data['last_transaction_date'] . "\t" . $depot_data['cash_received'] . "\t" . $depot_data['purchases_value'] . "\t" . $depot_data['purchases_kg'] . "\t" . $depot_data['dispatch'] . "\t" . $depot_data['avg_per_kg'] . "\t" . $depot_data['cash_balance'] . "\t" . $depot_data['product_balance'] . "\t" . $depot_data['last_price'] . "\t\n";
+					$region_summaries[$region -> id]['total_cash_received'] += $depot_data['cash_received'];
 					$region_summaries[$region -> id]['total_purchases_value'] += $depot_data['purchases_value'];
 					$region_summaries[$region -> id]['total_purchases_kg'] += $depot_data['purchases_kg'];
 					$region_summaries[$region -> id]['total_dispatch'] += $depot_data['dispatch'];
@@ -158,7 +159,7 @@ class Regional_Summaries extends MY_Controller {
 		$data_buffer .= "Summaries\nZone\tTotal Cash Received\tTotal Purchases (Tsh.)\tTotal Purchases (Kgs.)\tTotal Dispatch (Kgs.)\tAvg. Per KG.\tTotal Cash Balance\tTotal Product Balance\t\n";
 		foreach ($regions as $region) {
 			$avg_per_kg = 0;
-			$total_cash_received += $region_summaries[$region -> id]['total_cash_received']; 
+			$total_cash_received += $region_summaries[$region -> id]['total_cash_received'];
 			$total_purchases_value += $region_summaries[$region -> id]['total_purchases_value'];
 			$total_purchases_kg += $region_summaries[$region -> id]['total_purchases_kg'];
 			$total_dispatch += $region_summaries[$region -> id]['total_dispatch'];
@@ -171,7 +172,7 @@ class Regional_Summaries extends MY_Controller {
 		if ($total_purchases_value > 0 && $total_purchases_kg > 0) {
 			$avg_per_kg = $total_purchases_value / $total_purchases_kg;
 		}
-		$data_buffer .= "\nGrand Totals\t" . $total_cash_received . "\t" .$total_purchases_value. "\t" . $total_purchases_kg . "\t" . $total_dispatch . "\t" . $avg_per_kg . "\t" . ($total_cash_received - $total_cash_paid - $total_purchases_value) . "\t" . ($total_purchases_kg - $total_dispatch) . "\t\n";
+		$data_buffer .= "\nGrand Totals\t" . $total_cash_received . "\t" . $total_purchases_value . "\t" . $total_purchases_kg . "\t" . $total_dispatch . "\t" . $avg_per_kg . "\t" . ($total_cash_received - $total_cash_paid - $total_purchases_value) . "\t" . ($total_purchases_kg - $total_dispatch) . "\t\n";
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=BC Summaries.xls");
 		// Fix for crappy IE bug in download.
@@ -188,11 +189,11 @@ class Regional_Summaries extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Buying Center</th><th>BC Code</th><th>Status</th><th>Cashier Route</th><th>Last Purchase Date</th><th>Cash Received</th><th>Purchases (Tsh.)</th><th>Purchases (Kgs.)</th><th>Dispatch (Kgs.)</th><th>Avg. Per KG.</th><th>Cash Balance</th><th>Product Balance</th><th>Last Price</th></tr>";
+		return "<tr><th>Buying Center</th><th>BC Code</th><th>Status</th><th>Cashier Route</th><th>Avg. Distance</th><th>Last Purchase Date</th><th>Cash Received</th><th>Purchases (Tsh.)</th><th>Purchases (Kgs.)</th><th>Dispatch (Kgs.)</th><th>Avg. Per KG.</th><th>Cash Balance</th><th>Product Balance</th><th>Last Price</th></tr>";
 	}
 
 	public function echoExcelTitles() {
-		return "Buying Center\tBC Code\tStatus\tCashier Route\tLast Purchase Date\tCash Received\tPurchases (Tsh.)\tPurchases (Kgs.)\tDispatch (Kgs.)\tAvg. Per KG.\tCash Balance\tProduct Balance\tLast Price\t\n";
+		return "Buying Center\tBC Code\tStatus\tCashier Route\tAvg. Distance\tLast Purchase Date\tCash Received\tPurchases (Tsh.)\tPurchases (Kgs.)\tDispatch (Kgs.)\tAvg. Per KG.\tCash Balance\tProduct Balance\tLast Price\t\n";
 	}
 
 	function generatePDF($data, $date) {
