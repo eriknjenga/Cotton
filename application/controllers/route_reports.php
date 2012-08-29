@@ -26,7 +26,7 @@ class Route_Reports extends MY_Controller {
 		$route = $this -> input -> post("route");
 		$action = $this -> input -> post("action");
 
-		$date = date("m/d/Y");
+		$date = date("d/m/Y");
 		if ($route == 0) {
 			//Get the region
 			$routes = Route::getAll();
@@ -48,6 +48,12 @@ class Route_Reports extends MY_Controller {
 			table.data-table td {
 			width: 120px;
 			}
+			.amount{
+				text-align:right;
+			}
+			.center{
+				text-align:center;
+			}
 			</style>
 			";
 		//echo the start of the table
@@ -58,21 +64,23 @@ class Route_Reports extends MY_Controller {
 			$route_summaries['total_purchases'] = 0;
 			$route_summaries['total_dispatched'] = 0;
 			$route_summaries['total_stock_balance'] = 0;
-			$data_buffer .= "<tr><td><b>Route: </b></td><td><b>" . $route -> Route_Name . "</b></td></tr>";
+			$data_buffer .= "<tr><td><b>Collection Route: </b></td><td><b>" . $route -> Route_Name . "</b></td></tr>";
 			$data_buffer .= $this -> echoTitles();
+			$sql_route_depots = "select * from depot where purchase_route = '" . $route -> id . "' order by distance asc";
+			$route_depots_query = $this -> db -> query($sql_route_depots); 
 			//Get data for each depot
-			foreach ($route->Route_Depot_Objects as $route_depot) {
-				if ($route_depot -> Deleted == "0") {
-					$sql = "select center_details.*,(total_purchased-total_dispatched) as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,coalesce(sum(quantity+free_farmer_quantity),0) as total_purchased,max(str_to_date(date,'%m/%d/%Y'))as last_purchase_date, (select coalesce(sum(net_weight),0) as total_dispatched from weighbridge w where w.buying_center_code = d.depot_code and w.weighing_type = '2') as total_dispatched from depot d  left join purchase p on p.depot = d.id and p.batch_status = '2' where d.id = '" . $route_depot -> id . "') center_details";
+			foreach ($route_depots_query->result_array() as $route_depot) {
+				if ($route_depot['deleted'] == "0") {
+					$sql = "select center_details.*,(total_purchased-total_dispatched) as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,coalesce(sum(quantity+free_farmer_quantity),0) as total_purchased,date_format(max(str_to_date(date,'%m/%d/%Y')),'%d/%m/%Y') as last_purchase_date, (select coalesce(sum(net_weight),0) as total_dispatched from weighbridge w where w.buying_center_code = d.depot_code and w.weighing_type = '2') as total_dispatched from depot d  left join purchase p on p.depot = d.id and p.batch_status = '2' where d.id = '" . $route_depot['id'] . "') center_details";
 					$query = $this -> db -> query($sql);
 					$depot_data = $query -> row_array();
-					$data_buffer .= "<tr><td>" . $depot_data['depot_code'] . "</td><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['distance'] . "</td><td>" . $depot_data['last_purchase_date'] . "</td><td>" . number_format($depot_data['total_purchased'] + 0) . "</td><td>" . number_format($depot_data['total_dispatched'] + 0) . "</td><td>" . number_format($depot_data['stock_balance'] + 0) . "</td><td>" . number_format(($depot_data['capacity'] * 1000) + 0) . "</td></tr>";
+					$data_buffer .= "<tr><td>" . $depot_data['depot_code'] . "</td><td>" . $depot_data['depot_name'] . "</td><td>" . (empty($depot_data['distance']) ? '-' : $depot_data['distance']). "</td><td class='center'>" . (empty($depot_data['last_purchase_date']) ? '-' : $depot_data['last_purchase_date']). "</td><td class='amount'>" . (empty($depot_data['total_purchased']) ? '-' : number_format($depot_data['total_purchased'] + 0)). "</td><td class='amount'>" .(empty($depot_data['total_dispatched']) ? '-' : number_format($depot_data['total_dispatched'] + 0)). "</td><td class='amount'>" .(empty($depot_data['stock_balance']) ? '-' : number_format($depot_data['stock_balance'] + 0)). "</td><td class='center'>" .(empty($depot_data['capacity']) ? '-' : number_format($depot_data['capacity']*1000)). "</td></tr>";
 					$route_summaries['total_purchases'] += $depot_data['total_purchased'];
 					$route_summaries['total_dispatched'] += $depot_data['total_dispatched'];
 					$route_summaries['total_stock_balance'] += $depot_data['stock_balance'];
 				}
 			}
-			$data_buffer .= "<tr></tr><tr><td><b>Totals</b></td><td>-</td><td>-</td><td>-</td><td>" . number_format($route_summaries['total_purchases'] + 0) . "</td><td>" . number_format($route_summaries['total_dispatched'] + 0) . "</td><td>" . number_format($route_summaries['total_stock_balance'] + 0) . "</td><td>-</td></tr>";
+			$data_buffer .= "<tr></tr><tr><td><b>Totals</b></td><td>-</td><td>-</td><td class='center'>-</td><td class='amount'>" . number_format($route_summaries['total_purchases'] + 0) . "</td><td class='amount'>" . number_format($route_summaries['total_dispatched'] + 0) . "</td><td class='amount'>" . number_format($route_summaries['total_stock_balance'] + 0) . "</td><td class='center'>-</td></tr>";
 		}
 
 		$data_buffer .= "</table>";
@@ -97,12 +105,14 @@ class Route_Reports extends MY_Controller {
 			$route_summaries['total_purchases'] = "";
 			$route_summaries['total_dispatched'] = "";
 			$route_summaries['total_stock_balance'] = "";
-			$data_buffer .= "Route: \t" . $route -> Route_Name . "\n";
+			$data_buffer .= "Collection Route: \t" . $route -> Route_Name . "\n";
 			$data_buffer .= $this -> echoExcelTitles();
+			$sql_route_depots = "select * from depot where purchase_route = '" . $route -> id . "' order by abs(distance) asc";
+			$route_depots_query = $this -> db -> query($sql_route_depots); 
 			//Get data for each depot
-			foreach ($route->Route_Depot_Objects as $route_depot) {
-				if ($route_depot ->  Deleted == "0") {
-					$sql = "select center_details.*,(total_purchased-total_dispatched) as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,coalesce(sum(quantity+free_farmer_quantity),0) as total_purchased,max(str_to_date(date,'%m/%d/%Y'))as last_purchase_date, (select coalesce(sum(net_weight),0) as total_dispatched from weighbridge w where w.buying_center_code = d.depot_code and w.weighing_type = '2') as total_dispatched from depot d  left join purchase p on p.depot = d.id and p.batch_status = '2' where d.id = '" . $route_depot -> id . "') center_details";
+			foreach ($route_depots_query->result_array() as $route_depot) {
+				if ($route_depot['deleted'] == "0") {
+					$sql = "select center_details.*,(total_purchased-total_dispatched) as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,coalesce(sum(quantity+free_farmer_quantity),0) as total_purchased,date_format(max(str_to_date(date,'%m/%d/%Y')),'%d/%m/%Y') as last_purchase_date, (select coalesce(sum(net_weight),0) as total_dispatched from weighbridge w where w.buying_center_code = d.depot_code and w.weighing_type = '2') as total_dispatched from depot d  left join purchase p on p.depot = d.id and p.batch_status = '2' where d.id = '" . $route_depot['id'] . "') center_details";
 					$query = $this -> db -> query($sql);
 					$depot_data = $query -> row_array();
 					$data_buffer .= $depot_data['depot_code'] . "\t" . $depot_data['depot_name'] . "\t" . $depot_data['distance'] . "\t" . $depot_data['last_purchase_date'] . "\t" . $depot_data['total_purchased'] . "\t" . $depot_data['total_dispatched'] . "\t" . $depot_data['stock_balance'] . "\t" . ($depot_data['capacity'] * 1000) . "\t\n";
