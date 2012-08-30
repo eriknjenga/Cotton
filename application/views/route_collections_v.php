@@ -26,7 +26,21 @@ foreach($routes as $route){
 				?>
 				<option value="<?php echo $route -> id;?>"><?php echo $route -> Route_Name;?></option>
 				<?php }?>
-			</select> 
+			</select>
+		</p>
+		<p>
+			<label for="sort">Sort By</label>
+			<select name="sort" id="sort">
+				<option value="distance">Distance from Ginnery</option>
+				<option value="stock_balance">Stock Balance</option>
+			</select>
+		</p>
+		<p>
+			<label for="order">Order</label>
+			<select name="order" id="order">
+				<option value="asc">Ascending</option>
+				<option value="desc">Descending</option>
+			</select>
 		</p>
 		<input type="submit" name="action" class="button"	value="Download Route Collections PDF" />
 		<input type="submit" name="action" class="button"	value="Download Route Collections Excel" />
