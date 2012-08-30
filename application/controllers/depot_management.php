@@ -77,6 +77,8 @@ class Depot_Management extends MY_Controller {
 		}
 		$data['purchase_routes'] = Route::getAll();
 		$data['cash_disbursement_routes'] = Cash_Route::getAll();
+		$data['collection_routes'] = Collection_Route::getAll();
+		$data['audit_routes'] = Audit_Route::getAll();
 		$data['content_view'] = "add_depot_v";
 		$data['quick_link'] = "add_depot";
 		$data['scripts'] = array("validationEngine-en.js", "validator.js", "jquery.ui.autocomplete.js");
@@ -92,9 +94,9 @@ class Depot_Management extends MY_Controller {
 
 	public function print_depots() {
 		$depots = Depot::getAll();
-		$data_buffer = "Depot Code\tDepot Name\tBuyer\tVillage\tCapacity\tDistance\tFBG\tYield Per Acre\tAcreage\tPurchase Route\tCash Disbursement Route\t\n";
+		$data_buffer = "Depot Code\tDepot Name\tBuyer\tVillage\tCapacity\tDistance\tFBG\tYield Per Acre\tAcreage\tPurchase Route\tCashier Route\tCollection Route\tAudit Route\t\n";
 		foreach ($depots as $depot) {
-			$data_buffer .= $depot -> Depot_Code . "\t" . $depot -> Depot_Name . "\t" . $depot -> Buyer_Object -> Name . "\t" . $depot -> Village_Object -> Name . "\t" . $depot -> Capacity . "\t" . $depot -> Distance . "\t" . $depot -> FBG . "\t" . $depot -> Acre_Yield . "\t" . $depot -> Acreage . "\t" . $depot -> Purchase_Route_Object -> Route_Name . "\t" . $depot -> Cash_Disbursement_Route_Object -> Route_Name . "\n";
+			$data_buffer .= $depot -> Depot_Code . "\t" . $depot -> Depot_Name . "\t" . $depot -> Buyer_Object -> Name . "\t" . $depot -> Village_Object -> Name . "\t" . $depot -> Capacity . "\t" . $depot -> Distance . "\t" . $depot -> FBG . "\t" . $depot -> Acre_Yield . "\t" . $depot -> Acreage . "\t" . $depot -> Purchase_Route_Object -> Route_Name . "\t" . $depot -> Cash_Disbursement_Route_Object -> Route_Name. "\t".$depot -> Collection_Route_Object -> Route_Name . "\t" . $depot -> Audit_Route_Object -> Route_Name . "\t"  . "\n";
 		}
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=System Buying Centers.xls");
@@ -114,14 +116,16 @@ class Depot_Management extends MY_Controller {
 			$temp_depot -> Village = $this -> input -> post("village_id");
 			$temp_depot -> Purchase_Route = $this -> input -> post("purchase_route");
 			$temp_depot -> Cash_Disbursement_Route = $this -> input -> post("cash_disbursement_route");
+			$temp_depot -> Collection_Route = $this -> input -> post("collection_route");
+			$temp_depot -> Audit_Route = $this -> input -> post("audit_route");
 			$fbg = array("0" => "No", "1" => "Yes");
-			$details_desc = "{Code: '" . $this -> input -> post("depot_code") . "' Name: '" . $this -> input -> post("depot_name") . "' Capacity: '" . $this -> input -> post("capacity") . "' Distance: '" . $this -> input -> post("distance") . "' FBG/Non-FBG: '" . $fbg[$this -> input -> post("fbg")] . "' Acreage: '" . $this -> input -> post("acreage") . "' Yield/Acre: '" . $this -> input -> post("acre_yield") . "' Buyer: '" . $temp_depot -> Buyer_Object -> Name . "' Village: '" . $temp_depot -> Village_Object -> Name . "' Purchase Route: '" . $temp_depot -> Purchase_Route_Object -> Route_Name . "' Cash Disbursement Route: '" . $temp_depot -> Cash_Disbursement_Route_Object -> Route_Name . "'}";
+			$details_desc = "{Code: '" . $this -> input -> post("depot_code") . "' Name: '" . $this -> input -> post("depot_name") . "' Capacity: '" . $this -> input -> post("capacity") . "' Distance: '" . $this -> input -> post("distance") . "' FBG/Non-FBG: '" . $fbg[$this -> input -> post("fbg")] . "' Acreage: '" . $this -> input -> post("acreage") . "' Yield/Acre: '" . $this -> input -> post("acre_yield") . "' Buyer: '" . $temp_depot -> Buyer_Object -> Name . "' Village: '" . $temp_depot -> Village_Object -> Name . "' Purchase Route: '" . $temp_depot -> Purchase_Route_Object -> Route_Name . "' Collection Route: '" . $temp_depot -> Collection_Route_Object -> Route_Name . "' Audit Route: '" . $temp_depot -> Audit_Route_Object -> Route_Name . "' Cash Disbursement Route: '" . $temp_depot -> Cash_Disbursement_Route_Object -> Route_Name . "'}";
 			$editing = $this -> input -> post("editing_id");
 			//Check if we are editing the record first
 			if (strlen($editing) > 0) {
 				$depot = Depot::getDepot($editing);
 				$log -> Log_Type = "2";
-				$log -> Log_Message = "Edited Buying Center Record From {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . $depot -> Distance . "' FBG/Non-FBG: '" . $fbg[$depot -> FBG] . "' Acreage: '" . $depot -> Acreage . "' Yield/Acre: '" . $depot -> Acre_Yield . "'  Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "' Purchase Route: '" . $depot -> Purchase_Route_Object -> Route_Name . "' Cash Disbursement Route: '" . $depot -> Cash_Disbursement_Route_Object -> Route_Name . "'} to " . $details_desc;
+				$log -> Log_Message = "Edited Buying Center Record From {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . $depot -> Distance . "' FBG/Non-FBG: '" . $fbg[$depot -> FBG] . "' Acreage: '" . $depot -> Acreage . "' Yield/Acre: '" . $depot -> Acre_Yield . "'  Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "' Purchase Route: '" . $depot -> Purchase_Route_Object -> Route_Name . "' Collection Route: '" . $depot -> Collection_Route_Object -> Route_Name . "' Audit Route: '" . $depot -> Audit_Route_Object -> Route_Name . "' Cash Disbursement Route: '" . $depot -> Cash_Disbursement_Route_Object -> Route_Name . "'} to " . $details_desc;
 			} else {
 				$depot = new Depot();
 				$log -> Log_Type = "1";
@@ -137,6 +141,8 @@ class Depot_Management extends MY_Controller {
 			$depot -> Acreage = $this -> input -> post("acreage");
 			$depot -> Acre_Yield = $this -> input -> post("acre_yield");
 			$depot -> Purchase_Route = $this -> input -> post("purchase_route");
+			$depot -> Collection_Route = $this -> input -> post("collection_route");
+			$depot -> Audit_Route = $this -> input -> post("audit_route");
 			$depot -> Cash_Disbursement_Route = $this -> input -> post("cash_disbursement_route");
 			$depot -> save();
 			$log -> User = $this -> session -> userdata('user_id');
@@ -155,7 +161,7 @@ class Depot_Management extends MY_Controller {
 		$depot -> save();
 		$log = new System_Log();
 		$log -> Log_Type = "3";
-		$log -> Log_Message = "Deleted Buying Center Record {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . "' FBG/Non-FBG: '" . $fbg[$depot -> FBG] . "' Acreage: '" . $depot -> Acreage . "' Yield/Acre: '" . $depot -> Acre_Yield . $depot -> Distance . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "' Purchase Route: '" . $depot -> Purchase_Route_Object -> Route_Name . "' Cash Disbursement Route: '" . $depot -> Cash_Disbursement_Route_Object -> Route_Name . "'}";
+		$log -> Log_Message = "Deleted Buying Center Record {Code: '" . $depot -> Depot_Code . "' Name: '" . $depot -> Depot_Name . "' Capacity: '" . $depot -> Capacity . "' Distance: '" . "' FBG/Non-FBG: '" . $fbg[$depot -> FBG] . "' Acreage: '" . $depot -> Acreage . "' Yield/Acre: '" . $depot -> Acre_Yield . $depot -> Distance . "' Buyer: '" . $depot -> Buyer_Object -> Name . "' Village: '" . $depot -> Village_Object -> Name . "' Purchase Route: '" . $depot -> Purchase_Route_Object -> Route_Name . "' Collection Route: '" . $depot -> Collection_Route_Object -> Route_Name . "' Audit Route: '" . $depot -> Audit_Route_Object -> Route_Name . "' Cash Disbursement Route: '" . $depot -> Cash_Disbursement_Route_Object -> Route_Name . "'}";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();

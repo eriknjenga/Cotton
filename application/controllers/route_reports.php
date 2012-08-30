@@ -66,7 +66,7 @@ class Route_Reports extends MY_Controller {
 			$route_summaries['total_stock_balance'] = 0;
 			$data_buffer .= "<tr><td><b>Collection Route: </b></td><td><b>" . $route -> Route_Name . "</b></td></tr>";
 			$data_buffer .= $this -> echoTitles();
-			$sql_route_depots = "select * from depot where purchase_route = '" . $route -> id . "' order by distance asc";
+			$sql_route_depots = "select * from depot where purchase_route = '" . $route -> id . "' order by abs(distance) asc";
 			$route_depots_query = $this -> db -> query($sql_route_depots); 
 			//Get data for each depot
 			foreach ($route_depots_query->result_array() as $route_depot) {

@@ -3,8 +3,17 @@ if (!isset($sub_link)) {
 	$sub_link = "";
 }
 ?>
+<style>
+	#navbar ul.sub-nav { 
+		height: 40px; 
+		line-height: 20px;
+	}
+	.double-line{
+		line-height: 12px;
+	}
+</style>
 <div id="navbar" >
-	<ul class="nav" style="background-color: black; margin-top:0">
+	<ul class="nav sub-nav" style="background-color: black; margin-top:0">
 		<li>
 			<a  href = "<?php echo site_url('region_management')?>" class="<?php
 			if ($sub_link == 'region_management') {echo "active";
@@ -29,17 +38,29 @@ if (!isset($sub_link)) {
 			}
 			?>" >Villages</a>
 		</li>
-		<li>
+		<li class="double-line">
 			<a  href = "<?php echo site_url('route_management')?>" class="<?php
 			if ($sub_link == 'route_management') {echo "active";
 			}
-			?>" >Purchasing Routes</a>
+			?>" >Purchasing</br>Routes</a>
 		</li>
-		<li>
+		<li class="double-line">
 			<a  href = "<?php echo site_url('cash_route_management')?>" class="<?php
 			if ($sub_link == 'cash_route_management') {echo "active";
 			}
-			?>" >Cash Disbursement Routes</a>
+			?>" >Cashier</br>Routes</a>
+		</li>
+		<li class="double-line">
+			<a  href = "<?php echo site_url('collection_route_management')?>" class="<?php
+			if ($sub_link == 'collection_route_management') {echo "active";
+			}
+			?>" >Collection</br>Routes</a>
+		</li>
+		<li class="double-line">
+			<a  href = "<?php echo site_url('audit_route_management')?>" class="<?php
+			if ($sub_link == 'audit_route_management') {echo "active";
+			}
+			?>" >Audit</br>Routes</a>
 		</li>
 	</ul>
 </div>

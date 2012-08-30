@@ -10,6 +10,8 @@ class Depot extends Doctrine_Record {
 		$this -> hasColumn('Deleted', 'varchar', 1);
 		$this -> hasColumn('Purchase_Route', 'varchar', 10);
 		$this -> hasColumn('Cash_Disbursement_Route', 'varchar', 10);
+		$this -> hasColumn('Collection_Route', 'varchar', 10);
+		$this -> hasColumn('Audit_Route', 'varchar', 10);
 		$this -> hasColumn('FBG', 'varchar', 1);
 		$this -> hasColumn('Acre_Yield', 'varchar', 10);
 		$this -> hasColumn('Acreage', 'varchar', 10);
@@ -21,6 +23,8 @@ class Depot extends Doctrine_Record {
 		$this -> hasOne('Village as Village_Object', array('local' => 'Village', 'foreign' => 'id'));
 		$this -> hasOne('Route as Purchase_Route_Object', array('local' => 'Purchase_Route', 'foreign' => 'id'));
 		$this -> hasOne('Cash_Route as Cash_Disbursement_Route_Object', array('local' => 'Cash_Disbursement_Route', 'foreign' => 'id'));
+		$this -> hasOne('Collection_Route as Collection_Route_Object', array('local' => 'Collection_Route', 'foreign' => 'id'));
+		$this -> hasOne('Audit_Route as Audit_Route_Object', array('local' => 'Audit_Route', 'foreign' => 'id'));
 	}
 
 	public function getTotalDepots() {

@@ -13,7 +13,7 @@
 	 */
 	* html .ui-autocomplete {
 		width: 200px;
-	}
+	}
 </style>
 <script type="text/javascript">
 	$(function() {
@@ -24,7 +24,8 @@ $("#buyer_id").attr("value","");
 }
 });
 $("#village").autocomplete({
-source : "<?php echo base_url();?>fbg_management/autocomplete_village",
+source : "<?php echo base_url();?>
+	fbg_management / autocomplete_village",
 	minLength : 1,
 	select: function( event, ui ) {
 	$( "#village" ).val( ui.item.label );
@@ -33,7 +34,9 @@ source : "<?php echo base_url();?>fbg_management/autocomplete_village",
 	}
 	});
 	$("#buyer").autocomplete({
-	source : "<?php echo base_url();?>buyer_management/autocomplete_buyer",
+	source : "
+<?php echo base_url();?>
+	buyer_management / autocomplete_buyer",
 	minLength : 1,
 	select: function( event, ui ) {
 	$( "#buyer" ).val( ui.item.label );
@@ -56,6 +59,8 @@ if (isset($depot)) {
 	$buyer_id = $depot -> Buyer;
 	$purchase_route = $depot -> Purchase_Route;
 	$cash_disbursement_route = $depot -> Cash_Disbursement_Route;
+	$collection_route = $depot -> Collection_Route;
+	$audit_route = $depot -> Audit_Route;
 	$buyer = $depot -> Buyer_Object -> Name;
 	$fbg = $depot -> FBG;
 	$acre_yield = $depot -> Acre_Yield;
@@ -70,6 +75,8 @@ if (isset($depot)) {
 	$buyer_id = "";
 	$purchase_route = "";
 	$cash_disbursement_route = "";
+	$collection_route = "";
+	$audit_route = "";
 	$capacity = "";
 	$distance = "";
 	$depot_id = "";
@@ -117,7 +124,8 @@ echo validation_errors('
 		<select name="purchase_route" class="dropdown" id="purchase_route">
 			<option></option>
 			<?php
-foreach($purchase_routes as $route_object){?>
+foreach($purchase_routes as $route_object){
+			?>
 			<option value="<?php echo $route_object -> id;?>" <?php
 
 			if ($route_object -> id == $purchase_route) {echo "selected";
@@ -129,11 +137,12 @@ foreach($purchase_routes as $route_object){?>
 		<span class="field_desc">Select the purchase route for this Buying Center</span>
 	</p>
 	<p>
-		<label for="cash_disbursement_route">Cash Disbursement Route</label>
+		<label for="cash_disbursement_route">Cashier Route</label>
 		<select name="cash_disbursement_route" class="dropdown" id="cash_disbursement_route">
 			<option></option>
 			<?php
-foreach($cash_disbursement_routes as $route_object){?>
+foreach($cash_disbursement_routes as $route_object){
+			?>
 			<option value="<?php echo $route_object -> id;?>" <?php
 
 			if ($route_object -> id == $cash_disbursement_route) {echo "selected";
@@ -144,16 +153,50 @@ foreach($cash_disbursement_routes as $route_object){?>
 		</select>
 		<span class="field_desc">Select the cash disbursement route for this Buying Center</span>
 	</p>
+		<p>
+		<label for="collection_route">Collection Route</label>
+		<select name="collection_route" class="dropdown" id="collection_route">
+			<option></option>
+			<?php
+foreach($collection_routes as $collection_route_object){
+			?>
+			<option value="<?php echo $collection_route_object -> id;?>" <?php
+
+			if ($collection_route_object -> id == $collection_route) {echo "selected";
+
+			}
+			?>><?php echo $collection_route_object -> Route_Name;?></option>
+			<?php }?>
+		</select>
+		<span class="field_desc">Select the collection route for this Buying Center</span>
+	</p>
+		<p>
+		<label for="audit_route">Audit Route</label>
+		<select name="audit_route" class="dropdown" id="audit_route">
+			<option></option>
+			<?php
+foreach($audit_routes as $audit_route_object){
+			?>
+			<option value="<?php echo $audit_route_object -> id;?>" <?php
+
+			if ($audit_route_object -> id == $audit_route) {echo "selected";
+
+			}
+			?>><?php echo $audit_route_object -> Route_Name;?></option>
+			<?php }?>
+		</select>
+		<span class="field_desc">Select the audit route for this Buying Center</span>
+	</p>
 	<p>
 		<label for="fbg">FBG/Non-FBG: </label>
 		<input id="fbg" name="fbg" type="radio" value="1" <?php
-			if ($fbg == "1") {echo "checked";
-			};
+		if ($fbg == "1") {echo "checked";
+		};
 		?>/>
 		FBG
 		<input id="fbg" name="fbg" type="radio" value="0" <?php
-			if ($fbg == "0") {echo "checked";
-			};
+		if ($fbg == "0") {echo "checked";
+		};
 		?>/>
 		Non-FBG
 	<p>
