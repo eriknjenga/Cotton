@@ -31,9 +31,9 @@ class Route_Reports extends MY_Controller {
 		$date = date("d/m/Y");
 		if ($route == 0) {
 			//Get the region
-			$routes = Route::getAll();
+			$routes = Collection_Route::getAll();
 		} else {
-			$routes = Route::getRouteArray($route);
+			$routes = Collection_Route::getRouteArray($route);
 		}
 		//Check if the user requested an excel sheet; if so, call the responsible function
 		if ($action == "Download Route Collections Excel") {
@@ -68,7 +68,7 @@ class Route_Reports extends MY_Controller {
 			$route_summaries['total_stock_balance'] = 0;
 			$data_buffer .= "<tr><td><b>Collection Route: </b></td><td><b>" . $route -> Route_Name . "</b></td></tr>";
 			$data_buffer .= $this -> echoTitles();
-			$sql_route_depots = "select center_details.*,(total_purchased-total_dispatched) as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,coalesce(sum(quantity+free_farmer_quantity),0) as total_purchased,date_format(max(str_to_date(date,'%m/%d/%Y')),'%d/%m/%Y') as last_purchase_date, (select coalesce(sum(net_weight),0) as total_dispatched from weighbridge w where w.buying_center_code = d.depot_code and w.weighing_type = '2') as total_dispatched from depot d  left join purchase p on p.depot = d.id and p.batch_status = '2' where d.purchase_route = '" . $route -> id . "' and d.deleted='0' group by d.id) center_details order by cast(" . $sort . " as signed) " . $order . "";
+			$sql_route_depots = "select center_details.*,(total_purchased-total_dispatched) as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,coalesce(sum(quantity+free_farmer_quantity),0) as total_purchased,date_format(max(str_to_date(date,'%m/%d/%Y')),'%d/%m/%Y') as last_purchase_date, (select coalesce(sum(net_weight),0) as total_dispatched from weighbridge w where w.buying_center_code = d.depot_code and w.weighing_type = '2') as total_dispatched from depot d  left join purchase p on p.depot = d.id and p.batch_status = '2' where d.collection_route = '" . $route -> id . "' and d.deleted='0' group by d.id) center_details order by cast(" . $sort . " as signed) " . $order . "";
 			$route_depots_query = $this -> db -> query($sql_route_depots);
 			//Get data for each depot
 			foreach ($route_depots_query->result_array() as $depot_data) {
@@ -105,7 +105,7 @@ class Route_Reports extends MY_Controller {
 			$route_summaries['total_stock_balance'] = "";
 			$data_buffer .= "Collection Route: \t" . $route -> Route_Name . "\n";
 			$data_buffer .= $this -> echoExcelTitles();
-			$sql_route_depots = "select center_details.*,(total_purchased-total_dispatched) as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,coalesce(sum(quantity+free_farmer_quantity),0) as total_purchased,date_format(max(str_to_date(date,'%m/%d/%Y')),'%d/%m/%Y') as last_purchase_date, (select coalesce(sum(net_weight),0) as total_dispatched from weighbridge w where w.buying_center_code = d.depot_code and w.weighing_type = '2') as total_dispatched from depot d  left join purchase p on p.depot = d.id and p.batch_status = '2' where d.purchase_route = '" . $route -> id . "' and d.deleted='0' group by d.id) center_details order by cast(" . $sort . " as signed) " . $order . "";
+			$sql_route_depots = "select center_details.*,(total_purchased-total_dispatched) as stock_balance from (select d.id, depot_code, depot_name, capacity, distance,coalesce(sum(quantity+free_farmer_quantity),0) as total_purchased,date_format(max(str_to_date(date,'%m/%d/%Y')),'%d/%m/%Y') as last_purchase_date, (select coalesce(sum(net_weight),0) as total_dispatched from weighbridge w where w.buying_center_code = d.depot_code and w.weighing_type = '2') as total_dispatched from depot d  left join purchase p on p.depot = d.id and p.batch_status = '2' where d.collection_route = '" . $route -> id . "' and d.deleted='0' group by d.id) center_details order by cast(" . $sort . " as signed) " . $order . "";
 			$route_depots_query = $this -> db -> query($sql_route_depots);
 			//Get data for each depot
 			foreach ($route_depots_query->result_array() as $depot_data) {
