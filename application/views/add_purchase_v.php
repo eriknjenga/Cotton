@@ -218,7 +218,7 @@ if (isset($purchase)) {
 	$quantity = "0";
 	$price = "";
 	$total_value = "0";
-	$season = "";
+	$season = date('Y');
 	$loan_recovery = "0";
 	$farmer_registration = "0";
 	$other_recoveries = "0";
@@ -284,7 +284,7 @@ foreach ($prices as $price_object) {
 <div class="dps_details">
 	<p>
 	<label for="dpn">DPS Number</label>
-	<input id="dpn" name="dpn" type="text" value="<?php echo $dpn;?>" class="dpn validate[required]"/> 
+	<input id="dpn" name="dpn" type="text" value="<?php echo $dpn;?>" class="dpn validate[required,custom[integer]]"/> 
 </p>
 <p>
 	<label for="season">Season</label>

@@ -54,6 +54,7 @@ class FBG_Reports extends MY_Controller {
 		$total_debt = 0;
 		$total_recoveries = 0;
 		$total_debt_owing = 0;
+		$total_bought = 0;
 		//echo the start of the table
 		$data_buffer .= "<table class='data-table'>";
 		$region_summaries = array();
@@ -62,25 +63,28 @@ class FBG_Reports extends MY_Controller {
 			$region_summaries[$region -> id]['total_debt'] = 0;
 			$region_summaries[$region -> id]['total_recoveries'] = 0;
 			$region_summaries[$region -> id]['total_debt_owing'] = 0;
+			$region_summaries[$region -> id]['total_bought'] = "";
 			$data_buffer .= "<tr><td><b>Zone: </b></td><td><b>" . $region -> Region_Name . "</b></td></tr>";
 			$data_buffer .= $this -> echoTitles();
-			$sql = "select cpc_number,group_name,hectares_available,chairman_name,v.name as village,(select sum(d.total_value) from disbursement d where d.fbg = f.id and batch_status = '2') as total_borrowed ,(select sum(gross_value-net_value) from purchase p where p.fbg = f.id and batch_status = '2') as total_recovered  from fbg f left join village v on f.village = v.id left join ward w on v.ward = w.id where w.region = '" . $region -> id . "' order by village asc";
+			$sql = "select cpc_number,group_name,hectares_available,chairman_name,v.name as village,(select sum(d.total_value) from disbursement d where d.fbg = f.id) as total_borrowed ,sum(loan_recovery) as total_recovered,sum(p.quantity) as total_bought  from fbg f left join purchase p on f.id = p.fbg and p.batch_status = '2' left join village v on f.village = v.id left join ward w on v.ward = w.id where w.region = '" . $region -> id . "' group by f.id order by village asc";
 			$query = $this -> db -> query($sql);
 			foreach ($query->result_array() as $fbg_data) {
 				$total_outstanding = $fbg_data['total_borrowed'] - $fbg_data['total_recovered'];
-				$data_buffer .= "<tr><td>" . $fbg_data['cpc_number'] . "</td><td>" . $fbg_data['group_name'] . "</td><td>" . $fbg_data['chairman_name'] . "</td><td>" . $fbg_data['village'] . "</td><td class='right-align'>" . (empty($fbg_data['total_borrowed']) ? '-' : number_format($fbg_data['total_borrowed'] + 0)) . "</td><td class='right-align'>" . (empty($fbg_data['total_recovered']) ? '-' : number_format($fbg_data['total_recovered'] + 0)) . "</td><td class='right-align'>" . (empty($total_outstanding) ? '-' : number_format($total_outstanding + 0)) . "</td></tr>";
+				$data_buffer .= "<tr><td>" . $fbg_data['cpc_number'] . "</td><td>" . $fbg_data['group_name'] . "</td><td>" . $fbg_data['chairman_name'] . "</td><td>" . $fbg_data['village'] . "</td><td class='right-align'>" . (empty($fbg_data['total_borrowed']) ? '-' : number_format($fbg_data['total_borrowed'] + 0)) . "</td><td class='right-align'>" . (empty($fbg_data['total_recovered']) ? '-' : number_format($fbg_data['total_recovered'] + 0)) . "</td><td class='right-align'>" . (empty($total_outstanding) ? '-' : number_format($total_outstanding + 0)) . "</td><td class='right-align'>" . (empty($fbg_data['total_bought']) ? '-' : number_format($fbg_data['total_bought'] + 0)) . "</td></tr>";
 				$region_summaries[$region -> id]['total_debt'] += $fbg_data['total_borrowed'];
 				$region_summaries[$region -> id]['total_recoveries'] += $fbg_data['total_recovered'];
 				$region_summaries[$region -> id]['total_debt_owing'] += $total_outstanding;
+				$region_summaries[$region -> id]['total_bought'] += $fbg_data['total_bought'];
 			}
-			$data_buffer .= "<tr><td>Totals</td><td>-</td><td>-</td><td>-</td><td class='right-align'>" . number_format($region_summaries[$region -> id]['total_debt'] + 0) . "</td><td class='right-align'>" . number_format($region_summaries[$region -> id]['total_recoveries'] + 0) . "</td><td class='right-align'>" . number_format($region_summaries[$region -> id]['total_debt_owing'] + 0) . "</td></tr>";
+			$data_buffer .= "<tr><td>Totals</td><td>-</td><td>-</td><td>-</td><td class='right-align'>" . number_format($region_summaries[$region -> id]['total_debt'] + 0) . "</td><td class='right-align'>" . number_format($region_summaries[$region -> id]['total_recoveries'] + 0) . "</td><td class='right-align'>" . number_format($region_summaries[$region -> id]['total_debt_owing'] + 0) . "</td><td class='right-align'>" . number_format($region_summaries[$region -> id]['total_bought'] + 0) . "</td></tr>";
 			$total_debt += $region_summaries[$region -> id]['total_debt'];
 			$total_recoveries += $region_summaries[$region -> id]['total_recoveries'];
 			$total_debt_owing += $region_summaries[$region -> id]['total_debt_owing'];
+			$total_bought += $region_summaries[$region -> id]['total_bought'];
 		}
 		$data_buffer .= "</table>";
-		$data_buffer .= "<h3>Summaries</h3><table class='data-table'><tr><th></th><th>Total Debt</th><th>Total Recoveries</th><th>Total Debt Owing</th></tr>";
-		$data_buffer .= "<tr><td>Totals</td><td class='right-align'>" . number_format($total_debt + 0) . "</td><td class='right-align'>" . number_format($total_recoveries + 0) . "</td><td class='right-align'>" . number_format($total_debt_owing + 0) . "</td></tr>";
+		$data_buffer .= "<h3>Summaries</h3><table class='data-table'><tr><th></th><th>Total Debt</th><th>Total Recoveries</th><th>Total Debt Owing</th><th>Total KGs Bought</th></tr>";
+		$data_buffer .= "<tr><td>Totals</td><td class='right-align'>" . number_format($total_debt + 0) . "</td><td class='right-align'>" . number_format($total_recoveries + 0) . "</td><td class='right-align'>" . number_format($total_debt_owing + 0) . "</td><td class='right-align'>" . number_format($total_bought + 0) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -99,6 +103,7 @@ class FBG_Reports extends MY_Controller {
 		$total_debt = 0;
 		$total_recoveries = 0;
 		$total_debt_owing = 0;
+		$total_bought = 0;
 		//echo the start of the table
 		$region_summaries = array();
 		foreach ($regions as $region) {
@@ -106,24 +111,27 @@ class FBG_Reports extends MY_Controller {
 			$region_summaries[$region -> id]['total_debt'] = "";
 			$region_summaries[$region -> id]['total_recoveries'] = "";
 			$region_summaries[$region -> id]['total_debt_owing'] = "";
+			$region_summaries[$region -> id]['total_bought'] = "";
 			$data_buffer .= "Zone: \t" . $region -> Region_Name . "\n";
 			$data_buffer .= $this -> echo_excel_titles();
-			$sql = "select cpc_number,group_name,hectares_available,chairman_name,v.name as village,(select sum(d.total_value) from disbursement d where d.fbg = f.id) as total_borrowed ,(select sum(gross_value-net_value) from purchase p where p.fbg = f.id) as total_recovered  from fbg f left join village v on f.village = v.id left join ward w on v.ward = w.id where w.region = '" . $region -> id . "' order by village asc";
+			$sql = "select cpc_number,group_name,hectares_available,chairman_name,v.name as village,(select sum(d.total_value) from disbursement d where d.fbg = f.id) as total_borrowed ,sum(loan_recovery) as total_recovered,sum(p.quantity) as total_bought  from fbg f left join purchase p on f.id = p.fbg and p.batch_status = '2' left join village v on f.village = v.id left join ward w on v.ward = w.id where w.region = '" . $region -> id . "' group by f.id order by village asc";
 			$query = $this -> db -> query($sql);
 			foreach ($query->result_array() as $fbg_data) {
 				$total_outstanding = $fbg_data['total_borrowed'] - $fbg_data['total_recovered'];
-				$data_buffer .= $fbg_data['cpc_number'] . "\t" . $fbg_data['group_name'] . "\t" . $fbg_data['chairman_name'] . "\t" . $fbg_data['village'] . "\t" . ($fbg_data['total_borrowed'] + 0) . "\t" . ($fbg_data['total_recovered'] + 0) . "\t" . $total_outstanding . "\t\n";
+				$data_buffer .= $fbg_data['cpc_number'] . "\t" . $fbg_data['group_name'] . "\t" . $fbg_data['chairman_name'] . "\t" . $fbg_data['village'] . "\t" . ($fbg_data['total_borrowed'] + 0) . "\t" . ($fbg_data['total_recovered'] + 0) . "\t" . $total_outstanding . "\t". $fbg_data['total_bought'] . "\t\n";
 				$region_summaries[$region -> id]['total_debt'] += $fbg_data['total_borrowed'];
 				$region_summaries[$region -> id]['total_recoveries'] += $fbg_data['total_recovered'];
 				$region_summaries[$region -> id]['total_debt_owing'] += $total_outstanding;
+				$region_summaries[$region -> id]['total_bought'] += $fbg_data['total_bought'];
 			}
-			$data_buffer .= "Totals\t-\t-\t-\t" . $region_summaries[$region -> id]['total_debt'] . "\t" . $region_summaries[$region -> id]['total_recoveries'] . "\t" . $region_summaries[$region -> id]['total_debt_owing'] . "\t\n\n";
+			$data_buffer .= "Totals\t-\t-\t-\t" . $region_summaries[$region -> id]['total_debt'] . "\t" . $region_summaries[$region -> id]['total_recoveries'] . "\t" . $region_summaries[$region -> id]['total_debt_owing'] ."\t" . $region_summaries[$region -> id]['total_bought'] .  "\t\n\n";
 			$total_debt += $region_summaries[$region -> id]['total_debt'];
 			$total_recoveries += $region_summaries[$region -> id]['total_recoveries'];
 			$total_debt_owing += $region_summaries[$region -> id]['total_debt_owing'];
+			$total_bought += $region_summaries[$region -> id]['total_bought'];
 		}
-		$data_buffer .= "Summaries\tTotal Debt\tTotal Recoveries\tTotal Debt Owing\t\n";
-		$data_buffer .= "Totals\t" . $total_debt . "\t" . $total_recoveries . "\t" . $total_debt_owing . "\n";
+		$data_buffer .= "Summaries\tTotal Debt\tTotal Recoveries\tTotal Debt Owing\tTotal KGs Bought\t\n";
+		$data_buffer .= "Totals\t" . $total_debt . "\t" . $total_recoveries . "\t" . $total_debt_owing ."\t" . $total_bought . "\n";
 		//echo $data_buffer;
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=Debt Analysis.xls");
@@ -140,11 +148,11 @@ class FBG_Reports extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>FBG No.</th><th>Name</th><th>Chairman</th><th>Village</th><th>Loaned to Date</th><th>Recovered to Date</th><th>Outstanding Balance</th></tr>";
+		return "<tr><th>FBG No.</th><th>Name</th><th>Chairman</th><th>Village</th><th>Loaned to Date</th><th>Recovered to Date</th><th>Outstanding Balance</th><th>KGs Bought to Date</th></tr>";
 	}
 
 	public function echo_excel_titles() {
-		return "FBG No.\tName\tChairman\tVillage\tLoaned to Date\tRecovered to Date\tOutstanding Balance\t\n";
+		return "FBG No.\tName\tChairman\tVillage\tLoaned to Date\tRecovered to Date\tOutstanding Balance\tKGs Bought to Date\t\n";
 	}
 
 	function generatePDF($data, $date) {
