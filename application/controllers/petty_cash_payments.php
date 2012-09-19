@@ -24,23 +24,31 @@ class Petty_Cash_Payments extends MY_Controller {
 		$action = $this -> input -> post("action");
 		$date = $this -> input -> post("date");
 		//Check if the user requested an excel sheet; if so, call the responsible function
-		if ($action == "Download Petty Cash Payments Excel" ) {
+		if ($action == "Download Petty Cash Payments Excel") {
 			$this -> downloadExcel($date);
 			return;
-			}
-			$this -> load -> database();
-			$data_buffer = "
+		}
+		$this -> load -> database();
+		$data_buffer = "
 			<style>
 			table.data-table {
 			table-layout: fixed;
 			width: 700px;
 			}
 			table.data-table td {
-			width: 100px;
+			width: 50px;
+			font-size:11;
 			}
-			.right{
-				text-align: right;
+			table.data-table th {
+			width: 50px;
+			font-size:11;
 			}
+			.amount{
+				text-align:right;
+			}
+			.center{
+				text-align:center;
+			}			
 			</style>
 			";
 		//echo the start of the table
@@ -51,10 +59,10 @@ class Petty_Cash_Payments extends MY_Controller {
 		$sql = "SELECT cih,field_cashier_name,date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as date,amount,'Centre Distribution' as paid_for FROM `cash_disbursement` c left join field_cashier f on c.field_cashier = f.id where str_to_date(date,'%m/%d/%Y') = str_to_date('" . $date . "','%m/%d/%Y')";
 		$query = $this -> db -> query($sql);
 		foreach ($query->result_array() as $depot_data) {
-			$data_buffer .= "<tr><td>" . $depot_data['cih'] . "</td><td>" . $depot_data['date'] . "</td><td>" . $depot_data['field_cashier_name'] . "</td><td class='right'>" . number_format($depot_data['amount'] + 0) . "</td><td class='right'>" . $depot_data['paid_for'] . "</td></tr>";
+			$data_buffer .= "<tr><td class='center'>" . $depot_data['cih'] . "</td><td class='center'>" . $depot_data['date'] . "</td><td class='center'>" . $depot_data['field_cashier_name'] . "</td><td class='amount'>" . number_format($depot_data['amount'] + 0) . "</td><td class='center'>" . $depot_data['paid_for'] . "</td></tr>";
 			$total_amount += $depot_data['amount'];
 		}
-		$data_buffer .= "<tr></tr><tr><td>Total Amount</td><td>-</td><td>-</td><td class='right'>" . number_format($total_amount + 0) . "</td><td>-</td></tr>";
+		$data_buffer .= "<tr></tr><tr><td>Total Amount</td><td class='center'>-</td><td class='center'>-</td><td class='amount'>" . number_format($total_amount + 0) . "</td><td class='center'>-</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -96,7 +104,7 @@ class Petty_Cash_Payments extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>CIH Number</th><th>Date</th><th>Field Cashier</th><th>Amount</th><th>Paid For</th></tr>";
+		return "<thead><tr><th>CIH Number</th><th>Date</th><th>Field Cashier</th><th>Amount</th><th>Paid For</th></tr></thead>";
 	}
 
 	public function echoExcelTitles() {
@@ -104,7 +112,7 @@ class Petty_Cash_Payments extends MY_Controller {
 	}
 
 	function generatePDF($data, $date) {
-
+		$date = date('d/m/Y', strtotime($date));
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>CIH Payments to FC</h3>";
 		$html_title .= "<h5 style='text-align:center;'> For " . $date . "</h5>";
@@ -113,8 +121,17 @@ class Petty_Cash_Payments extends MY_Controller {
 		$this -> mpdf = new mPDF('c', 'A4');
 		$this -> mpdf -> shrink_tables_to_fit = 1;
 		$this -> mpdf -> SetTitle('CIH Payments to FC');
-		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
+		$this -> mpdf -> defaultfooterfontsize = 9;
+		/* blank, B, I, or BI */
+		$this -> mpdf -> defaultfooterline = 1;
+		/* 1 to include line below header/above footer */
+		$this -> mpdf -> mirrorMargins = 1;
+		$mpdf -> defaultfooterfontstyle = B;
+		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|-{PAGENO}-|Petty Cash Payments Report');
+		/* defines footer for Odd and Even Pages - placed at Outer margin */
+
+		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "CIH Payments to FC.pdf";

@@ -37,8 +37,19 @@ class Truck_Summaries extends MY_Controller {
 			width: 700px;
 			}
 			table.data-table td {
-			width: 100px;
+			width: 50px;
+			font-size:11;
 			}
+			table.data-table th {
+			width: 50px;
+			font-size:11;
+			}
+			.amount{
+				text-align:right;
+			}
+			.center{
+				text-align:center;
+			}			
 			</style>
 			";
 		//echo the start of the table
@@ -50,11 +61,11 @@ class Truck_Summaries extends MY_Controller {
 		$sql = "SELECT vehicle_number, SUM( distance ) AS total_distance, SUM( net_weight ) AS total_delivered FROM weighbridge w LEFT JOIN depot d ON w.buying_center_code = d.depot_code WHERE weighing_type =  '2' AND STR_TO_DATE( transaction_date,  '%d/%m/%Y' ) BETWEEN STR_TO_DATE(  '" . $start_date . "',  '%m/%d/%Y' )AND STR_TO_DATE(  '" . $end_date . "',  '%m/%d/%Y' )GROUP BY vehicle_number";
 		$query = $this -> db -> query($sql);
 		foreach ($query->result_array() as $depot_data) {
-			$data_buffer .= "<tr><td>" . $depot_data['vehicle_number'] . "</td><td>" . number_format($depot_data['total_distance'] + 0) . "</td><td>" . number_format($depot_data['total_delivered'] + 0) . "</td></tr>";
+			$data_buffer .= "<tr><td>" . $depot_data['vehicle_number'] . "</td><td class='center'>" . number_format($depot_data['total_distance'] + 0) . "</td><td class='amount'>" . number_format($depot_data['total_delivered'] + 0) . "</td></tr>";
 			$total_weight += $depot_data['total_delivered'];
 			$total_distance += $depot_data['total_distance'];
 		}
-		$data_buffer .= "<tr></tr><tr><td>Totals</td><td>" . number_format($total_distance + 0) . "</td><td>" . number_format($total_weight + 0) . "</td></tr>";
+		$data_buffer .= "<tr></tr><tr><td>Totals</td><td class='center'>" . number_format($total_distance + 0) . "</td><td class='amount'>" . number_format($total_weight + 0) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -97,7 +108,7 @@ class Truck_Summaries extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Vehicle Number</th><th>Total Distance Covered (Kms.)</th><th>Total Cotton Delivered (Kgs.)</th></tr>";
+		return "<thead><tr><th>Vehicle Number</th><th>Total Distance Covered (Kms.)</th><th>Total Cotton Delivered (Kgs.)</th></tr></thead>";
 	}
 
 	public function echoExcelTitles() {
@@ -105,7 +116,8 @@ class Truck_Summaries extends MY_Controller {
 	}
 
 	function generatePDF($data, $start_date, $end_date) {
-
+		$start_date = date('d/m/Y', strtotime($start_date));
+		$end_date = date('d/m/Y', strtotime($end_date));
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Truck Summaries</h3>";
 		$html_title .= "<h5 style='text-align:center;'> Between " . $start_date . " and " . $end_date . "</h5>";
@@ -113,8 +125,17 @@ class Truck_Summaries extends MY_Controller {
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4');
 		$this -> mpdf -> SetTitle('Truck Summaries');
-		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
+		$this -> mpdf -> defaultfooterfontsize = 9;
+		/* blank, B, I, or BI */
+		$this -> mpdf -> defaultfooterline = 1;
+		/* 1 to include line below header/above footer */
+		$this -> mpdf -> mirrorMargins = 1;
+		$mpdf -> defaultfooterfontstyle = B;
+		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|-{PAGENO}-|Truck Summaries Report');
+		/* defines footer for Odd and Even Pages - placed at Outer margin */
+
+		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "Truck Summaries.pdf";

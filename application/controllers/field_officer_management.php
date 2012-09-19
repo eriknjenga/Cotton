@@ -30,6 +30,17 @@ class Field_Officer_Management extends MY_Controller {
 
 	}
 
+	public function search_feo() {
+		$search_term = $this -> input -> post("search_value6");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$officers = Field_Officer::getSearchedOfficer($db_search_term);
+			$data['officers'] = $officers;
+		$data['listing_title'] = "Ward Search Results For <b>' " . $search_term . "</b>";
+		$data['content_view'] = "list_field_officers_v";
+		$this -> base_params($data);
+	}
+
 	public function new_officer($data = null) {
 		if ($data == null) {
 			$data = array();
@@ -52,7 +63,7 @@ class Field_Officer_Management extends MY_Controller {
 		$feos = Field_Officer::getAll();
 		$data_buffer = "FEO Code\tName\tNational Id\tZone\t\n";
 		foreach ($feos as $feo) {
-			$data_buffer .= $feo ->Officer_Code . "\t" . $feo -> Officer_Name ."\t" . $feo -> National_Id ."\t" . $feo -> Region_Object->Region_Name . "\n";
+			$data_buffer .= $feo -> Officer_Code . "\t" . $feo -> Officer_Name . "\t" . $feo -> National_Id . "\t" . $feo -> Region_Object -> Region_Name . "\n";
 		}
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=System Field Extension Officers.xls");
@@ -100,7 +111,7 @@ class Field_Officer_Management extends MY_Controller {
 	}
 
 	public function base_params($data) {
-		$data['title'] = "Field Officer Management"; 
+		$data['title'] = "Field Officer Management";
 		$data['sub_link'] = "field_officer_management";
 		$data['link'] = "people_management";
 		$this -> load -> view("demo_template", $data);

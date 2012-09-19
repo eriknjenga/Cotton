@@ -25,44 +25,71 @@ class Transaction_Batch extends Doctrine_Record {
 		$this -> hasMany('Field_Cash_Disbursement as Field_Cash_Disbursements', array('local' => 'id', 'foreign' => 'Batch'));
 		$this -> hasMany('Region_Input_Issue as Region_Disbursements', array('local' => 'id', 'foreign' => 'Batch'));
 		$this -> hasMany('Mopping_Payment as Mopping_Payments', array('local' => 'id', 'foreign' => 'Batch'));
+		$this -> hasMany('Loan_Recovery_Receipt as Loan_Recovery_Cash_Receipts', array('local' => 'id', 'foreign' => 'Batch'));
+		$this -> hasMany('Buying_Center_Summary as Buying_Center_Summaries', array('local' => 'id', 'foreign' => 'Batch'));
 	}
 
 	//For the data entry clerk
-	public function getTotalBatches($user) {
-		$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch") -> where("User = '$user'");
+	public function getTotalBatches($user, $status = "") {
+		if ($status != "N") {
+			$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch") -> where("User = '$user' and Status = '$status'");
+		} else {
+			$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch") -> where("User = '$user'");
+		}
+
 		$total = $query -> execute();
 		return $total[0]['Total_Batches'];
 	}
 
-	public function getPagedBatches($offset, $items, $user) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("User = '$user'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+	public function getPagedBatches($offset, $items, $user, $status = "") {
+		if ($status != "N") {
+			$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("User = '$user' and Status = '$status'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+		} else {
+			$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("User = '$user'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+		}
 		$batches = $query -> execute(array());
 		return $batches;
 	}
 
 	//For the general supervisor. Get batches that are not open
-	public function getTotalClosedBatches() {
-		$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch") -> where("Status != '0'");
-
+	public function getTotalClosedBatches($status = "") {
+		if ($status != "N") {
+			$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch") -> where("Status = '$status'");
+		} else {
+			$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch");
+		}
 		$total = $query -> execute();
 		return $total[0]['Total_Batches'];
 	}
 
-	public function getPagedClosedBatches($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("Status != '0'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+	public function getPagedClosedBatches($offset, $items, $status = "") {
+		if ($status != "N") {
+			$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("Status = '$status'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+		} else {
+			$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+		}
 		$batches = $query -> execute(array());
 		return $batches;
 	}
 
 	//For the super administrator
-	public function getTotalSystemBatches() {
-		$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch");
+	public function getTotalSystemBatches($status = "") {
+		if ($status != "N") {
+			$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch") -> where("Status = '$status'");
+		} else {
+			$query = Doctrine_Query::create() -> select("count(*) as Total_Batches") -> from("Transaction_Batch");
+		}
 		$total = $query -> execute();
 		return $total[0]['Total_Batches'];
 	}
 
-	public function getPagedSystemBatches($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+	public function getPagedSystemBatches($offset, $items, $status = "") {
+		if ($status != "N") {
+			$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("Status = '$status'") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+		} else {
+			$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> offset($offset) -> limit($items) -> orderBy("id Desc");
+		}
+
 		$batches = $query -> execute(array());
 		return $batches;
 	}
@@ -99,7 +126,7 @@ class Transaction_Batch extends Doctrine_Record {
 	}
 
 	public function getSearchedSupervisorBatch($batch) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("Id = '$batch' and Status != '0'");
+		$query = Doctrine_Query::create() -> select("*") -> from("Transaction_Batch") -> where("Id = '$batch'");
 		$batch = $query -> execute();
 		return $batch;
 	}

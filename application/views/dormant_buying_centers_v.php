@@ -19,7 +19,7 @@
 		</legend>
 		<p>
 			<label for="days">Days Dormant: </label>
-			<input id="days"  name="days" type="text"  class="validate[required]" value="6"/>
+			<input id="days"  name="days" type="text"  class="validate[required]" value="2"/>
 			</p>
 		<input type="submit" name="action" class="button"	value="Download Dormant Buying Centers PDF" />
 		<input type="submit" name="action" class="button"	value="Download Dormant Buying Centers Excel" />

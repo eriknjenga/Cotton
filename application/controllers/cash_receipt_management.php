@@ -115,7 +115,7 @@ class Cash_Receipt_Management extends MY_Controller {
 		$receipt -> delete();
 		$log = new System_Log();
 		$log -> Log_Type = "3";
-		$log -> Log_Message = "Deleted Cash Record {Buyer: '" . $receipt -> Field_Cashier_Object -> Field_Cashier_Name . "' Receipt Number: '" . $receipt -> Receipt_Number . "' Date: '" . $receipt -> Date . "' Amount: '" . $receipt -> Amount . "' Batch '" . $receipt -> Batch . "'}";
+		$log -> Log_Message = "Deleted Cash Record {Field Cashier: '" . $receipt -> Field_Cashier_Object -> Field_Cashier_Name . "' Receipt Number: '" . $receipt -> Receipt_Number . "' Date: '" . $receipt -> Date . "' Amount: '" . $receipt -> Amount . "' Batch '" . $receipt -> Batch . "'}";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();

@@ -31,6 +31,17 @@ class Disbursement_Management extends MY_Controller {
 
 	}
 
+	public function search_invoice() {
+		$search_term = $this -> input -> post("search_value8");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$disbursements = Disbursement::getSearchedInvoice($db_search_term);
+		$data['disbursements'] = $disbursements;
+		$data['listing_title'] = "Invoice Search Results For <b>' " . $search_term . "</b>";
+		$data['content_view'] = "list_disbursement_search_results_v";
+		$this -> base_params($data);
+	}
+
 	public function new_disbursement($data = null) {
 		$batch = $this -> session -> userdata('input_disbursement_batch');
 		if (strlen($batch) == 0) {
@@ -90,7 +101,7 @@ class Disbursement_Management extends MY_Controller {
 			$quantities = $this -> input -> post("quantity");
 			$unit_prices = $this -> input -> post("unit_price");
 			$total_values = $this -> input -> post("total_value");
-			$seasons = $this -> input -> post("season");
+			$seasons = date('Y');
 			$id_batch = $this -> session -> userdata('input_disbursement_batch');
 			$fbg = $this -> input -> post("fbg");
 			$agent = $this -> input -> post("agent");
@@ -219,7 +230,6 @@ class Disbursement_Management extends MY_Controller {
 		$chart .= "</chart>";
 		echo $chart;
 	}
-
 
 	public function getTotalInputDisbursements() {
 		$this -> load -> database();

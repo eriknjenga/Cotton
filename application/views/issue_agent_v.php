@@ -4,7 +4,8 @@
 		$("#date").datepicker({
 			defaultDate : new Date(),
 			changeYear : true,
-			changeMonth : true
+			changeMonth : true,
+			maxDate: 0
 		});
 		$(".farm_input").change(function() {
 			var date_object = $("#date");
@@ -143,7 +144,7 @@ foreach($agents as $agent_object){
 	</p>
 	<p>
 		<label for="date">Transaction Date: </label>
-		<input class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>"/>
+		<input class="date validate[required]" id="date" readonly="" name="date" type="text" value="<?php echo $date;?>"/>
 		<span class="field_desc">Enter the <b>Date</b> for this transaction</span>
 	</p>
 	<table class="normal" id="inputs_table" style="margin:0 auto;">
@@ -184,7 +185,7 @@ foreach($farm_inputs as $farm_input_object){
 				<input class="quantity validate[required,number]" name="quantity[]" id="quantity"  type="text" value="<?php echo $quantity;?>" style="width: 100px; padding:2px;"/>
 				</td>
 				<td>
-				<input readonly="" class="total_value" name="total_value[]" id="total_value" type="text" value="<?php echo $total_value;?>" style="width: 100px; padding:2px;"/>
+				<input class="total_value" name="total_value[]" id="total_value" type="text" value="<?php echo $total_value;?>" style="width: 100px; padding:2px;"/>
 				</td>
 				<td>
 				<input class="season validate[required]" name="season[]" id="season" type="text" value="<?php echo $season;?>" style="width: 100px; padding:2px;"/>

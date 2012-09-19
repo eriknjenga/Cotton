@@ -30,6 +30,16 @@ class Ward_Management extends MY_Controller {
 
 	}
 
+	public function search_ward() {
+		$search_term = $this -> input -> post("search_value3");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$wards = Ward::getSearchedWard($db_search_term);
+		$data['wards'] = $wards;
+		$data['content_view'] = "list_wards_v";
+		$this -> base_params($data);
+	}
+
 	public function new_ward($data = null) {
 		if ($data == null) {
 			$data = array();
@@ -52,8 +62,8 @@ class Ward_Management extends MY_Controller {
 	public function print_wards() {
 		$wards = Ward::getAll();
 		$data_buffer = "Ward Name\tDistrict\tZone\t\n";
-		foreach($wards as $ward){
-			$data_buffer .= $ward->Name."\t".$ward->District_Object->Name."\t".$ward->Region_Object->Region_Name."\n";			
+		foreach ($wards as $ward) {
+			$data_buffer .= $ward -> Name . "\t" . $ward -> District_Object -> Name . "\t" . $ward -> Region_Object -> Region_Name . "\n";
 		}
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=System Wards.xls");

@@ -33,8 +33,19 @@ class FBG_Transactions extends MY_Controller {
 			width: 700px;
 			}
 			table.data-table td {
-			width: 100px;
+			width: 50px;
+			font-size:11;
 			}
+			table.data-table th {
+			width: 50px;
+			font-size:11;
+			}
+			.amount{
+				text-align:right;
+			}
+			.center{
+				text-align:center;
+			}			
 			</style>
 			";
 			$fbg = $this -> input -> post("fbg");
@@ -50,13 +61,14 @@ class FBG_Transactions extends MY_Controller {
 			$data_buffer .= "<h4>Input Disbursements</h4>";
 			$data_buffer .= "<table class='data-table'>";
 			//$data_buffer .= $this -> echoTitles();
-			$data_buffer .= "<tr><th>Transaction Date</th><th>Input</th><th>Invoice Number</th><th>Quantity</th><th>Unit Price</th><th>Total Value</th><th>Season</th></tr>";
+			$data_buffer .= "<thead><tr><th>Transaction Date</th><th>Input</th><th>Invoice Number</th><th>Quantity</th><th>Unit Price</th><th>Total Value</th></tr></thead>";
 			$total_loan_value = 0;
 			foreach ($fbg_disbursements as $disbursement) {
+				$disbursement_date = date('d/m/Y', strtotime($disbursement['date']));
 				$total_loan_value += $disbursement['total_value'];
-				$data_buffer .= "<tr><td>" . $disbursement['date'] . "</td><td>" . $disbursement['product_name'] . "</td><td>" . $disbursement['invoice_number'] . "</td><td>" . number_format($disbursement['quantity'] + 0) . "</td><td>" . (empty($disbursement['unit_price']) ? '-' : number_format($disbursement['unit_price'] + 0)) . "</td><td>" . number_format($disbursement['total_value'] + 0) . "</td><td>" . $disbursement['season'] . "</td></tr>";
+				$data_buffer .= "<tr><td class='center'>" . $disbursement_date . "</td><td class='center'>" . $disbursement['product_name'] . "</td><td class='center'>" . $disbursement['invoice_number'] . "</td><td class='amount'>" . number_format($disbursement['quantity'] + 0) . "</td><tdclass='amount'>" . (empty($disbursement['unit_price']) ? '-' : number_format($disbursement['unit_price'] + 0)) . "</td><td class='amount'>" . number_format($disbursement['total_value'] + 0) . "</td></tr>";
 			}
-			$data_buffer .= "<tr><td><b>Totals</b></td><td>-</td><td>-</td><td>-</td><td>-</td><td>" . number_format($total_loan_value + 0) . "</td><td>-</td></tr>";
+			$data_buffer .= "<tr><td><b>Totals</b></td><td class='center'>-</td><td class='center'>-</td><td class='center'>-</td><td class='center'>-</td><td class='amount'>" . number_format($total_loan_value + 0) . "</td></tr>";
 			$data_buffer .= "</table>";
 			//Get all purchases from this fbg
 			$sql_purchases = "select * from purchase p left join depot d on p.depot = d.id where p.fbg = '" . $fbg . "' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') and batch_status = '2'";
@@ -66,34 +78,35 @@ class FBG_Transactions extends MY_Controller {
 			$data_buffer .= "<h4>Product Purchases</h4>";
 			$data_buffer .= "<table class='data-table'>";
 			//$data_buffer .= $this -> echoTitles();
-			$data_buffer .= "<tr><th>BC Name</th><th>BC Code</th><th>Transaction Date</th><th>Purchases (Kgs)</th><th>Value(Tshs)</th><th>Total Recovered</th><th>Outstanding Balance</th></tr>";
+			$data_buffer .= "<thead><tr><th>BC Name</th><th>BC Code</th><th>Transaction Date</th><th>Purchases (Kgs)</th><th>Value(Tshs)</th><th>Total Recovered</th><th>Outstanding Balance</th></tr></thead>";
 			$total_value = 0;
 			$total_kgs = 0;
 			$total_recovered = 0;
 			$outstanding_balance = $total_loan_value;
 			foreach ($fbg_purchases as $purchase) {
+				$purchase_date = date('d/m/Y', strtotime($purchase['date']));
 				$total_value += $purchase['gross_value'];
 				$total_kgs += $purchase['quantity'];
 				$recoveries = ($purchase['loan_recovery'] + $purchase['farmer_reg_fee'] + $purchase['other_recoveries']);
 				$total_recovered += $recoveries;
-				$outstanding_balance -= $recoveries; 
-				$data_buffer .= "<tr><td>" . $purchase['depot_name'] . "</td><td>" . $purchase['depot_code'] . "</td><td>" . $purchase['date'] . "</td><td>" . number_format($purchase['quantity'] + 0) . "</td><td>" . (empty($purchase['gross_value']) ? '-' : number_format($purchase['gross_value'] + 0)) . "</td><td>" . (empty($recoveries) ? '-' : number_format($recoveries + 0)) . "</td><td>" . number_format($outstanding_balance) . "</td></tr>";
+				$outstanding_balance -= $recoveries;
+				$data_buffer .= "<tr><td>" . $purchase['depot_name'] . "</td><td class='center'>" . $purchase['depot_code'] . "</td><td class='center'>" . $purchase_date . "</td><td class='amount'>" . number_format($purchase['quantity'] + 0) . "</td><td class='amount'>" . (empty($purchase['gross_value']) ? '-' : number_format($purchase['gross_value'] + 0)) . "</td><td class='amount'>" . (empty($recoveries) ? '-' : number_format($recoveries + 0)) . "</td><td class='amount'>" . number_format($outstanding_balance) . "</td></tr>";
 			}
-			$data_buffer .= "<tr><td><b>Totals:</b></td><td>-</td><td>-</td><td>" . number_format($total_kgs + 0) . "</td><td>" . number_format($total_value + 0) . "</td><td>" . number_format($total_recovered + 0) . "</td><td>-</td></tr>";
+			$data_buffer .= "<tr><td><b>Totals:</b></td><td class='center'>-</td><td class='center'>-</td><td class='amount'>" . number_format($total_kgs + 0) . "</td><td class='amount'>" . number_format($total_value + 0) . "</td><td class='amount'>" . number_format($total_recovered + 0) . "</td><td class='amount'>-</td></tr>";
 			$data_buffer .= "</table>";
 			$data_buffer .= "<table>";
 			$data_buffer .= "<tr><td><h3>Purchase Summary</h3></td><td><h3>Loan Summary</h3></td></tr>";
 			$data_buffer .= "<tr><td><table class='data-table'>";
-			$data_buffer .= "<tr><td><b>Total Purchases(Kgs.)</b></td><td>" . number_format($total_kgs) . "</td></tr>";
-			$data_buffer .= "<tr><td><b>Total Value</b></td><td>" . number_format($total_value) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Purchases(Kgs.)</b></td><td class='amount'>" . number_format($total_kgs) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Value</b></td><td class='amount'>" . number_format($total_value) . "</td></tr>";
 			$data_buffer .= "</table></td>";
 			$data_buffer .= "<td><table class='data-table'>";
-			$data_buffer .= "<tr><td><b>Total Loaned</b></td><td>" . number_format($total_loan_value) . "</td></tr>";
-			$data_buffer .= "<tr><td><b>Total Recovered</b></td><td>" . number_format($total_recovered) . "</td></tr>";
-			$data_buffer .= "<tr></tr><tr><td><b>Outstanding Balance</b></td><td>" . number_format(($total_loan_value - $total_recovered)) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Loaned</b></td><td class='amount'>" . number_format($total_loan_value) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Recovered</b></td><td class='amount'>" . number_format($total_recovered) . "</td></tr>";
+			$data_buffer .= "<tr></tr><tr><td><b>Outstanding Balance</b></td><td class='amount'>" . number_format(($total_loan_value - $total_recovered)) . "</td></tr>";
 			$data_buffer .= "</table></td></tr></table>";
 
-//			echo $data_buffer;
+			//			echo $data_buffer;
 			$log = new System_Log();
 			$log -> Log_Type = "4";
 			$log -> Log_Message = "Downloaded FBG Transactions PDF";
@@ -106,9 +119,10 @@ class FBG_Transactions extends MY_Controller {
 		}
 
 	}
- 
 
 	function generatePDF($data, $start_date, $end_date) {
+		$start_date = date('d/m/Y', strtotime($start_date));
+		$end_date = date('d/m/Y', strtotime($end_date));
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>FBG Transactions</h3>";
 		$html_title .= "<h5 style='text-align:center;'> from: " . $start_date . " to: " . $end_date . "</h5>";
@@ -116,8 +130,17 @@ class FBG_Transactions extends MY_Controller {
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4');
 		$this -> mpdf -> SetTitle('FBG Transactions');
-		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
+		$this -> mpdf -> defaultfooterfontsize = 9;
+		/* blank, B, I, or BI */
+		$this -> mpdf -> defaultfooterline = 1;
+		/* 1 to include line below header/above footer */
+		$this -> mpdf -> mirrorMargins = 1;
+		$mpdf -> defaultfooterfontstyle = B;
+		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|-{PAGENO}-|FBG Transactions Report');
+		/* defines footer for Odd and Even Pages - placed at Outer margin */
+
+		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "FBG Transactions.pdf";

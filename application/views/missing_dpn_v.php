@@ -23,18 +23,6 @@
 		<legend>
 			Select Filter Options
 		</legend>
-		<p>
-			<label for="season">Season</label>
-			<select name="season" id="season" class="validate[required]">
-				<option value=""></option>
-				<?php
-foreach($seasons as $season){
-				?>
-				<option value="<?php echo $season['season'];?>"><?php echo $season['season'];?></option>
-				<?php }?>
-			</select>
-			<span>The season to analyze for</span>
-		</p>
 		<input type="submit" name="surveillance" class="button"	value="Download Missing DPNs" />
 	</fieldset>
 	</form>

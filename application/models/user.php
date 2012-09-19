@@ -85,4 +85,10 @@ class User extends Doctrine_Record {
 		return $clerks;
 	}
 
+	public function getSearchedUser($search_value) {
+		$query = Doctrine_Query::create() -> select("*") -> from("User") -> where("Name like '%$search_value%' or Username like '%$search_value%' or Phone_Number like '%$search_value%' or Email_Address like '%$search_value%'");
+		$results = $query -> execute();
+		return $results;
+	}
+
 }

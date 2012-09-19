@@ -1,3 +1,13 @@
+<?php
+if (!isset($batch_listing)) {
+	$batch_listing = "";
+}
+?>
+<style>
+	.link-active {
+		color: #ff6b08;
+	}
+</style>
 <script type="text/javascript">
 		var url = "";
 	$(function() {
@@ -34,17 +44,26 @@
 		$attributes = array("method" => "post");
 		echo form_open('batch_management/search', $attributes);
 		echo validation_errors('
-		<p class="form_error">
-			', '
-		</p>
-		');
+<p class="form_error">
+', '
+</p>
+');
 		?> <label for="batch_id">Batch Id: </label>
 		<input id="batch_id"  name="batch_id" type="text"/>
 		<input class="button" type="submit" value="Go to Batch">
-	</form>
+		</form>
 	</div>
 </div>
-<h1>Batch Listing</h1>
+<h1>Batch Listing </h1> Type:<a class="link <?php
+	if ($batch_listing == "0") {echo "link-active";
+	}
+?>" href="<?php echo base_url()."batch_management/listing/0"?>">Open</a> | <a class="link <?php
+	if ($batch_listing == "1") {echo "link-active";
+	}
+?>" href="<?php echo base_url()."batch_management/listing/1"?>">Closed</a> | <a class="link <?php
+	if ($batch_listing == "2") {echo "link-active";
+	}
+?>" href="<?php echo base_url()."batch_management/listing/2"?>">Posted</a>
 <table class="fullwidth">
 	<thead>
 		<tr>
@@ -99,10 +118,14 @@ $statuses = array("Open","Closed","Posted");
 			echo sizeof($batch -> Region_Disbursements);
 		} else if ($batch -> Transaction_Type_Object -> Indicator == "mopping_payments") {
 			echo sizeof($batch -> Mopping_Payments);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "loan_recovery_receipts") {
+			echo sizeof($batch -> Loan_Recovery_Cash_Receipts);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "buying_center_summaries") {
+			echo sizeof($batch -> Buying_Center_Summaries);
 		}
 		?>
 		</td>
-		<td><a href="<?php echo base_url()."batch_management/print_batch/".$batch->id?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a><?php if($batch->Status != 2){?><a href="<?php echo base_url()."batch_management/enter_batch/".$batch->id?>" class="button" style="background: none; background-color: green; border-color: green;"><span class="ui-icon ui-icon-folder-open"></span>Open</a><?php } if($batch->Status == 0){?><a href="<?php echo base_url()."batch_management/close_batch/".$batch->id?>" class="button" style="background: none; background-color: #E01B1B; border-color: #E01B1B;"><span class="ui-icon ui-icon-folder-collapsed"></span>Close</a><?php } else if($batch->Status == 2){echo "Already Posted! ";}?><?php if($batch->Status != 2){?><a href="#" class="button delete" batch = "<?php echo $batch -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><?php }?></td>
+		<td><a href="<?php echo base_url()."batch_management/print_batch/excel/".$batch->id?>" class="button"><span class="ui-icon ui-icon-print"></span>Excel</a><a href="<?php echo base_url()."batch_management/print_batch/pdf/".$batch->id?>" class="button"><span class="ui-icon ui-icon-print"></span>PDF</a><?php if($batch->Status != 2){?><a href="<?php echo base_url()."batch_management/enter_batch/".$batch->id?>" class="button" style="background: none; background-color: green; border-color: green;"><span class="ui-icon ui-icon-folder-open"></span>Open</a><?php } if($batch->Status == 0){?><a href="<?php echo base_url()."batch_management/close_batch/".$batch->id?>" class="button" style="background: none; background-color: #E01B1B; border-color: #E01B1B;"><span class="ui-icon ui-icon-folder-collapsed"></span>Close</a><?php } else if($batch->Status == 2){echo "Already Posted! ";}?><?php if($batch->Status != 2){?><a href="#" class="button delete" batch = "<?php echo $batch -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><?php }?></td>
 		</tr>
 		<?php
 

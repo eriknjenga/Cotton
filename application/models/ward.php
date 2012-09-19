@@ -14,7 +14,7 @@ class Ward extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Ward")->where("Deleted = '0'") -> orderBy("Name asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Ward") -> where("Deleted = '0'") -> orderBy("Name asc");
 		$wards = $query -> execute();
 		return $wards;
 	}
@@ -35,6 +35,12 @@ class Ward extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Ward") -> where("id = '$id'");
 		$ward = $query -> execute();
 		return $ward[0];
-	} 
+	}
+
+	public function getSearchedWard($search_value) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Ward") -> where("Name like '%$search_value%'");
+		$results = $query -> execute();
+		return $results;
+	}
 
 }

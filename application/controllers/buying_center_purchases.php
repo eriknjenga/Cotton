@@ -39,11 +39,19 @@ class Buying_Center_Purchases extends MY_Controller {
 			width: 700px;
 			}
 			table.data-table td {
-			width: 100px;
+			width: 50px;
+			font-size:11;
 			}
-			.right-align{
+			table.data-table th {
+			width: 50px;
+			font-size:11;
+			}
+			.amount{
 				text-align:right;
 			}
+			.center{
+				text-align:center;
+			}			
 			</style>
 			";
 		//echo the start of the table
@@ -53,18 +61,18 @@ class Buying_Center_Purchases extends MY_Controller {
 		$total_value = 0;
 		$grand_total_quantity = 0;
 		$grand_total_value = 0;
+		$data_buffer .= $this -> echoTitles();
 		foreach ($regions as $region) {
 			$region_summaries[$region -> id] = array();
 			$region_summaries[$region -> id]['total_quantity'] = "";
 			$region_summaries[$region -> id]['total_value'] = "";
 			$data_buffer .= "<tr><td><b>Zone: </b></td><td><b>" . $region -> Region_Name . "</b></td></tr>";
-			$data_buffer .= $this -> echoTitles();
-			//Get data for each zone
-			$sql = "select (case when d.Deleted ='1' then concat(depot_name,' (Closed)') else case when d.Deleted = '0' then depot_name end  end) as depot_name ,depot_code, r.region_name , p.dpn,p.date,(p.quantity+p.free_farmer_quantity) as quantity,(p.gross_value+p.free_farmer_value) as gross_value,(p.gross_value/p.quantity) as avg_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on p.batch_status = '2' and d.id = p.depot and str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  where r.id = '" . $region -> id . "' order by depot_name,dpn asc ";
+
+			$sql = "select (case when d.Deleted ='1' then concat(depot_name,' (Closed)') else case when d.Deleted = '0' then depot_name end end) as depot_name ,depot_code, r.region_name , p.dpn,p.date,(p.quantity+p.free_farmer_quantity) as quantity,(p.gross_value+p.free_farmer_value) as gross_value,((p.gross_value+free_farmer_value)/(p.quantity+free_farmer_quantity)) as avg_price from purchase p left join depot d on p.batch_status = '2' and p.depot= d.id  left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id where str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') and r.id = '" . $region -> id . "'  order by depot_name,dpn asc";
 			$query = $this -> db -> query($sql);
 			foreach ($query->result_array() as $depot_data) {
 				//(empty($disbursement['unit_price']) ? '-' : number_format($disbursement['unit_price'] + 0))
-				$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['depot_code'] . "</td><td>" . (empty($depot_data['dpn']) ? '-' : $depot_data['dpn']) . "</td><td class='right-align'>" . (empty($depot_data['quantity']) ? '-' : number_format($depot_data['quantity'] + 0)) . "</td><td class='right-align'>" . (empty($depot_data['gross_value']) ? '-' : number_format($depot_data['gross_value'] + 0)) . "</td><td class='right-align'>" . (empty($depot_data['avg_price']) ? '-' : number_format($depot_data['avg_price'] + 0)) . "</td></tr>";
+				$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td class='center'>" . $depot_data['depot_code'] . "</td><td class='center'>" . (empty($depot_data['dpn']) ? '-' : $depot_data['dpn']) . "</td><td class='amount'>" . (empty($depot_data['quantity']) ? '-' : number_format($depot_data['quantity'] + 0)) . "</td><td class='amount'>" . (empty($depot_data['gross_value']) ? '-' : number_format($depot_data['gross_value'] + 0)) . "</td><td class='center'>" . (empty($depot_data['avg_price']) ? '-' : number_format($depot_data['avg_price'] + 0)) . "</td></tr>";
 				$region_summaries[$region -> id]['total_quantity'] += $depot_data['quantity'];
 				$region_summaries[$region -> id]['total_value'] += $depot_data['gross_value'];
 			}
@@ -78,9 +86,9 @@ class Buying_Center_Purchases extends MY_Controller {
 			if ($region_summaries[$region -> id]['total_value'] > 0 && $region_summaries[$region -> id]['total_quantity'] > 0) {
 				$avg_per_kg = $region_summaries[$region -> id]['total_value'] / $region_summaries[$region -> id]['total_quantity'];
 			}
-			$data_buffer .= "<tr><td>" . $region -> Region_Name . "</td><td class='right-align'>" . (empty($region_summaries[$region -> id]['total_quantity']) ? '-' : number_format($region_summaries[$region -> id]['total_quantity'] + 0)) . "</td><td class='right-align'>" . (empty($region_summaries[$region -> id]['total_value']) ? '-' : number_format($region_summaries[$region -> id]['total_value'] + 0)) . "</td><td class='right-align'>" . (empty($avg_per_kg) ? '-' : number_format($avg_per_kg + 0)) . "</td></tr>";
+			$data_buffer .= "<tr><td>" . $region -> Region_Name . "</td><td class='amount'>" . (empty($region_summaries[$region -> id]['total_quantity']) ? '-' : number_format($region_summaries[$region -> id]['total_quantity'] + 0)) . "</td><td class='amount'>" . (empty($region_summaries[$region -> id]['total_value']) ? '-' : number_format($region_summaries[$region -> id]['total_value'] + 0)) . "</td><td class='amount'>" . (empty($avg_per_kg) ? '-' : number_format($avg_per_kg + 0)) . "</td></tr>";
 		}
-		$data_buffer .= "<tr><td>Grand Totals</td><td class='right-align'>" . (empty($grand_total_quantity) ? '-' : number_format($grand_total_quantity+ 0)) . "</td><td class='right-align'>" . (empty($grand_total_value) ? '-' : number_format($grand_total_value+ 0)) . "</td><td></td></tr>";
+		$data_buffer .= "<tr><td>Grand Totals</td><td class='amount'>" . (empty($grand_total_quantity) ? '-' : number_format($grand_total_quantity + 0)) . "</td><td class='amount'>" . (empty($grand_total_value) ? '-' : number_format($grand_total_value + 0)) . "</td><td></td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -106,7 +114,7 @@ class Buying_Center_Purchases extends MY_Controller {
 			$data_buffer .= "Zone: \t" . $region -> Region_Name . "\t\n";
 			$data_buffer .= $this -> echoExcelTitles();
 			//Get data for each zone
-			$sql = "select (case when d.Deleted ='1' then concat(depot_name,' (Closed)') else case when d.Deleted = '0' then depot_name end  end) as depot_name ,depot_code, r.region_name , p.dpn,p.date,(p.quantity+p.free_farmer_quantity) as quantity,(p.gross_value+p.free_farmer_value) as gross_value,(p.gross_value/p.quantity) as avg_price from depot d left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id left join purchase p on p.batch_status = '2' and d.id = p.depot and str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  where r.id = '" . $region -> id . "' order by depot_name,dpn asc ";
+			$sql = "select (case when d.Deleted ='1' then concat(depot_name,' (Closed)') else case when d.Deleted = '0' then depot_name end end) as depot_name ,depot_code, r.region_name , p.dpn,p.date,(p.quantity+p.free_farmer_quantity) as quantity,(p.gross_value+p.free_farmer_value) as gross_value,((p.gross_value+free_farmer_value)/(p.quantity+free_farmer_quantity)) as avg_price from purchase p left join depot d on p.batch_status = '2' and p.depot= d.id  left join village v on d.village = v.id left join ward w on v.ward = w.id left join region r on w.region = r.id where str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') and r.id = '" . $region -> id . "'  order by depot_name,dpn asc";
 			$query = $this -> db -> query($sql);
 			foreach ($query->result_array() as $depot_data) {
 				$data_buffer .= $depot_data['depot_name'] . "\t" . $depot_data['depot_code'] . "\t" . $depot_data['dpn'] . "\t" . $depot_data['quantity'] . "\t" . $depot_data['gross_value'] . "\t" . $depot_data['avg_price'] . "\t\n";
@@ -143,7 +151,7 @@ class Buying_Center_Purchases extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Buying Center</th><th>Center Code</th><th>DPN #</th><th>Quantity (Kgs.)</th><th>Total Value (Tsh.)</th><th>Avg. Price</th></tr>";
+		return "<thead><tr><th>Buying Center</th><th>Center Code</th><th>DPN #</th><th>Quantity (Kgs.)</th><th>Total Value (Tsh.)</th><th>Avg. Price</th></tr></thead>";
 	}
 
 	public function echoExcelTitles() {
@@ -151,6 +159,8 @@ class Buying_Center_Purchases extends MY_Controller {
 	}
 
 	function generatePDF($data, $start_date, $end_date) {
+		$start_date = date('d/m/Y', strtotime($start_date));
+		$end_date = date('d/m/Y', strtotime($end_date));
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Buying Center Purchases</h3>";
 		$html_title .= "<h5 style='text-align:center;'> Purchases between: " . $start_date . " and " . $end_date . "</h5>";
@@ -158,6 +168,13 @@ class Buying_Center_Purchases extends MY_Controller {
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4');
 		$this -> mpdf -> SetTitle('BC Purchases');
+		$this -> mpdf -> defaultfooterfontsize = 9;
+		/* blank, B, I, or BI */
+		$this -> mpdf -> defaultfooterline = 1;
+		/* 1 to include line below header/above footer */
+		$this -> mpdf -> mirrorMargins = 1;
+		$mpdf -> defaultfooterfontstyle = B;
+		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|{PAGENO}|BC Purchases Report');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
 		$this -> mpdf -> WriteHTML($data);

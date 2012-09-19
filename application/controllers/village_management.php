@@ -30,6 +30,17 @@ class Village_Management extends MY_Controller {
 
 	}
 
+	public function search_village() {
+		$search_term = $this -> input -> post("search_value4");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$villages = Village::getSearchedVillage($db_search_term);
+		$data['villages'] = $villages;
+		$data['listing_title'] = "Village Search Results For <b>' " . $search_term . "</b>";
+		$data['content_view'] = "list_villages_v";
+		$this -> base_params($data);
+	}
+
 	public function new_village($data = null) {
 		if ($data == null) {
 			$data = array();

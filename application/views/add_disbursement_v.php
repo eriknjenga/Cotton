@@ -4,7 +4,8 @@
 		$("#date").datepicker({
 			defaultDate : new Date(),
 			changeYear : true,
-			changeMonth : true
+			changeMonth : true,
+			maxDate: 0
 		});
 		$(".farm_input").change(function() {
 			updateInputPrice($(this));
@@ -168,8 +169,7 @@ $invoice_number = "";
 $date = "";
 $farm_input = "";
 $quantity = "";
-$total_value = "";
-$season = "";
+$total_value = ""; 
 $disbursement_id = "";
 $agent = "";
 
@@ -219,7 +219,7 @@ foreach($agents as $agent_object){
 	</p>
 	<p>
 		<label for="date">Transaction Date</label>
-		<input class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>"/>
+		<input readonly="" class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>"/>
 		<span class="field_desc">Enter the <b>Date</b> for this transaction</span>
 	</p>
 	<table class="normal" id="inputs_table" style="margin:0 auto;">
@@ -231,8 +231,7 @@ foreach($agents as $agent_object){
 				<th>Input Name</th>
 				<th>Unit Price</th>
 				<th>Quantity</th>
-				<th>Total Value</th>
-				<th>Season</th>
+				<th>Total Value</th> 
 				<th></th>
 			</tr>
 		</thead>
@@ -268,10 +267,7 @@ foreach($farm_inputs as $farm_input_object){
 				</td>
 				<td>
 				<input readonly="" class="total_value" name="total_value[]" id="total_value" type="text" value="<?php echo $disbursement -> Total_Value;?>" style="width: 60px; padding:2px;"/>
-				</td>
-				<td>
-				<input class="season validate[required]" name="season[]" id="season" type="text" value="<?php echo $disbursement -> Season;?>" style="width: 60px; padding:2px;"/>
-				</td>
+				</td> 
 				<td>
 				<input  class="add button"   value="+" style="width:20px; text-align: center"/>
 				</td>
@@ -308,10 +304,7 @@ foreach($farm_inputs as $farm_input_object){
 				</td>
 				<td>
 				<input readonly="" class="total_value" name="total_value[]" id="total_value" type="text" value="" style="width: 60px; padding:2px;"/>
-				</td>
-				<td>
-				<input class="season validate[required]" name="season[]" id="season" type="text" value="" style="width: 60px; padding:2px;"/>
-				</td>
+				</td> 
 				<td>
 				<input  class="add button"   value="+" style="width:20px; text-align: center"/>
 				</td>

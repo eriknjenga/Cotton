@@ -64,6 +64,17 @@ class FBG_Management extends MY_Controller {
 		$this -> base_params($data);
 	}
 
+	public function search_fbg_simple() {
+		$search_term = $this -> input -> post("search_value11");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$fbgs = FBG::getPagedSearchedFbgs($db_search_term, 0, 20);
+		$data['listing_title'] = "FBG Search Results For <b>' " . $db_search_term . "</b> '";
+		$data['fbgs'] = $fbgs;
+		$data['content_view'] = "list_fbgs_v";
+		$this -> base_params($data);
+	}
+
 	public function new_fbg($data = null) {
 		if ($data == null) {
 			$data = array();
@@ -129,7 +140,7 @@ class FBG_Management extends MY_Controller {
 		$fbgs = FBG::getAll();
 		$data_buffer = "Contract Number\tGroup Name\tField Extension Officer\tHectares Available\tChairman Name\tChairman Phone\tSecretary Name\tSecretary Phone\tVillage\t\n";
 		foreach ($fbgs as $fbg) {
-			$data_buffer .= $fbg -> CPC_Number . "\t" . $fbg -> Group_Name ."\t" . $fbg -> Officer_Object->Officer_Name ."\t" . $fbg -> Hectares_Available ."\t" . $fbg -> Chairman_Name ."\t" . $fbg -> Chairman_Phone ."\t" . $fbg -> Secretary_Name ."\t" . $fbg -> Secretary_Phone ."\t" . $fbg -> Village_Object->Name . "\n";
+			$data_buffer .= $fbg -> CPC_Number . "\t" . $fbg -> Group_Name . "\t" . $fbg -> Officer_Object -> Officer_Name . "\t" . $fbg -> Hectares_Available . "\t" . $fbg -> Chairman_Name . "\t" . $fbg -> Chairman_Phone . "\t" . $fbg -> Secretary_Name . "\t" . $fbg -> Secretary_Phone . "\t" . $fbg -> Village_Object -> Name . "\n";
 		}
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=System FBGs.xls");
@@ -173,8 +184,8 @@ class FBG_Management extends MY_Controller {
 		redirect($previous_page);
 	}
 
-	public function validate_form() { 
-		$this -> form_validation -> set_rules('group_name', 'First Name', 'trim|required|max_length[100]|xss_clean'); 
+	public function validate_form() {
+		$this -> form_validation -> set_rules('group_name', 'First Name', 'trim|required|max_length[100]|xss_clean');
 		return $this -> form_validation -> run();
 	}
 

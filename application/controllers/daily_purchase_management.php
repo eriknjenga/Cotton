@@ -38,27 +38,40 @@ class Daily_Purchase_Management extends MY_Controller {
 			width: 1000px;
 			}
 			table.data-table td {
-			width: 120px;
+			width: 50px; 
+			font-size:11;
+			}
+			table.data-table th {
+			width: 50px;
+			font-size:11;
 			}
 			.amount{
 				text-align:right;
 			}
+			.center{
+				text-align:center;
+			}			
 			</style>
 			";
 		//echo the start of the table
 		$data_buffer .= "<table class='data-table'>";
 		$data_buffer .= $this -> echoTitles();
 		//Get all the depots in this region
-		$sql_purchase_summaries = "SELECT date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as date,sum(loan_recovery) as total_recoveries,sum(gross_value+free_farmer_value) as total_value,sum(quantity+free_farmer_quantity) as total_quantity,count(distinct dpn) as buying_centers FROM `purchase` where batch_status = '2' group by date order by str_to_date(date,'%m/%d/%Y') asc";
+		$sql_purchase_summaries = "SELECT date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as date,sum(loan_recovery) as total_recoveries,sum(gross_value) as total_value,sum(free_farmer_value) as total_free_farmer_value,sum(quantity) as total_quantity,sum(free_farmer_quantity) as total_free_farmer_quantity,count(distinct dpn) as buying_centers FROM `purchase` where batch_status = '2' group by date order by str_to_date(date,'%m/%d/%Y') asc";
 		$purchase_summaries = $this -> db -> query($sql_purchase_summaries);
-		$cumulative_quantity = 0;
-		$cumulative_value = 0;
+		$cumulative_free_farmer_quantity = 0;
+		$cumulative_free_farmer_value = 0;
+		$cumulative_fbg_quantity = 0;
+		$cumulative_fbg_value = 0;
 		$cumulative_recoveries = 0;
 		foreach ($purchase_summaries->result_array() as $summary) {
-			$cumulative_quantity += $summary['total_quantity'];
-			$cumulative_value += $summary['total_value'];
+			$cumulative_free_farmer_quantity += $summary['total_free_farmer_quantity'];
+			$cumulative_free_farmer_value += $summary['total_free_farmer_value'];
+			$cumulative_fbg_quantity += $summary['total_quantity'];
+			$cumulative_fbg_value += $summary['total_value'];
 			$cumulative_recoveries += $summary['total_recoveries'];
-			$data_buffer .= "<tr><td>" . $summary['date'] . "</td><td>" . $summary['buying_centers'] . "</td><td class='amount'>" . number_format($summary['total_quantity'] + 0) . "</td><td class='amount'>" . number_format($cumulative_quantity + 0) . "</td><td class='amount'>" . number_format($summary['total_value'] + 0) . "</td><td class='amount'>" . number_format($cumulative_value + 0) . "</td><td class='amount'>" . number_format($summary['total_recoveries'] + 0) . "</td><td class='amount'>" . number_format($cumulative_recoveries + 0) . "</td></tr>";
+			$data_buffer .= "<tr><td class='center'>" . $summary['date'] . "</td><td class='center'>" . $summary['buying_centers'] . "</td><td class='amount'>" . number_format($summary['total_free_farmer_quantity'] + 0) . "</td><td class='amount'>" . number_format($cumulative_free_farmer_quantity + 0) . "</td><td class='amount'>" . number_format($summary['total_free_farmer_value'] + 0) . "</td><td class='amount'>" . number_format($cumulative_free_farmer_value + 0) . "</td><td class='amount'>" . number_format($summary['total_quantity'] + 0) . "</td><td class='amount'>" . number_format($cumulative_fbg_quantity + 0) . "</td><td class='amount'>" . number_format($summary['total_value'] + 0) . "</td><td class='amount'>" . number_format($cumulative_fbg_value + 0) . "</td><td class='amount'>" . number_format($summary['total_recoveries'] + 0) . "</td><td class='amount'>" . number_format($cumulative_recoveries + 0) . "</td></tr>";
+			//$data_buffer .= $summary['date'] . "\t" . $summary['buying_centers'] . "\t" . $summary['total_free_farmer_quantity'] . "\t" . $cumulative_free_farmer_quantity . "\t" . $summary['total_free_farmer_value'] . "\t" . $cumulative_free_farmer_value . "\t" . $summary['total_quantity'] . "\t" . $cumulative_fbg_quantity . "\t" . $summary['total_value'] . "\t" . $cumulative_fbg_value . "\t" . $summary['total_recoveries'] . "\t" . $cumulative_recoveries . "\n";
 		}
 		$data_buffer .= "</table>";
 		//echo $data_buffer;
@@ -69,7 +82,7 @@ class Daily_Purchase_Management extends MY_Controller {
 		$log -> Timestamp = date('U');
 		$log -> save();
 		$this -> generatePDF($data_buffer, $date);
-
+		//echo $data_buffer;
 	}
 
 	public function downloadExcel() {
@@ -77,16 +90,20 @@ class Daily_Purchase_Management extends MY_Controller {
 		$data_buffer = "";
 		$data_buffer .= $this -> echoExcelTitles();
 		//Get all the depots in this region
-		$sql_purchase_summaries = "SELECT date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as date,sum(loan_recovery) as total_recoveries,sum(gross_value+free_farmer_value) as total_value,sum(quantity+free_farmer_quantity) as total_quantity,count(distinct dpn) as buying_centers FROM `purchase` where batch_status = '2' group by date order by str_to_date(date,'%m/%d/%Y') asc";
+		$sql_purchase_summaries = "SELECT date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as date,sum(loan_recovery) as total_recoveries,sum(gross_value) as total_value,sum(free_farmer_value) as total_free_farmer_value,sum(quantity) as total_quantity,sum(free_farmer_quantity) as total_free_farmer_quantity,count(distinct dpn) as buying_centers FROM `purchase` where batch_status = '2' group by date order by str_to_date(date,'%m/%d/%Y') asc";
 		$purchase_summaries = $this -> db -> query($sql_purchase_summaries);
-		$cumulative_quantity = 0;
-		$cumulative_value = 0;
+		$cumulative_free_farmer_quantity = 0;
+		$cumulative_free_farmer_value = 0;
+		$cumulative_fbg_quantity = 0;
+		$cumulative_fbg_value = 0;
 		$cumulative_recoveries = 0;
 		foreach ($purchase_summaries->result_array() as $summary) {
-			$cumulative_quantity += $summary['total_quantity'];
-			$cumulative_value += $summary['total_value'];
+			$cumulative_free_farmer_quantity += $summary['total_free_farmer_quantity'];
+			$cumulative_free_farmer_value += $summary['total_free_farmer_value'];
+			$cumulative_fbg_quantity += $summary['total_quantity'];
+			$cumulative_fbg_value += $summary['total_value'];
 			$cumulative_recoveries += $summary['total_recoveries'];
-			$data_buffer .= $summary['date'] . "\t" . $summary['buying_centers'] . "\t" . $summary['total_quantity']. "\t" .$cumulative_quantity  . "\t" . $summary['total_value']. "\t" . $cumulative_value . "\t" . $summary['total_recoveries']. "\t" . $cumulative_recoveries. "\n";
+			$data_buffer .= $summary['date'] . "\t" . $summary['buying_centers'] . "\t" . $summary['total_free_farmer_quantity'] . "\t" . $cumulative_free_farmer_quantity . "\t" . $summary['total_free_farmer_value'] . "\t" . $cumulative_free_farmer_value . "\t" . $summary['total_quantity'] . "\t" . $cumulative_fbg_quantity . "\t" . $summary['total_value'] . "\t" . $cumulative_fbg_value . "\t" . $summary['total_recoveries'] . "\t" . $cumulative_recoveries . "\n";
 		}
 		$data_buffer .= "\n";
 		header("Content-type: application/vnd.ms-excel; name='excel'");
@@ -105,11 +122,11 @@ class Daily_Purchase_Management extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Date</th><th>Visited Buying Centers</th><th>Total Quantity Purchased (Kgs.)</th><th>Cumulative Quantity (Kgs.)</th><th>Total Value Purchased (Tsh.)</th><th>Cumulative Value (Tsh.)</th><th>Total Loan Recoveries (Tsh.)</th><th>Cumulative Recoveries (Tsh.)</th></tr>";
+		return "<thead><tr><th>Date</th><th>Visited Buying Centers</th><th>Free Farmer Kgs.</th><th>Cumulative Free Farmer Kgs.</th><th>Free Farmer Tsh.</th><th>Cumulative Free Farmer Tsh.</th><th>FBG Purchases Kgs.</th><th>Cumulative FBG Kgs.</th><th>FBG Purchases Tsh.</th><th>Cumulative FBG Tsh.</th><th>Loan Recoveries (Tsh.)</th><th>Cumulative Recoveries (Tsh.)</th></tr></thead>";
 	}
 
 	public function echoExcelTitles() {
-		return "Date\tVisited Buying Centers\tTotal Quantity Purchased (Kgs.)\tCumulative Quantity (Kgs.)\tTotal Value Purchased (Tsh.)\tCumulative Value (Tsh.)\tTotal Loan Recoveries (Tsh.)\tCumulative Recoveries (Tsh.)\t\n";
+		return "Date\tVisited Buying Centers\tFree Farmer Kgs.\tCumulative Free Farmer Kgs.\tFree Farmer Tsh.\tCumulative Free Farmer Tsh.\tFBG Purchases Kgs.\tCumulative FBG Kgs.\tFBG Purchases Tsh.\tCumulative FBG Tsh.\tLoan Recoveries (Tsh.)\tCumulative Recoveries (Tsh.)\t\n";
 	}
 
 	function generatePDF($data, $date) {
@@ -120,8 +137,17 @@ class Daily_Purchase_Management extends MY_Controller {
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('', 'A4-L', 0, '', 15, 15, 16, 16, 9, 9, '');
 		$this -> mpdf -> SetTitle('Daily Purchases Summary');
-		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
+		$this -> mpdf -> defaultfooterfontsize = 9;
+		/* blank, B, I, or BI */
+		$this -> mpdf -> defaultfooterline = 1;
+		/* 1 to include line below header/above footer */
+		$this -> mpdf -> mirrorMargins = 1;
+		$mpdf -> defaultfooterfontstyle = B;
+		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|{PAGENO}|Daily Purchases Summary Report');
+		/* defines footer for Odd and Even Pages - placed at Outer margin */
+
+		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "Daily Purchases Summary.pdf";

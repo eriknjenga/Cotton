@@ -30,6 +30,17 @@ class District_Management extends MY_Controller {
 
 	}
 
+	public function search_district() {
+		$search_term = $this -> input -> post("search_value2");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$districts = District::getSearchedDistrict($db_search_term);
+		$data['districts'] = $districts;
+		$data['listing_title'] = "District Search Results For <b>' " . $search_term . "</b>";
+		$data['content_view'] = "list_districts_v";
+		$this -> base_params($data);
+	}
+
 	public function new_district($data = null) {
 		if ($data == null) {
 			$data = array();

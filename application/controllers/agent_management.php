@@ -30,6 +30,16 @@ class Agent_Management extends MY_Controller {
 
 	}
 
+	public function search_agent() {
+		$search_term = $this -> input -> post("search_value7");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$agents = Agent::getSearchedAgent($db_search_term);
+		$data['agents'] = $agents; 
+		$data['content_view'] = "list_agents_v";
+		$this -> base_params($data);
+	}
+
 	public function new_agent($data = null) {
 		if ($data == null) {
 			$data = array();

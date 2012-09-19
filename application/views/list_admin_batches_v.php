@@ -1,3 +1,13 @@
+<?php 
+if(!isset($batch_listing)){
+	$batch_listing = "";
+}
+?>
+<style>
+	.link-active{
+		color: #ff6b08;
+	}
+</style>
 <script type="text/javascript">
 		var url = ""; 
 	$(function() {
@@ -43,7 +53,7 @@
 	</form>
 	</div>
 </div>
-<h1>Batch Listing</h1>
+<h1>Batch Listing</h1>Type: <a class="link <?php if($batch_listing == "0"){echo "link-active";}?>" href="<?php echo base_url()."batch_management/listing/0"?>">Open</a> | <a class="link <?php if($batch_listing =="1"){echo "link-active";}?>" href="<?php echo base_url()."batch_management/listing/1"?>">Closed</a> | <a class="link <?php if($batch_listing == "2"){echo "link-active";}?>" href="<?php echo base_url()."batch_management/listing/2"?>">Posted</a>
 <table class="fullwidth">
 	<thead>
 		<tr>
@@ -82,9 +92,34 @@ $statuses = array("Open","Closed","Posted");
 		<?php echo date("d/m/y H:i:s", $batch -> Timestamp);?>
 		</td>
 		<td>
-		<?php echo sizeof($batch -> Purchases) + sizeof($batch -> Disbursements);?>
+		<?php
+		//Check type of batch and get total number of transactions
+		if ($batch -> Transaction_Type_Object -> Indicator == "purchases") {
+			echo sizeof($batch -> Purchases);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "input_disbursements") {
+			echo sizeof($batch -> Disbursements);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "agent_input_disbursements") {
+			echo sizeof($batch -> Agent_Disbursements);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "buying_center_receipts") {
+			echo sizeof($batch -> Buying_Center_Receipts);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "cash_receipts") {
+			echo sizeof($batch -> Cash_Receipts);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "cihc") {
+			echo sizeof($batch -> Cash_Disbursements);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "cihb") {
+			echo sizeof($batch -> Field_Cash_Disbursements);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "input_transfers") {
+			echo sizeof($batch -> Region_Disbursements);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "mopping_payments") {
+			echo sizeof($batch -> Mopping_Payments);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "loan_recovery_receipts") {
+			echo sizeof($batch -> Loan_Recovery_Cash_Receipts);
+		} else if ($batch -> Transaction_Type_Object -> Indicator == "buying_center_summaries") {
+			echo sizeof($batch -> Buying_Center_Summaries);
+		}
+		?>
 		</td>
-		<td><a href="<?php echo base_url()."batch_management/print_batch/".$batch->id?>" class="button"><span class="ui-icon ui-icon-print"></span>Print</a><?php if($batch->Status == 2){echo "Already Posted! ";}?><?php if($batch->Status != 2){?><a href="#" class="button change" batch = "<?php echo $batch -> id;?>"><span class="ui-icon ui-icon-transferthick-e-w"></span>Change Owner</a><?php }?></td>
+		<td><a href="<?php echo base_url()."batch_management/print_batch/excel/".$batch->id?>" class="button"><span class="ui-icon ui-icon-print"></span>Excel</a><a href="<?php echo base_url()."batch_management/print_batch/pdf/".$batch->id?>" class="button"><span class="ui-icon ui-icon-print"></span>PDF</a><?php if($batch->Status == 2){echo "Already Posted! ";}?><?php if($batch->Status != 2){?><a href="#" class="button change" batch = "<?php echo $batch -> id;?>"><span class="ui-icon ui-icon-transferthick-e-w"></span>Change Owner</a><?php }?></td>
 		</tr>
 		<?php
 

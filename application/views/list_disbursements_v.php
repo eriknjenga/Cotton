@@ -43,8 +43,7 @@
 			<th>Invoice No.</th>
 			<th>Date</th>
 			<th>FBG Name</th>
-			<th>Village</th>
-			<th>Season</th>
+			<th>Village</th> 
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -72,10 +71,7 @@ $class = "odd";
 		</td>
 		<td>
 		<?php echo $disbursement -> FBG_Object->Village_Object -> Name;?>
-		</td>
-		<td>
-		<?php echo $disbursement -> Season;?>
-		</td>
+		</td> 
 		<td><?php if($disbursement->Batch_Status == 0){?><a href="<?php echo base_url()."disbursement_management/edit_disbursement/".$disbursement->id?>" class="button"><span class="ui-icon ui-icon-pencil"></span>Edit</a><a href="#" class="button delete" disbursement = "<?php echo $disbursement -> id;?>"><span class="ui-icon ui-icon-trash"></span>Delete</a><?php } else {echo "Closed/Posted Transaction";}?></td>
 		</tr>
 		<?php

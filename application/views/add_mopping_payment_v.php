@@ -4,7 +4,8 @@
 		$("#date").datepicker({
 			defaultDate : new Date(),
 			changeYear : true,
-			changeMonth : true
+			changeMonth : true,
+			maxDate: 0
 		});
 	});
 
@@ -52,7 +53,7 @@ if(isset($batch_information)){
 	</p>
 	<p>
 		<label for="date">Transaction Date: </label>
-		<input id="date"  name="date" type="text"  value="<?php echo $date;?>" class="validate[required]"/>
+		<input id="date" readonly=""  name="date" type="text"  value="<?php echo $date;?>" class="validate[required]"/>
 		<span class="field_desc">Enter the transaction date</span>
 	</p>
 	<p>

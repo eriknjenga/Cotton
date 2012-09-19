@@ -31,9 +31,15 @@ class Agent extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Agent")-> where("Deleted = '0'");
+		$query = Doctrine_Query::create() -> select("*") -> from("Agent") -> where("Deleted = '0'");
 		$agents = $query -> execute();
 		return $agents;
+	}
+
+	public function getSearchedAgent($search_value) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Agent") -> where("Agent_Code like '%$search_value%' or First_Name like '%$search_value%' or Surname like '%$search_value%' or National_Id like '%$search_value%'");
+		$results = $query -> execute();
+		return $results;
 	}
 
 }

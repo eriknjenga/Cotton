@@ -9,7 +9,13 @@ class Search_Management extends MY_Controller {
 	}
 
 	public function search_page() {
-		$data['content_view'] = "document_search_v";
+		$user_indicator = $this -> session -> userdata('user_indicator');
+		if ($user_indicator == "system_administrator") {
+			$data['content_view'] = "admin_search_v";
+		} else {
+			$data['content_view'] = "document_search_v";
+		}
+
 		$this -> base_params($data);
 	}
 

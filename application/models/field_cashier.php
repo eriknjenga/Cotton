@@ -8,7 +8,7 @@ class Field_Cashier extends Doctrine_Record {
 	}
 
 	public function setUp() {
-		$this -> setTableName('field_cashier'); 
+		$this -> setTableName('field_cashier');
 	}
 
 	public function getTotalFieldCashiers() {
@@ -18,7 +18,7 @@ class Field_Cashier extends Doctrine_Record {
 	}
 
 	public function getPagedFieldCashiers($offset, $items) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cashier") -> offset($offset) -> limit($items)->orderBy("id Desc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cashier") -> offset($offset) -> limit($items) -> orderBy("id Desc");
 		$field_cashiers = $query -> execute(array());
 		return $field_cashiers;
 	}
@@ -30,9 +30,15 @@ class Field_Cashier extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cashier")->orderBy("Field_Cashier_Name asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cashier") -> orderBy("Field_Cashier_Name asc");
 		$field_cashiers = $query -> execute();
 		return $field_cashiers;
+	}
+
+	public function getSearchedCashier($search_value) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Field_Cashier") -> where("Field_Cashier_Code like '%$search_value%' or Field_Cashier_Name like '%$search_value%' or National_Id like '%$search_value%' or Phone_Number like '%$search_value%'");
+		$results = $query -> execute();
+		return $results;
 	}
 
 }

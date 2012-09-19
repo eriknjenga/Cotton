@@ -30,6 +30,17 @@ class Buyer_Management extends MY_Controller {
 
 	}
 
+	public function search_buyer() {
+		$search_term = $this -> input -> post("search_value8");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$buyers = Buyer::getSearchedBuyer($db_search_term);
+		$data['buyers'] = $buyers;
+		$data['title'] = "System Buyers";
+		$data['content_view'] = "list_buyers_v";
+		$this -> base_params($data);
+	}
+
 	public function autocomplete_buyer() {
 		$this -> load -> database();
 		$search_term = $this -> input -> post("term");

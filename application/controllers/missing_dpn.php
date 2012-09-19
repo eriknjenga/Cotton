@@ -25,16 +25,27 @@ class Missing_Dpn extends MY_Controller {
 	}
 
 	public function download() {
-		$season = $this -> input -> post("season");
+		$season = date('Y');
 		$date = date("m/d/Y");
 		$data_buffer = "
 			<style>
 			table.data-table {
 			table-layout: fixed;
 			width: 700px;
+			border-collapse:collapse;
+			border:1px solid black;
+			}
+			table.data-table td, th {
+			width: 100px;
+			border: 1px solid black;
 			}
 			table.data-table td {
-			width: 200px; 
+			width: 70px;
+			font-size:11;
+			}
+			table.data-table th {
+			width: 70px;
+			font-size:11;
 			}
 			</style>
 			";
@@ -50,13 +61,13 @@ class Missing_Dpn extends MY_Controller {
 				//echo the start of the table
 
 				//sql to get the current book being used
-				$sql_get_depot_sequence = "select * from dpn_sequence where season = '" . $season . "' and '" . $depot_data['dpn'] . "' between first and last and depot = '" . $depot_data['depot'] . "'";
-				
+				$sql_get_depot_sequence = "select * from dpn_sequence where season = '" . $season . "' and abs('" . $depot_data['dpn'] . "') between abs(first) and abs(last) and depot = '" . $depot_data['depot'] . "'";
+
 				$query = $this -> db -> query($sql_get_depot_sequence);
 				$sequence_data = $query -> row_array();
 				if (isset($sequence_data['first'])) {
 					$sql = "select sequence_numbers from (select (@start_sq := @start_sq +1) as sequence_numbers from dps_sequence,(select @start_sq := " . $sequence_data['first'] . ") s where @start_sq < " . $depot_data['dpn'] . ") sequence where sequence_numbers not in (select dpn from purchase p where depot = '" . $depot_data['depot'] . "' and season = '$season'  and dpn>" . $sequence_data['first'] . ")";
-					
+
 					$query = $this -> db -> query($sql);
 					if ($query -> num_rows() > 0) {
 						$data_buffer .= "<tr><td>" . $depot_data['depot_name'] . "</td><td>" . $depot_data['depot_code'] . "</td><td>";
@@ -80,18 +91,28 @@ class Missing_Dpn extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Missing DPS Numbers</th></tr>";
+		return "<thead><tr><th>Missing DPS Numbers</th></tr></thead>";
 	}
 
 	function generatePDF($data, $season, $date) {
+		$date = date('d/m/Y', strtotime($date));
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Missing DPNs</h3>";
-		$html_title .= "<h5 style='text-align:center;'> For the " . $season . " Season as at " . $date . "</h5>";
+		$html_title .= "<h5 style='text-align:center;'>As at " . $date . "</h5>";
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4');
 		$this -> mpdf -> SetTitle('Missing DPNs');
-		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
+		$this -> mpdf -> defaultfooterfontsize = 9;
+		/* blank, B, I, or BI */
+		$this -> mpdf -> defaultfooterline = 1;
+		/* 1 to include line below header/above footer */
+		$this -> mpdf -> mirrorMargins = 1;
+		$mpdf -> defaultfooterfontstyle = B;
+		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|-{PAGENO}-|Missing DPNs Report');
+		/* defines footer for Odd and Even Pages - placed at Outer margin */
+
+		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "Missing DPNs.pdf";

@@ -23,6 +23,18 @@ class User_Management extends MY_Controller {
 		redirect("user_management/login");
 	}
 
+	public function search_user() {
+		$search_term = $this -> input -> post("search_value5");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$users = User::getSearchedUser($db_search_term);
+		$data['users'] = $users;
+		$data['title'] = "Users";
+		$data['content_view'] = "list_users_v";
+		$data['listing_title'] = "Ward Search Results For <b>' " . $search_term . "</b>";
+		$this -> base_params($data);
+	}
+
 	public function change_password() {
 		$data = array();
 		$data['title'] = "Change User Password";

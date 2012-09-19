@@ -1,6 +1,6 @@
 <script type="text/javascript">
 $(function() {
-	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Column2D.swf"?>", "zonal_purchases", "600", "350", "0", "0");
+	/*var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Column2D.swf"?>", "zonal_purchases", "600", "350", "0", "0");
 	var url = '<?php echo base_url()."region_management/getRegionalPurchases/"?>'; 
 	chart.setDataURL(url);
 	chart.render("zonal_purchases");
@@ -24,11 +24,7 @@ $(function() {
 	var url = '<?php echo base_url()."price_management/getPriceTrend/"?>'; 
 	chart.setDataURL(url);
 	chart.render("price_movement");
-	
-	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionWidgets/Charts/AngularGauge.swf"?>", "performance", "350", "200", "0", "0");
-	var url = '<?php echo base_url()."price_management/getPerformance/"?>'; 
-	chart.setDataURL(url);
-	chart.render("performance");
+	*/
 });
 </script>
 <style>
@@ -43,7 +39,36 @@ $(function() {
 		margin: 0 auto;
 		width:300px;
 	}
+	#notifications_panel{
+		width:100%;
+	}
+	.message{
+		width:300px;
+	}
+	.notification_link{
+		text-decoration: none;
+		float:left;
+		margin: 5px;
+	}
 </style>
+<div id="notifications_panel">
+	<a href="<?php echo site_url('dormant_buying_centers');?>" class="notification_link">
+	<div class="message information close">
+	<h2>Dormant Centers</h2>
+	<p>
+		A total of <?php echo $total_dormant;?> have been dormant for more than 2 days
+	</p>
+</div>
+</a>
+<a href="<?php echo site_url('missing_dpn');?>" class="notification_link">
+	<div class="message information close">
+	<h2>Missing DPNs</h2>
+	<p>
+		A total of <?php echo $centers_missing;?> Buying Centers are missing DPNs
+	</p>
+</div>
+	</a>
+</div>
 <div class="graph_container">
 	<div id="zonal_purchases"></div>
 </div>
@@ -62,8 +87,4 @@ $(function() {
 
 <div class="graph_container">
 	<div id="price_movement"></div>
-</div>
-<div class="graph_container">
-	<div class="graph_title">% of Target Reached</div>
-	<div id="performance" style="margin-left:50px;"></div>
 </div>

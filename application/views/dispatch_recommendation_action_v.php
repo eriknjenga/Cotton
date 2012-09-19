@@ -21,7 +21,9 @@ echo validation_errors('
 			<th>Center Code</th>
 			<th>Route</th>
 			<th>Distance</th>
+			<th>Capacity (Tonnes)</th>
 			<th>Product Balance</th>
+			<th>Ratio</th>
 			<th>Days Pending</th>
 			<th>Truck</th>
 		</tr>
@@ -62,7 +64,13 @@ $days_pending += 1;
 		<?php echo $center_recommendation['distance'];?>
 		</td>
 		<td>
+		<?php echo $center_recommendation['depot_capacity'];?>
+		</td>
+		<td>
 		<?php echo $center_recommendation['product_balance'];?>
+		</td>
+		<td>
+		<?php echo number_format(($center_recommendation['ratio']+0),2);?>
 		</td>
 		<td>
 		<?php echo $days_pending;?>

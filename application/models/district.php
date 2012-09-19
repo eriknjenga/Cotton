@@ -13,7 +13,7 @@ class District extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("District") ->where("Deleted = '0'") -> orderBy("Name asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("District") -> where("Deleted = '0'") -> orderBy("Name asc");
 		$districts = $query -> execute();
 		return $districts;
 	}
@@ -34,6 +34,12 @@ class District extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("District") -> where("id = '$id'");
 		$ward = $query -> execute();
 		return $ward[0];
+	}
+
+	public function getSearchedDistrict($district) {
+		$query = Doctrine_Query::create() -> select("*") -> from("District") -> where("Name like '%$district%'");
+		$district = $query -> execute();
+		return $district;
 	}
 
 }

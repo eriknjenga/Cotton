@@ -30,6 +30,17 @@ class Field_Cashier_Management extends MY_Controller {
 
 	}
 
+	public function search_cashier() {
+		$search_term = $this -> input -> post("search_value9");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$field_cashiers = Field_Cashier::getSearchedCashier($db_search_term);
+		$data['field_cashiers'] = $field_cashiers;
+		$data['title'] = "Field Cashiers";
+		$data['content_view'] = "list_field_cashiers_v";
+		$this -> base_params($data);
+	}
+
 	public function new_field_cashier($data = null) {
 		if ($data == null) {
 			$data = array();
@@ -51,7 +62,7 @@ class Field_Cashier_Management extends MY_Controller {
 		$cashiers = Field_Cashier::getAll();
 		$data_buffer = "Cashier Code\tFull Name\tNational Id\tPhone Number\t\n";
 		foreach ($cashiers as $cashier) {
-			$data_buffer .= $cashier -> Field_Cashier_Code . "\t" . $cashier -> Field_Cashier_Name ."\t" . $cashier -> National_Id."\t" . $cashier -> Phone_Number. "\n";
+			$data_buffer .= $cashier -> Field_Cashier_Code . "\t" . $cashier -> Field_Cashier_Name . "\t" . $cashier -> National_Id . "\t" . $cashier -> Phone_Number . "\n";
 		}
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=System Field Cashiers.xls");
@@ -97,7 +108,7 @@ class Field_Cashier_Management extends MY_Controller {
 		return $this -> form_validation -> run();
 	}
 
-	public function base_params($data) { 
+	public function base_params($data) {
 		$data['sub_link'] = "field_cashier_management";
 		$data['link'] = "people_management";
 		$this -> load -> view("demo_template", $data);

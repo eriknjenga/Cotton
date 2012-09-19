@@ -36,8 +36,19 @@ class Field_Cashier_Summaries extends MY_Controller {
 			width: 700px;
 			}
 			table.data-table td {
-			width: 120px;
+			width: 50px;
+			font-size:11;
 			}
+			table.data-table th {
+			width: 50px;
+			font-size:11;
+			}
+			.amount{
+				text-align:right;
+			}
+			.center{
+				text-align:center;
+			}			
 			</style>
 			";
 		$total_cash_received = 0;
@@ -55,12 +66,12 @@ class Field_Cashier_Summaries extends MY_Controller {
 			$sql = "select balances.*,total_received - (total_paid+total_returned) as balance from (select (select coalesce(sum(amount),0) from cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2') as total_received,(select coalesce(sum(amount),0) from field_cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2') as total_paid,(select coalesce(sum(amount),0) from cash_receipt where field_cashier = '$field_cashier' and batch_status = '2' ) as total_returned) balances";
 			$query = $this -> db -> query($sql);
 			$summary_data = $query -> row_array();
-			$data_buffer .= "<tr><td>" . $cashier['field_cashier_name'] . "</td><td>" . number_format($summary_data['total_received'] + 0) . "</td><td>" . number_format(($summary_data['total_paid'] + $summary_data['total_returned']) + 0) . "</td><td>" . number_format($summary_data['balance'] + 0) . "</td></tr>";
+			$data_buffer .= "<tr><td>" . $cashier['field_cashier_name'] . "</td><td class='amount'>" . number_format($summary_data['total_received'] + 0) . "</td><td  class='amount'>" . number_format(($summary_data['total_paid'] + $summary_data['total_returned']) + 0) . "</td><td class='amount'>" . number_format($summary_data['balance'] + 0) . "</td></tr>";
 			$total_cash_received += $summary_data['total_received'];
 			$total_cash_paid += ($summary_data['total_paid'] + $summary_data['total_returned']);
 			$total_balance += $summary_data['balance'];
 		}
-		$data_buffer .= "<tr></tr><tr><td>Totals: </td><td>" . number_format($total_cash_received + 0) . "</td><td>" . number_format($total_cash_paid + 0) . "</td><td>" . number_format($total_balance + 0) . "</td></tr>";
+		$data_buffer .= "<tr></tr><tr><td>Totals: </td><td class='amount'>" . number_format($total_cash_received + 0) . "</td><td class='amount'>" . number_format($total_cash_paid + 0) . "</td><td class='amount'>" . number_format($total_balance + 0) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -111,7 +122,7 @@ class Field_Cashier_Summaries extends MY_Controller {
 	}
 
 	public function echoTitles() {
-		return "<tr><th>Field Cashier</th><th>Cash Received</th><th>Cash Paid</th><th>Balance</th></tr>";
+		return "<thead><tr><th>Field Cashier</th><th>Cash Received</th><th>Cash Paid</th><th>Balance</th></tr></thead>";
 	}
 
 	public function echoExcelTitles() {
@@ -119,6 +130,7 @@ class Field_Cashier_Summaries extends MY_Controller {
 	}
 
 	function generatePDF($data, $date) {
+		$date = date('d/m/Y', strtotime($date));
 		$html_title = "<img src='Images/logo.png' style='position:absolute; width:134px; height:46px; top:0px; left:0px; '></img>";
 		$html_title .= "<h3 style='text-align:center; text-decoration:underline; margin-top:-50px;'>Field Cashier Summaries</h3>";
 		$html_title .= "<h5 style='text-align:center;'> as at: " . $date . "</h5>";
@@ -126,8 +138,17 @@ class Field_Cashier_Summaries extends MY_Controller {
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4');
 		$this -> mpdf -> SetTitle('Field Cashier Summaries');
-		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
+		$this -> mpdf -> defaultfooterfontsize = 9;
+		/* blank, B, I, or BI */
+		$this -> mpdf -> defaultfooterline = 1;
+		/* 1 to include line below header/above footer */
+		$this -> mpdf -> mirrorMargins = 1;
+		$mpdf -> defaultfooterfontstyle = B;
+		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|{PAGENO}|Field Cashier Summaries Report');
+		/* defines footer for Odd and Even Pages - placed at Outer margin */
+
+		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "Field Cashier Summaries.pdf";

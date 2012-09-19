@@ -138,3 +138,60 @@
 		</form>
 	</fieldset>
 </div>
+<div class="search_box">
+	<?php
+	$attributes = array("method" => "post");
+	echo form_open('disbursement_management/search_invoice', $attributes);
+	?>
+	<fieldset>
+		<legend>
+			Search Input Invoice
+		</legend>
+		<p>
+			<label for="search_value8">Invoice Number: </label>
+			<input name="search_value8" type="text" value=""/>
+		</p>
+		<p>
+			<input class="button submit" type="submit" value="Search" name="submit">
+		</p>
+		</form>
+	</fieldset>
+</div>
+<div class="search_box">
+	<?php
+	$attributes = array("method" => "post");
+	echo form_open('loan_recovery_receipt_management/search_receipt', $attributes);
+	?>
+	<fieldset>
+		<legend>
+			Search Input Invoice
+		</legend>
+		<p>
+			<label for="search_value9">Invoice Number: </label>
+			<input name="search_value9" type="text" value=""/>
+		</p>
+		<p>
+			<input class="button submit" type="submit" value="Search" name="submit">
+		</p>
+		</form>
+	</fieldset>
+</div>
+<div class="search_box">
+	<?php
+	$attributes = array("method" => "post");
+	echo form_open('buying_center_summary_management/search_summary', $attributes);
+	?>
+	<fieldset>
+		<legend>
+			Search Buying Center Summary
+		</legend>
+		<p>
+			<label for="search_value10">BCS Number: </label>
+			<input name="search_value10" type="text" value=""/>
+		</p>
+		<p>
+			<input class="button submit" type="submit" value="Search" name="submit">
+		</p>
+		</form>
+	</fieldset>
+</div>

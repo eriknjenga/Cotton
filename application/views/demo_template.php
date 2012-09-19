@@ -125,6 +125,7 @@ foreach($menus as $menu){
 					<h2>Quick Menu</h2>
 					<ul>
 						<?php 
+						
 $quick_menus = $this -> quick_menus -> userdata('quick_menu_items');
 if(isset($quick_menus[0])){
 foreach($quick_menus as $quick_menu){

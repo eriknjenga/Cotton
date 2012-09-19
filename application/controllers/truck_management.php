@@ -30,6 +30,17 @@ class Truck_Management extends MY_Controller {
 
 	}
 
+	public function search_truck() {
+		$search_term = $this -> input -> post("search_value10");
+		$this -> load -> database();
+		$db_search_term = $this -> db -> escape_str($search_term);
+		$trucks = Truck::getSearchedTruck($db_search_term);
+		$data['trucks'] = $trucks;
+		$data['title'] = "System Trucks";
+		$data['content_view'] = "list_trucks_v";
+		$this -> base_params($data);
+	}
+
 	public function new_truck($data = null) {
 		if ($data == null) {
 			$data = array();
@@ -49,7 +60,7 @@ class Truck_Management extends MY_Controller {
 
 	public function print_trucks() {
 		$trucks = Truck::getAll();
-		$categories = array(1=>"Alliance Truck",2=>"Contracted Truck");
+		$categories = array(1 => "Alliance Truck", 2 => "Contracted Truck");
 		$data_buffer = "Number Plate\tCategory\tCapacity\tAgreed Rate\t\n";
 		foreach ($trucks as $truck) {
 			$data_buffer .= $truck -> Number_Plate . "\t" . $categories[$truck -> Category] . "\t" . $truck -> Capacity . "\t" . $truck -> Agreed_Rate . "\n";
@@ -73,7 +84,7 @@ class Truck_Management extends MY_Controller {
 			if (strlen($editing) > 0) {
 				$truck = Truck::getTruck($editing);
 				$log -> Log_Type = "2";
-				$log -> Log_Message = "Edited Truck Record From {Number Plate: '" . $truck -> Number_Plate . "' Capacity: '" . $truck -> Capacity . "' Agreed Rate: '" . $truck -> Agreed_Rate. "'} to " . $details_desc;
+				$log -> Log_Message = "Edited Truck Record From {Number Plate: '" . $truck -> Number_Plate . "' Capacity: '" . $truck -> Capacity . "' Agreed Rate: '" . $truck -> Agreed_Rate . "'} to " . $details_desc;
 			} else {
 				$truck = new Truck();
 				$log -> Log_Type = "1";
@@ -99,7 +110,7 @@ class Truck_Management extends MY_Controller {
 		$truck -> save();
 		$log = new System_Log();
 		$log -> Log_Type = "3";
-		$log -> Log_Message = "Deleted Truck Record {Number Plate: '" . $truck -> Number_Plate . "' Capacity: '" . $truck -> Capacity . "' Agreed Rate: '" . $truck -> Agreed_Rate. "'} ";
+		$log -> Log_Message = "Deleted Truck Record {Number Plate: '" . $truck -> Number_Plate . "' Capacity: '" . $truck -> Capacity . "' Agreed Rate: '" . $truck -> Agreed_Rate . "'} ";
 		$log -> User = $this -> session -> userdata('user_id');
 		$log -> Timestamp = date('U');
 		$log -> save();

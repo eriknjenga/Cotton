@@ -18,7 +18,7 @@
 <script type="text/javascript">
 					$(function() {
 	$("#purchase_form").validationEngine();
-	/*$(".submit").click(function(){ 
+	$(".submit").click(function(){ 
 			var free_totals = checkFreeTotals();
 			var fbg_totals = checkFbgTotals();
 			if(free_totals == true && fbg_totals == true){
@@ -28,7 +28,7 @@
 				return false;
 			}
 			
-		});*/
+		});
 		
 		$("#fbg").autocomplete({
 			source : "<?php echo base_url();?>fbg_management/autocomplete_fbg",
@@ -42,7 +42,8 @@
 				$("#date").datepicker({
 				defaultDate : new Date(),
 				changeYear : true,
-				changeMonth : true
+				changeMonth : true,
+				maxDate: 0
 				});
 				$("#quantity").keyup(function() {
 				var date_object = $("#date");
@@ -294,7 +295,7 @@ foreach ($prices as $price_object) {
 <div class="dps_details">
 	<p>
 	<label for="date">DPS Date</label>
-	<input class="date validate[required]" id="date" name="date" type="text" value="<?php echo $date;?>"/> 
+	<input class="date validate[required]" id="date" name="date" readonly="" type="text" value="<?php echo $date;?>"/> 
 </p>
 <p>
 	<label for="price">Unit Price</label>

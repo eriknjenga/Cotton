@@ -35,5 +35,9 @@ class Truck extends Doctrine_Record {
 		$trucks = $query -> execute();
 		return $trucks;
 	}
-
+	public function getSearchedTruck($search_value) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Truck") -> where("Number_Plate like '%$search_value%'");
+		$results = $query -> execute();
+		return $results;
+	}
 }

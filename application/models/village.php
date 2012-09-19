@@ -12,7 +12,7 @@ class Village extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Village")->where("Deleted = '0'") -> orderBy("Name asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("Village") -> where("Deleted = '0'") -> orderBy("Name asc");
 		$villages = $query -> execute();
 		return $villages;
 	}
@@ -39,6 +39,12 @@ class Village extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Village") -> where("id = '$id'");
 		$village = $query -> execute();
 		return $village[0];
+	}
+
+	public function getSearchedVillage($search_value) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Village") -> where("Name like '%$search_value%'");
+		$results = $query -> execute();
+		return $results;
 	}
 
 }

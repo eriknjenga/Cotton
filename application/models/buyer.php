@@ -43,4 +43,10 @@ class Buyer extends Doctrine_Record {
 		return $buyers;
 	}
 
+	public function getSearchedBuyer($search_value) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Buyer") -> where("Name like '%$search_value%' or Buyer_Code like '%$search_value%' or National_Id like '%$search_value%' or Phone_Number like '%$search_value%'");
+		$results = $query -> execute();
+		return $results;
+	}
+
 }

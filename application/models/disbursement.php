@@ -20,6 +20,7 @@ class Disbursement extends Doctrine_Record {
 		$this -> hasOne('FBG as FBG_Object', array('local' => 'FBG', 'foreign' => 'id'));
 		$this -> hasOne('Agent as Agent_Object', array('local' => 'Agent', 'foreign' => 'id'));
 		$this -> hasOne('Farm_Input as Farm_Input_Object', array('local' => 'Farm_Input', 'foreign' => 'id'));
+		$this -> hasOne('Transaction_Batch as Batch_Object', array('local' => 'ID_Batch', 'foreign' => 'id'));
 	}
 
 	public function getTotalDisbursements($batch) {
@@ -68,6 +69,12 @@ class Disbursement extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> where("fbg = '$fbg'");
 		$disbursements = $query -> execute();
 		return $disbursements;
-	} 
+	}
+
+	public function getSearchedInvoice($search_value) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Disbursement") -> where("Invoice_Number = '$search_value'");
+		$results = $query -> execute();
+		return $results;
+	}
 
 }
