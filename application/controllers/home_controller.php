@@ -12,7 +12,7 @@ class Home_Controller extends MY_Controller {
 		$this -> home();
 	}
 
-	public function home() { 
+	public function home() {
 		// Create session for holding quick menus
 		$config_session1 = array('sess_cookie_name' => 'quick_menus');
 		$this -> load -> library('session', $config_session1, 'quick_menus');
@@ -62,6 +62,10 @@ class Home_Controller extends MY_Controller {
 
 	}
 
+	function test_function() {
+		echo "ror";
+	}
+
 	function management_dashboard() {
 		$data['title'] = "System Home";
 		$data['content_view'] = "management_dashboard_v";
@@ -69,10 +73,10 @@ class Home_Controller extends MY_Controller {
 		$season = date('Y');
 		$this -> load -> database();
 		//Get the number of dormant buying centers
-		$sql = "select count(*) as total_dormant from (select max(str_to_date(date,'%m/%d/%Y')) as last_purchase,depot from purchase group by depot)last_dates where datediff(str_to_date('" . $todays_date . "','%m/%d/%Y') ,last_purchase) >2 ";
+		/*$sql = "select count(*) as total_dormant from (select max(str_to_date(date,'%m/%d/%Y')) as last_purchase,depot from purchase group by depot)last_dates where datediff(str_to_date('" . $todays_date . "','%m/%d/%Y') ,last_purchase) >2 ";
 		$query = $this -> db -> query($sql);
 		$result = $query -> result_array();
-		$data['total_dormant'] = $result[0]['total_dormant'];
+		$data['total_dormant'] = $result[0]['total_dormant'];*/
 		//Get the total number of missing dpns
 		$centers_missing_dpns = 0;
 		$missing_dpns = 0;

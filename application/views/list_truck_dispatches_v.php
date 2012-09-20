@@ -27,7 +27,7 @@
 		window.location = url;
 		}
 </script>
-<h1>DPN Sequence Listing</h1>
+<h1>Truck Dispatches</h1>
 <table class="fullwidth">
 	<thead>
 		<tr>
@@ -54,7 +54,7 @@ $class = "odd";
 		<?php echo $dispatch -> Depot_Object -> Depot_Code . " - " . $dispatch -> Depot_Object -> Depot_Name;?>
 		</td>
 		<td>
-		<?php echo $dispatch -> Date;?>
+		<?php echo date('d/m/Y', strtotime($dispatch -> Date)); ;?>
 		</td>
 		<td>
 		<?php echo $dispatch -> Truck_Object->Number_Plate;?>

@@ -4,7 +4,8 @@
 		$("#date").datepicker({
 			defaultDate : new Date(),
 			changeYear : true,
-			changeMonth : true
+			changeMonth : true,
+			maxDate : 0
 		});
 	});
 

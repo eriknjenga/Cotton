@@ -81,10 +81,11 @@ class Depot_Reports extends MY_Controller {
 
 			$data_buffer .= "<tr><td><table class='data-table'>";
 			$data_buffer .= "<tr><td><b>Total Cash Received</b></td><td class='amount'>" . number_format($total_cash_received) . "</td></tr>";
-			$data_buffer .= "<tr><td><b>Total Purchases</b></td><td class='amount'>" . number_format($total_purchases) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Purchases (Gross)</b></td><td class='amount'>" . number_format($total_purchases) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Loan Recoveries</b></td><td class='amount'>" . number_format($total_recoveries) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Purchases (Net)</b></td><td class='amount'>" . number_format($total_purchases - $total_recoveries) . "</td></tr>";
 			$data_buffer .= "<tr><td><b>Total Cash Returned</b></td><td class='amount'>" . number_format($total_returned) . "</td></tr>";
-			$data_buffer .= "<tr></tr><tr><td><b>Balance</b></td><td class='amount'>" . number_format(($total_cash_received - $total_purchases - $total_returned)) . "</td></tr>";
-			$data_buffer .= "<tr></tr><tr><td><b>Total Loan Recoveries</b></td><td class='amount'>" . number_format($total_recoveries) . "</td></tr>";
+			$data_buffer .= "<tr></tr><tr><td><b>Balance</b></td><td class='amount'>" . number_format(($total_cash_received - $total_purchases - $total_returned - $total_recoveries)) . "</td></tr>"; 
 			$data_buffer .= "</table></td>";
 			$data_buffer .= "<td><table class='data-table'>";
 			$data_buffer .= "<tr><td><b>Total Purchases</b></td><td class='amount'>" . number_format($total_purchased_weight) . "</td></tr>";

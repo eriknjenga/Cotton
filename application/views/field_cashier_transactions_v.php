@@ -52,7 +52,8 @@ foreach($field_cashiers as $field_cashier){
 			<label for="end_date">To</label>
 			<input id="end_date" name="end_date" type="text" class="validate[required]"/>
 		</p>
-		<input type="submit" name="surveillance" class="button"	value="Download Field Cashier Transactions" />
+		<input type="submit" name="action" class="button"	value="Download Cashier Transactions PDF" />
+		<input type="submit" name="action" class="button"	value="Download Cashier Transactions Excel" />
 	</fieldset>
 	</form>
 </div>

@@ -50,6 +50,11 @@ class Field_Cashier_Transactions extends MY_Controller {
 			$field_cashier = $this -> input -> post("field_cashier");
 			$start_date = $this -> input -> post("start_date");
 			$end_date = $this -> input -> post("end_date");
+			$action = $this -> input -> post("action");
+			if ($action == "Download Cashier Transactions Excel") {
+				$this -> downloadExcel($field_cashier, $start_date, $end_date);
+				return;
+			}
 			$cashier_details = Field_Cashier::getFieldCashier($field_cashier);
 			$sql = "SELECT 'CIH C' as document_type,cih as document_number , date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as transaction_date, amount as cash_received, '' as cash_paid, 'Center Distribution' as message,'' as bcr FROM cash_disbursement where field_cashier  = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  union all (select 'CIH B' as document_type,cih as document_number,date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y')  as transaction_date,'',amount as cash_paid,concat(d.depot_name,' (',d.depot_code,')') as message,receipt as bcr from field_cash_disbursement f left join depot d on f.depot = d.id where field_cashier = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y'))  union all (select 'Receipt' as document_number,receipt_number as document_number,date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as transaction_date,'',amount as cash_paid,'Cash Return' as message,'' as bcr from cash_receipt where field_cashier = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y'))  order by str_to_date(transaction_date,'%d/%m/%Y') asc";
 			$balance_sql = "select total_received - (total_paid+total_returned) as balance from (select (select sum(amount) from cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') < str_to_date('" . $start_date . "','%m/%d/%Y')) as total_received,(select sum(amount) from field_cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') < str_to_date ('" . $start_date . "','%m/%d/%Y')) as total_paid,(select sum(amount) from cash_receipt where field_cashier = '$field_cashier' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') < str_to_date ('" . $start_date . "','%m/%d/%Y')) as total_returned) balances";
@@ -82,7 +87,7 @@ class Field_Cashier_Transactions extends MY_Controller {
 			//echo $data_buffer;
 			$log = new System_Log();
 			$log -> Log_Type = "4";
-			$log -> Log_Message = "Downloaded Buying Center Transactions PDF";
+			$log -> Log_Message = "Downloaded Field Cashier Transactions PDF";
 			$log -> User = $this -> session -> userdata('user_id');
 			$log -> Timestamp = date('U');
 			$log -> save();
@@ -93,8 +98,56 @@ class Field_Cashier_Transactions extends MY_Controller {
 
 	}
 
+	public function downloadExcel($field_cashier, $start_date, $end_date) {
+		$data_buffer = "";
+		$this -> load -> database();
+		$cashier_details = Field_Cashier::getFieldCashier($field_cashier);
+		$sql = "SELECT 'CIH C' as document_type,cih as document_number , date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as transaction_date, amount as cash_received, '' as cash_paid, 'Center Distribution' as message,'' as bcr FROM cash_disbursement where field_cashier  = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y')  union all (select 'CIH B' as document_type,cih as document_number,date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y')  as transaction_date,'',amount as cash_paid,concat(d.depot_name,' (',d.depot_code,')') as message,receipt as bcr from field_cash_disbursement f left join depot d on f.depot = d.id where field_cashier = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y'))  union all (select 'Receipt' as document_number,receipt_number as document_number,date_format(str_to_date(date,'%m/%d/%Y'),'%d/%m/%Y') as transaction_date,'',amount as cash_paid,'Cash Return' as message,'' as bcr from cash_receipt where field_cashier = '" . $field_cashier . "' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y'))  order by str_to_date(transaction_date,'%d/%m/%Y') asc";
+		$balance_sql = "select total_received - (total_paid+total_returned) as balance from (select (select sum(amount) from cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') < str_to_date('" . $start_date . "','%m/%d/%Y')) as total_received,(select sum(amount) from field_cash_disbursement where field_cashier = '$field_cashier' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') < str_to_date ('" . $start_date . "','%m/%d/%Y')) as total_paid,(select sum(amount) from cash_receipt where field_cashier = '$field_cashier' and batch_status = '2' and str_to_date(date,'%m/%d/%Y') < str_to_date ('" . $start_date . "','%m/%d/%Y')) as total_returned) balances";
+		$balance_query = $this -> db -> query($balance_sql);
+		$cashier_balance = $balance_query -> result_array();
+		$transactions_query = $this -> db -> query($sql);
+		$cashier_transactions = $transactions_query -> result_array();
+		$total_cash_received = 0;
+		$total_cash_paid = 0;
+		$balance = $cashier_balance[0]['balance'] + 0;
+		//echo the start of the table
+		$data_buffer .= "Field Cashier: " . $cashier_details -> Field_Cashier_Name . "\n";
+		$data_buffer .= "Balance at start of period: " . $balance . "\t"; 
+		$data_buffer .= $this -> echoExcelTitles();
+
+		foreach ($cashier_transactions as $transaction) {
+			$total_cash_received += $transaction['cash_received'];
+			$total_cash_paid += $transaction['cash_paid'];
+			$balance += $transaction['cash_received'];
+			$balance -= $transaction['cash_paid'];
+			$data_buffer .= $transaction['transaction_date'] . "\t" . $transaction['document_type'] . "\t" . $transaction['document_number'] . "\t" . (empty($transaction['bcr']) ? '-' : $transaction['bcr'] + 0) . "\t" . $transaction['message'] . "\t" . (empty($transaction['cash_received']) ? '-' : number_format($transaction['cash_received'] + 0)) . "\t" . (empty($transaction['cash_paid']) ? '-' : number_format($transaction['cash_paid'] + 0)) . "\t" . number_format($balance + 0) . "\t\n";
+		}
+		$data_buffer .= "\nCash Summary\n";
+		$data_buffer .= "Total Cash Received\t" . number_format($total_cash_received) . "\n";
+		$data_buffer .= "Total Cash Distributed/Returned\t" . number_format($total_cash_paid) . "\n";
+		$data_buffer .= "Balance\t" . number_format($balance) . "\n"; 
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=Field Cashier Transactions.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
+		$log = new System_Log();
+		$log -> Log_Type = "4";
+		$log -> Log_Message = "Downloaded Field Cashier Transactions Excel";
+		$log -> User = $this -> session -> userdata('user_id');
+		$log -> Timestamp = date('U');
+		$log -> save(); 
+
+	}
+
 	public function echoTitles() {
 		return "<thead><tr><th>Transaction Date</th><th>Doc Type</th><th>Doc. Number</th><th>BC Receipt</th><th>Details</th><th>Cash Received</th><th>Cash Paid</th><th>Balance</th></tr></thead>";
+	}
+
+	public function echoExcelTitles() {
+		return "Transaction Date\tDoc Type\tDoc. Number\tBC Receipt\tDetails\tCash Received\tCash Paid\tBalance\t\n";
 	}
 
 	function generatePDF($data, $start_date, $end_date) {
@@ -106,7 +159,7 @@ class Field_Cashier_Transactions extends MY_Controller {
 
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4');
-		$this -> mpdf -> SetTitle('Field Cashier Transactions');  
+		$this -> mpdf -> SetTitle('Field Cashier Transactions');
 		$this -> mpdf -> simpleTables = true;
 		$this -> mpdf -> defaultfooterfontsize = 9;
 		/* blank, B, I, or BI */
@@ -119,7 +172,7 @@ class Field_Cashier_Transactions extends MY_Controller {
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
-		
+
 		$report_name = "Field Cashier Transactions.pdf";
 		$this -> mpdf -> Output($report_name, 'D');
 	}
