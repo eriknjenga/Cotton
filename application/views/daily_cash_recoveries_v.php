@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	$(function() {
-		$("#truck_transactions").validationEngine();
+		$("#cash_recoveries").validationEngine();
 		$("#start_date").datepicker({
 			defaultDate : new Date(),
 			changeYear : true,
@@ -17,14 +17,14 @@
 <div class="message information close">
 	<h2>Report Description</h2>
 	<p>
-		A report showing all cotton deliveries made by all trucks in a specified date range
+		A report showing all cash recoveries from FBGs in a specified date range
 	</p>
 </div>
 <div id="filter">
 	<?php
-	$attributes = array("method" => "POST", "id" => "truck_transactions");
+	$attributes = array("method" => "POST", "id" => "cash_recoveries");
 
-	echo form_open('daily_dispatches/download', $attributes);
+	echo form_open('daily_cash_recoveries/download', $attributes);
 	echo validation_errors('
 <p class="form_error">', '</p>
 ');
@@ -41,8 +41,8 @@
 			<label for="end_date">To</label>
 			<input id="end_date" name="end_date" type="text" class="validate[required]"/>
 		</p>
-		<input type="submit" name="action" class="button"	value="Download Daily Dispatches PDF" />
-		<input type="submit" name="action" class="button"	value="Download Daily Dispatches Excel" />
+		<input type="submit" name="action" class="button"	value="Download Daily Cash Recoveries PDF" />
+		<input type="submit" name="action" class="button"	value="Download Daily Cash Recoveries Excel" />
 	</fieldset>
 	</form>
 </div>
