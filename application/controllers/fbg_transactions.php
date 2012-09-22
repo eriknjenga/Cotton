@@ -94,6 +94,22 @@ class FBG_Transactions extends MY_Controller {
 			}
 			$data_buffer .= "<tr><td><b>Totals:</b></td><td class='center'>-</td><td class='center'>-</td><td class='amount'>" . number_format($total_kgs + 0) . "</td><td class='amount'>" . number_format($total_value + 0) . "</td><td class='amount'>" . number_format($total_recovered + 0) . "</td><td class='amount'>-</td></tr>";
 			$data_buffer .= "</table>";
+			//Get all cash returns from this fbg
+			$sql_cash_returns = "select * from loan_recovery_receipt where fbg = '" . $fbg . "' and str_to_date(date,'%m/%d/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') and batch_status = '2'";
+			$query = $this -> db -> query($sql_cash_returns);
+			$fbg_returns = $query -> result_array();
+			$data_buffer .= "<h4>Cash Loan Repayments</h4>";
+			$data_buffer .= "<table class='data-table'>";
+			//$data_buffer .= $this -> echoTitles();
+			$data_buffer .= "<thead><tr><th>Date</th><th>Receipt Number</th><th>Received From</th><th>Amount</th></tr></thead>";
+			$total_return_amount = 0;
+			foreach ($fbg_returns as $fbg_return) {
+				$return_date = date('d/m/Y', strtotime($fbg_return['date']));
+				$total_return_amount += $fbg_return['amount'];  
+				$data_buffer .= "<tr><td>" . $return_date . "</td><td class='center'>" . $fbg_return['receipt_number'] . "</td><td class='center'>" . $fbg_return['received_from'] . "</td><td class='amount'>" . number_format($fbg_return['amount'] + 0) . "</td></tr>";
+			}
+			$data_buffer .= "<tr><td><b>Totals:</b></td><td class='center'>-</td><td class='cetner'>-</td><td class='amount'>" . number_format($total_return_amount + 0) . "</td></tr>";
+			$data_buffer .= "</table>";
 			$data_buffer .= "<table>";
 			$data_buffer .= "<tr><td><h3>Purchase Summary</h3></td><td><h3>Loan Summary</h3></td></tr>";
 			$data_buffer .= "<tr><td><table class='data-table'>";
@@ -102,11 +118,12 @@ class FBG_Transactions extends MY_Controller {
 			$data_buffer .= "</table></td>";
 			$data_buffer .= "<td><table class='data-table'>";
 			$data_buffer .= "<tr><td><b>Total Loaned</b></td><td class='amount'>" . number_format($total_loan_value) . "</td></tr>";
-			$data_buffer .= "<tr><td><b>Total Recovered</b></td><td class='amount'>" . number_format($total_recovered) . "</td></tr>";
-			$data_buffer .= "<tr></tr><tr><td><b>Outstanding Balance</b></td><td class='amount'>" . number_format(($total_loan_value - $total_recovered)) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Repaid (Crop)</b></td><td class='amount'>" . number_format($total_recovered) . "</td></tr>";
+			$data_buffer .= "<tr><td><b>Total Repaid (Cash)</b></td><td class='amount'>" . number_format($total_return_amount) . "</td></tr>";
+			$data_buffer .= "<tr></tr><tr><td><b>Outstanding Balance</b></td><td class='amount'>" . number_format(($total_loan_value - $total_recovered - $total_return_amount)) . "</td></tr>";
 			$data_buffer .= "</table></td></tr></table>";
 
-			//			echo $data_buffer;
+						//echo $data_buffer;
 			$log = new System_Log();
 			$log -> Log_Type = "4";
 			$log -> Log_Message = "Downloaded FBG Transactions PDF";
