@@ -106,7 +106,7 @@ class FBG_Transactions extends MY_Controller {
 			foreach ($fbg_returns as $fbg_return) {
 				$return_date = date('d/m/Y', strtotime($fbg_return['date']));
 				$total_return_amount += $fbg_return['amount'];  
-				$data_buffer .= "<tr><td>" . $return_date . "</td><td class='center'>" . $fbg_return['receipt_number'] . "</td><td class='center'>" . $fbg_return['received_from'] . "</td><td class='amount'>" . number_format($fbg_return['amount'] + 0) . "</td></tr>";
+				$data_buffer .= "<tr><td class='center'>" . $return_date . "</td><td class='center'>" . $fbg_return['receipt_number'] . "</td><td class='center'>" . $fbg_return['received_from'] . "</td><td class='amount'>" . number_format($fbg_return['amount'] + 0) . "</td></tr>";
 			}
 			$data_buffer .= "<tr><td><b>Totals:</b></td><td class='center'>-</td><td class='cetner'>-</td><td class='amount'>" . number_format($total_return_amount + 0) . "</td></tr>";
 			$data_buffer .= "</table>";
