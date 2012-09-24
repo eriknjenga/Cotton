@@ -22,11 +22,12 @@ class Truck_Summaries extends MY_Controller {
 	public function download() {
 		$regions = array();
 		$action = $this -> input -> post("action");
+		$trucks = $this -> input -> post("trucks");
 		$start_date = $this -> input -> post("start_date");
 		$end_date = $this -> input -> post("end_date");
 		//Check if the user requested an excel sheet; if so, call the responsible function
 		if ($action == "Download Truck Summaries Excel") {
-			$this -> downloadExcel($start_date, $end_date);
+			$this -> downloadExcel($start_date, $end_date, $trucks);
 			return;
 		}
 		$this -> load -> database();
@@ -57,15 +58,22 @@ class Truck_Summaries extends MY_Controller {
 		$total_weight = 0;
 		$total_distance = 0;
 		$data_buffer .= $this -> echoTitles();
-		//Get data for each zone
-		$sql = "SELECT vehicle_number, SUM( distance ) AS total_distance, SUM( net_weight ) AS total_delivered FROM weighbridge w LEFT JOIN depot d ON w.buying_center_code = d.depot_code WHERE weighing_type =  '2' AND STR_TO_DATE( transaction_date,  '%d/%m/%Y' ) BETWEEN STR_TO_DATE(  '" . $start_date . "',  '%m/%d/%Y' )AND STR_TO_DATE(  '" . $end_date . "',  '%m/%d/%Y' )GROUP BY vehicle_number";
+		//get data based on the trucks selected
+		$sql = "";
+		if ($trucks == "all") {
+			$sql = "SELECT vehicle_number, SUM( distance ) AS total_distance, SUM( net_weight ) AS total_delivered FROM weighbridge w LEFT JOIN depot d ON w.buying_center_code = d.depot_code WHERE weighing_type =  '2' AND STR_TO_DATE( transaction_date,  '%d/%m/%Y' ) BETWEEN STR_TO_DATE(  '" . $start_date . "',  '%m/%d/%Y' )AND STR_TO_DATE(  '" . $end_date . "',  '%m/%d/%Y' )GROUP BY vehicle_number";
+		} else if ($trucks == "alliance") {
+			$sql = "SELECT vehicle_number, SUM( distance ) AS total_distance, SUM( net_weight ) AS total_delivered FROM weighbridge w LEFT JOIN depot d ON w.buying_center_code = d.depot_code left join truck t on w.vehicle_number = t.number_plate WHERE weighing_type =  '2' and t.category = '1' and t.deleted = '0'  AND STR_TO_DATE( transaction_date,  '%d/%m/%Y' ) BETWEEN STR_TO_DATE(  '" . $start_date . "',  '%m/%d/%Y' )AND STR_TO_DATE(  '" . $end_date . "',  '%m/%d/%Y' )GROUP BY vehicle_number";
+		} else if ($trucks == "contracted") {
+			$sql = "SELECT vehicle_number, SUM( distance ) AS total_distance, SUM( net_weight ) AS total_delivered FROM weighbridge w LEFT JOIN depot d ON w.buying_center_code = d.depot_code left join truck t on w.vehicle_number = t.number_plate WHERE weighing_type =  '2' and t.category = '2' and t.deleted = '0'  AND STR_TO_DATE( transaction_date,  '%d/%m/%Y' ) BETWEEN STR_TO_DATE(  '" . $start_date . "',  '%m/%d/%Y' )AND STR_TO_DATE(  '" . $end_date . "',  '%m/%d/%Y' )GROUP BY vehicle_number";
+		} 
 		$query = $this -> db -> query($sql);
 		foreach ($query->result_array() as $depot_data) {
 			$data_buffer .= "<tr><td>" . $depot_data['vehicle_number'] . "</td><td class='center'>" . number_format($depot_data['total_distance'] + 0) . "</td><td class='amount'>" . number_format($depot_data['total_delivered'] + 0) . "</td></tr>";
 			$total_weight += $depot_data['total_delivered'];
 			$total_distance += $depot_data['total_distance'];
 		}
-		$data_buffer .= "<tr></tr><tr><td>Totals</td><td class='center'>" . number_format($total_distance + 0) . "</td><td class='amount'>" . number_format($total_weight + 0) . "</td></tr>";
+		$data_buffer .= "<tr></tr><tr><td>Totals</td><td class='center'>" . number_format(($total_distance + 0),2) . "</td><td class='amount'>" . number_format($total_weight + 0) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -77,14 +85,20 @@ class Truck_Summaries extends MY_Controller {
 
 	}
 
-	public function downloadExcel($start_date, $end_date) {
+	public function downloadExcel($start_date, $end_date, $trucks) {
 		$this -> load -> database();
 		$data_buffer = "";
 		$total_weight = 0;
 		$total_distance = 0;
-		$data_buffer .= $this -> echoExcelTitles();
-		//Get data for each zone
-		$sql = "SELECT vehicle_number, SUM( distance ) AS total_distance, SUM( net_weight ) AS total_delivered FROM weighbridge w LEFT JOIN depot d ON w.buying_center_code = d.depot_code WHERE weighing_type =  '2' AND STR_TO_DATE( transaction_date,  '%d/%m/%Y' ) BETWEEN STR_TO_DATE(  '" . $start_date . "',  '%m/%d/%Y' )AND STR_TO_DATE(  '" . $end_date . "',  '%m/%d/%Y' )GROUP BY vehicle_number";
+		$data_buffer .= $this -> echoExcelTitles(); 
+		$sql = "";
+		if ($trucks == "all") {
+			$sql = "SELECT vehicle_number, SUM( distance ) AS total_distance, SUM( net_weight ) AS total_delivered FROM weighbridge w LEFT JOIN depot d ON w.buying_center_code = d.depot_code WHERE weighing_type =  '2' AND STR_TO_DATE( transaction_date,  '%d/%m/%Y' ) BETWEEN STR_TO_DATE(  '" . $start_date . "',  '%m/%d/%Y' )AND STR_TO_DATE(  '" . $end_date . "',  '%m/%d/%Y' )GROUP BY vehicle_number";
+		} else if ($trucks == "alliance") {
+			$sql = "SELECT vehicle_number, SUM( distance ) AS total_distance, SUM( net_weight ) AS total_delivered FROM weighbridge w LEFT JOIN depot d ON w.buying_center_code = d.depot_code left join truck t on w.vehicle_number = t.number_plate WHERE weighing_type =  '2' and t.category = '1' and t.deleted = '0'  AND STR_TO_DATE( transaction_date,  '%d/%m/%Y' ) BETWEEN STR_TO_DATE(  '" . $start_date . "',  '%m/%d/%Y' )AND STR_TO_DATE(  '" . $end_date . "',  '%m/%d/%Y' )GROUP BY vehicle_number";
+		} else if ($trucks == "contracted") {
+			$sql = "SELECT vehicle_number, SUM( distance ) AS total_distance, SUM( net_weight ) AS total_delivered FROM weighbridge w LEFT JOIN depot d ON w.buying_center_code = d.depot_code left join truck t on w.vehicle_number = t.number_plate WHERE weighing_type =  '2' and t.category = '2' and t.deleted = '0'  AND STR_TO_DATE( transaction_date,  '%d/%m/%Y' ) BETWEEN STR_TO_DATE(  '" . $start_date . "',  '%m/%d/%Y' )AND STR_TO_DATE(  '" . $end_date . "',  '%m/%d/%Y' )GROUP BY vehicle_number";
+		}
 		$query = $this -> db -> query($sql);
 		foreach ($query->result_array() as $depot_data) {
 			$data_buffer .= $depot_data['vehicle_number'] . "\t" . $depot_data['total_distance'] . "\t" . $depot_data['total_delivered'] . "\t\n";

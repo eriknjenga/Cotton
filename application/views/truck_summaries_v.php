@@ -41,6 +41,12 @@
 			<label for="end_date">To</label>
 			<input id="end_date" name="end_date" type="text" class="validate[required]"/>
 		</p>
+		<p>
+			<label for="trucks">Trucks</label> 
+			<input id="trucks" name="trucks" type="radio" value="all" class="validate[required]" checked=""/> All
+			<input id="trucks" name="trucks" type="radio" value="alliance" class="validate[required]"/> Alliance Only
+			<input id="trucks" name="trucks" type="radio" value="contracted" class="validate[required]"/> Contracted Only
+		</p>
 		<input type="submit" name="action" class="button"	value="Download Truck Summaries PDF" />
 		<input type="submit" name="action" class="button"	value="Download Truck Summaries Excel" />
 	</fieldset>

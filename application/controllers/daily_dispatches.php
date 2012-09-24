@@ -24,9 +24,10 @@ class Daily_Dispatches extends MY_Controller {
 		$action = $this -> input -> post("action");
 		$start_date = $this -> input -> post("start_date");
 		$end_date = $this -> input -> post("end_date");
+		$trucks = $this -> input -> post("trucks");
 		//Check if the user requested an excel sheet; if so, call the responsible function
 		if ($action == "Download Daily Dispatches Excel") {
-			$this -> downloadExcel($start_date, $end_date);
+			$this -> downloadExcel($start_date, $end_date, $trucks);
 			return;
 		}
 		$this -> load -> database();
@@ -57,15 +58,22 @@ class Daily_Dispatches extends MY_Controller {
 		$total_weight = 0;
 		$total_distance = 0;
 		$data_buffer .= $this -> echoTitles();
-		//Get data for each zone
-		$sql = "select transaction_date,vehicle_number,depot_code,depot_name,distance, buying_center_code,net_weight,ticket_number from weighbridge w left join depot d on w.buying_center_code = d.depot_code where weighing_type = '2' and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by str_to_date(transaction_date,'%d/%m/%Y') asc";
+		//Get data based on which trucks have been selected
+		$sql = "";
+		if ($trucks == "all") {
+			$sql = "select transaction_date,vehicle_number,depot_code,depot_name,distance, buying_center_code,net_weight,ticket_number from weighbridge w left join depot d on w.buying_center_code = d.depot_code where weighing_type = '2' and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by str_to_date(transaction_date,'%d/%m/%Y') asc";
+		} else if ($trucks == "alliance") {
+			$sql = "select transaction_date,vehicle_number,depot_code,depot_name,distance, buying_center_code,net_weight,ticket_number from weighbridge w left join depot d on w.buying_center_code = d.depot_code left join truck t on w.vehicle_number = t.number_plate WHERE weighing_type =  '2' and t.category = '1' and t.deleted = '0'  and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by str_to_date(transaction_date,'%d/%m/%Y') asc";
+		} else if ($trucks == "contracted") {
+			$sql = "select transaction_date,vehicle_number,depot_code,depot_name,distance, buying_center_code,net_weight,ticket_number from weighbridge w left join depot d on w.buying_center_code = d.depot_code left join truck t on w.vehicle_number = t.number_plate WHERE weighing_type =  '2' and t.category = '2' and t.deleted = '0'  and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by str_to_date(transaction_date,'%d/%m/%Y') asc";
+		}
 		$query = $this -> db -> query($sql);
 		foreach ($query->result_array() as $depot_data) {
 			$data_buffer .= "<tr><td class='center'>" . $depot_data['transaction_date'] . "</td><td class='center'>" . $depot_data['vehicle_number'] . "</td><td class='center'>" . $depot_data['ticket_number'] . "</td><td class='center'>" . $depot_data['depot_name'] . "</td><td class='center'>" . $depot_data['distance'] . "</td><td class='amount'>" . number_format($depot_data['net_weight'] + 0) . "</td></tr>";
 			$total_weight += $depot_data['net_weight'];
 			$total_distance += $depot_data['distance'];
 		}
-		$data_buffer .= "<tr></tr><tr><td>Totals: </td><td class='center'>-</td><td class='center'>-</td><td  class='center'>-</td><td  class='center'>" . number_format($total_distance + 0) . "</td><td class='amount'>" . number_format($total_weight + 0) . "</td></tr>";
+		$data_buffer .= "<tr></tr><tr><td>Totals: </td><td class='center'>-</td><td class='center'>-</td><td  class='center'>-</td><td  class='center'>" . number_format(($total_distance + 0),2) . "</td><td class='amount'>" . number_format($total_weight + 0) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
@@ -78,14 +86,21 @@ class Daily_Dispatches extends MY_Controller {
 
 	}
 
-	public function downloadExcel($start_date, $end_date) {
+	public function downloadExcel($start_date, $end_date, $trucks) {
 		$this -> load -> database();
 		$data_buffer = "";
 		$total_weight = 0;
 		$total_distance = 0;
 		$data_buffer .= $this -> echoExcelTitles();
-		//Get data for each zone
-		$sql = "select transaction_date,vehicle_number,depot_code,depot_name,distance, buying_center_code,net_weight,ticket_number from weighbridge w left join depot d on w.buying_center_code = d.depot_code where weighing_type = '2' and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by str_to_date(transaction_date,'%d/%m/%Y') asc";
+		//Get data based on which trucks have been selected
+		$sql = "";
+		if ($trucks == "all") {
+			$sql = "select transaction_date,vehicle_number,depot_code,depot_name,distance, buying_center_code,net_weight,ticket_number from weighbridge w left join depot d on w.buying_center_code = d.depot_code where weighing_type = '2' and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by str_to_date(transaction_date,'%d/%m/%Y') asc";
+		} else if ($trucks == "alliance") {
+			$sql = "select transaction_date,vehicle_number,depot_code,depot_name,distance, buying_center_code,net_weight,ticket_number from weighbridge w left join depot d on w.buying_center_code = d.depot_code left join truck t on w.vehicle_number = t.number_plate WHERE weighing_type =  '2' and t.category = '1' and t.deleted = '0'  and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by str_to_date(transaction_date,'%d/%m/%Y') asc";
+		} else if ($trucks == "contracted") {
+			$sql = "select transaction_date,vehicle_number,depot_code,depot_name,distance, buying_center_code,net_weight,ticket_number from weighbridge w left join depot d on w.buying_center_code = d.depot_code left join truck t on w.vehicle_number = t.number_plate WHERE weighing_type =  '2' and t.category = '2' and t.deleted = '0'  and str_to_date(transaction_date,'%d/%m/%Y') between str_to_date('" . $start_date . "','%m/%d/%Y') and str_to_date('" . $end_date . "','%m/%d/%Y') order by str_to_date(transaction_date,'%d/%m/%Y') asc";
+		}
 		$query = $this -> db -> query($sql);
 		foreach ($query->result_array() as $depot_data) {
 			$data_buffer .= $depot_data['transaction_date'] . "\t" . $depot_data['vehicle_number'] . "\t" . $depot_data['ticket_number'] . "\t" . $depot_data['depot_name'] . "\t" . $depot_data['distance'] . "\t" . $depot_data['net_weight'] . "\t\n";

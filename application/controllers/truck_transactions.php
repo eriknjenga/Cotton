@@ -66,7 +66,7 @@ class Truck_Transactions extends MY_Controller {
 			$total_weight += $depot_data['net_weight'];
 			$total_distance += $depot_data['distance'];
 		}
-		$data_buffer .= "<tr></tr><tr><td>Totals: </td><td class='center'>-</td><td  class='center'>" . number_format($total_distance + 0) . "</td><td  class='center'>-</td><td class='amount'>" . number_format($total_weight + 0) . "</td></tr>";
+		$data_buffer .= "<tr></tr><tr><td>Totals: </td><td class='center'>-</td><td  class='center'>" . number_format(($total_distance + 0),2) . "</td><td  class='center'>-</td><td class='amount'>" . number_format($total_weight + 0) . "</td></tr>";
 		$data_buffer .= "</table>";
 		$log = new System_Log();
 		$log -> Log_Type = "4";
