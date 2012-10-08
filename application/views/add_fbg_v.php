@@ -43,6 +43,7 @@ if (isset($fbg)) {
 	$fbg_id = $fbg -> id;
 	$village = $fbg -> Village_Object->Name;
 	$village_id = $fbg -> Village;
+	$acre_yield = $fbg -> Acre_Yield;
 } else {
 	$cpc_number = "";
 	$group_name = "";
@@ -55,6 +56,7 @@ if (isset($fbg)) {
 	$fbg_id = "";
 	$village = "";
 	$village_id = "";
+	$acre_yield = "";
 }
 $attributes = array("method" => "post", "id" => "add_fbg_input");
 echo form_open('fbg_management/save', $attributes);
@@ -124,9 +126,14 @@ foreach($field_officers as $officer){
 	<span class="field_desc">Enter the village where this FBG comes from</span>
 </p>
 	<p>
-		<label for="hectares_available">Hectares Available: </label>
+		<label for="hectares_available">Acreage: </label>
 		<input id="hectares_available" name="hectares_available" type="text" value="<?php echo $hectares_available;?>"/>
-		<span class="field_desc">Enter the hectares offered by this FBG</span>
+		<span class="field_desc">Enter the acres offered by this FBG</span>
+	</p>
+	<p>
+		<label for="acre_yield">Yield/Acre: </label>
+		<input id="acre_yield" name="acre_yield" type="text" value="<?php echo $acre_yield;?>"/>
+		<span class="field_desc">Enter the yield/acre for this FBGs acreage</span>
 	</p>
 	<p>
 		<input class="button" type="submit" value="Submit">

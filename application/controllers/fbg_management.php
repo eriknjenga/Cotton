@@ -138,9 +138,9 @@ class FBG_Management extends MY_Controller {
 
 	public function print_fbgs() {
 		$fbgs = FBG::getAll();
-		$data_buffer = "Contract Number\tGroup Name\tField Extension Officer\tHectares Available\tChairman Name\tChairman Phone\tSecretary Name\tSecretary Phone\tVillage\t\n";
+		$data_buffer = "Contract Number\tGroup Name\tField Extension Officer\tAcreage\tYield per Acre\tChairman Name\tChairman Phone\tSecretary Name\tSecretary Phone\tVillage\t\n";
 		foreach ($fbgs as $fbg) {
-			$data_buffer .= $fbg -> CPC_Number . "\t" . $fbg -> Group_Name . "\t" . $fbg -> Officer_Object -> Officer_Name . "\t" . $fbg -> Hectares_Available . "\t" . $fbg -> Chairman_Name . "\t" . $fbg -> Chairman_Phone . "\t" . $fbg -> Secretary_Name . "\t" . $fbg -> Secretary_Phone . "\t" . $fbg -> Village_Object -> Name . "\n";
+			$data_buffer .= $fbg -> CPC_Number . "\t" . $fbg -> Group_Name . "\t" . $fbg -> Officer_Object -> Officer_Name . "\t" . $fbg -> Hectares_Available ."\t" . $fbg -> Acre_Yield. "\t" . $fbg -> Chairman_Name . "\t" . $fbg -> Chairman_Phone . "\t" . $fbg -> Secretary_Name . "\t" . $fbg -> Secretary_Phone . "\t" . $fbg -> Village_Object -> Name . "\n";
 		}
 		header("Content-type: application/vnd.ms-excel; name='excel'");
 		header("Content-Disposition: filename=System FBGs.xls");
@@ -169,6 +169,7 @@ class FBG_Management extends MY_Controller {
 			$fbg -> Secretary_Phone = $this -> input -> post("secretary_phone");
 			$fbg -> Field_Officer = $this -> input -> post("field_officer");
 			$fbg -> Village = $this -> input -> post("village_id");
+			$fbg -> Acre_Yield = $this -> input -> post("acre_yield");
 			$fbg -> Hectares_Available = $this -> input -> post("hectares_available");
 			$fbg -> save();
 			redirect("fbg_management/listing");

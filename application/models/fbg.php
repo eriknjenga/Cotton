@@ -9,6 +9,7 @@ class FBG extends Doctrine_Record {
 		$this -> hasColumn('Chairman_Name', 'varchar', 100);
 		$this -> hasColumn('Chairman_Phone', 'varchar', 100);
 		$this -> hasColumn('Secretary_Name', 'varchar', 100);
+		$this -> hasColumn('Acre_Yield', 'varchar', 10);
 		$this -> hasColumn('Secretary_Phone', 'varchar', 100);
 	}
 

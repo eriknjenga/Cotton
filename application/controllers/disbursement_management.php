@@ -101,7 +101,7 @@ class Disbursement_Management extends MY_Controller {
 			$quantities = $this -> input -> post("quantity");
 			$unit_prices = $this -> input -> post("unit_price");
 			$total_values = $this -> input -> post("total_value");
-			$seasons = date('Y');
+			$season = date('Y');
 			$id_batch = $this -> session -> userdata('input_disbursement_batch');
 			$fbg = $this -> input -> post("fbg");
 			$agent = $this -> input -> post("agent");
@@ -137,7 +137,7 @@ class Disbursement_Management extends MY_Controller {
 				$disbursement -> Quantity = $quantities[$input_counter];
 				$disbursement -> Unit_Price = $unit_prices[$input_counter];
 				$disbursement -> Total_Value = $total_values[$input_counter];
-				$disbursement -> Season = $seasons[$input_counter];
+				$disbursement -> Season = $season;
 				$disbursement -> ID_Batch = $id_batch;
 				$disbursement -> Timestamp = date('U');
 				$disbursement -> Agent = $agent;
