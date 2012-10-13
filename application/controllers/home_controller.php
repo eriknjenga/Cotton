@@ -78,6 +78,7 @@ class Home_Controller extends MY_Controller {
 		$result = $query -> result_array();
 		$data['total_dormant'] = $result[0]['total_dormant'];*/
 		//Get the total number of missing dpns
+		$data['total_dormant'] = 0;
 		$centers_missing_dpns = 0;
 		$missing_dpns = 0;
 		$sql_reporting_depots = "select * from (select depot,max(abs(dpn)) as dpn from purchase where season = '$season' group by depot) reported_depots left join depot d on reported_depots.depot = d.id order by depot_name asc";

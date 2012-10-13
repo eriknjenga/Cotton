@@ -23,7 +23,7 @@
 <div style="width:20px; height:20px; background-color: red;float:left"></div> <div style="float:left; padding:5px;"><a class="link" href="<?php echo base_url()."log_management/listing/3";?>">Deletions</a></div>
 <div style="width:20px; height:20px; background-color: blue;float:left"></div> <div style="float:left; padding:5px;"><a class="link" href="<?php echo base_url()."log_management/listing/4";?>">Report Downloads</a></div>
 <h1>Security Log Listing</h1>
-
+<a class="link" href="<?php echo base_url()."log_management/download/".$type;?>">Download Logs in Excell</a>
 <table class="fullwidth">
 	<thead>
 		<tr>

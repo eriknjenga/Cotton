@@ -41,6 +41,17 @@ class System_Log extends Doctrine_Record {
 		return $logs;
 	}
 
+	public function getAllLogs($type) {
+		if ($type > 0) {
+			$query = Doctrine_Query::create() -> select("*") -> from("System_Log") -> where("Log_Type = '$type'") -> orderBy("id Desc");
+		} else {
+			$query = Doctrine_Query::create() -> select("*") -> from("System_Log") -> orderBy("id Desc");
+		}
+
+		$logs = $query -> execute();
+		return $logs;
+	}
+
 	public function getLog($id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("System_Log") -> where("id = '$id'");
 		$log = $query -> execute();

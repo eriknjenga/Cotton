@@ -81,43 +81,6 @@ class Production_Management extends MY_Controller {
 		return;
 	}
 
-	function getDailyTrend($type, $from = "", $to = "") {
-		if ($from == "") {
-			$from = date('d-m-Y', strtotime('-7 days', date('U')));
-		}
-		if ($to == "") {
-			$to = date('d-m-Y');
-		}
-		$ginneries = array(1 => "Sow Gin", 2 => "Roller Gin");
-		$label_from = date('M-d-Y', strtotime($from));
-		$label_to = date('M-d-Y', strtotime($to));
-		$this -> load -> database();
-		$sql = "SELECT count(*) as total_bales,date FROM `production_data` p where ginnery = '" . $type . "'  and str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $from . "','%d-%m-%Y') and str_to_date('" . $to . "','%d-%m-%Y') group by str_to_date(p.date,'%m/%d/%Y') order by str_to_date(p.date,'%m/%d/%Y') asc";
-		echo $sql;
-		$query = $this -> db -> query($sql);
-		$production_data = $query -> result_array();
-		$chart = '<chart caption="Daily '.$ginneries[$type].' Production Trend" subcaption="From ' . $label_from . ' to ' . $label_to . '" xAxisName="Day" yAxisName="Purchases (Tsh.)" showValues="0" showBorder="0" showAlternateHGridColor="0" divLineAlpha="10"  bgColor="FFFFFF"  exportEnabled="1" exportHandler="' . base_url() . 'Scripts/FusionCharts/ExportHandlers/PHP/FCExporter.php" exportAtClient="0" exportAction="download">';
-		foreach ($production_data as $data) {
-			$date = date('M-d', strtotime($data['date']));
-			$chart .= '<set label="' . $date . '" value="' . $data['total_bales'] . '"/>';
-		}
-		$chart .= '
-		<styles>
-<definition>
-<style name="Anim1" type="animation" param="_xscale" start="0" duration="1"/>
-<style name="Anim2" type="animation" param="_alpha" start="0" duration="0.6"/>
-<style name="DataShadow" type="Shadow" alpha="40"/>
-</definition>
-<application>
-<apply toObject="DIVLINES" styles="Anim1"/>
-<apply toObject="HGRID" styles="Anim2"/>
-<apply toObject="DATALABELS" styles="DataShadow,Anim2"/>
-</application>
-</styles>
-		</chart>';
-		echo $chart;
-	}
-
 	public function base_params($data) {
 		$data['title'] = "Weighbridge Management";
 		$data['content_view'] = "production_v";

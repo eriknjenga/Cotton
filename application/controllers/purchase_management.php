@@ -261,41 +261,6 @@ class Purchase_Management extends MY_Controller {
 		}
 	}
 
-	function getDailyTrend($from = "", $to = "") {
-		if ($from == "") {
-			$from = date('d-m-Y', strtotime('-7 days', date('U')));
-		}
-		if ($to == "") {
-			$to = date('d-m-Y');
-		}
-		$label_from = date('M-d-Y', strtotime($from));
-		$label_to = date('M-d-Y', strtotime($to));
-		$this -> load -> database();
-		$sql = "SELECT sum(gross_value) as total_purchases,date FROM `purchase` p where batch_status = '2'  and str_to_date(p.date,'%m/%d/%Y') between str_to_date('" . $from . "','%d-%m-%Y') and str_to_date('" . $to . "','%d-%m-%Y') group by str_to_date(p.date,'%m/%d/%Y') order by str_to_date(p.date,'%m/%d/%Y') asc";
-		$query = $this -> db -> query($sql);
-		$purchasing_data = $query -> result_array();
-		$chart = '<chart caption="Daily Purchases Trend" subcaption="From '.$label_from.' to '.$label_to.'" xAxisName="Day" yAxisName="Purchases (Tsh.)" showValues="0" showBorder="0" showAlternateHGridColor="0" divLineAlpha="10"  bgColor="FFFFFF"  exportEnabled="1" exportHandler="'.base_url().'Scripts/FusionCharts/ExportHandlers/PHP/FCExporter.php" exportAtClient="0" exportAction="download">';
-		foreach ($purchasing_data as $data) {
-			$date = date('M-d', strtotime($data['date']));
-			$chart .= '<set label="' .$date . '" value="' . $data['total_purchases'] . '"/>';
-		}
-		$chart .= '
-		<styles>
-<definition>
-<style name="Anim1" type="animation" param="_xscale" start="0" duration="1"/>
-<style name="Anim2" type="animation" param="_alpha" start="0" duration="0.6"/>
-<style name="DataShadow" type="Shadow" alpha="40"/>
-</definition>
-<application>
-<apply toObject="DIVLINES" styles="Anim1"/>
-<apply toObject="HGRID" styles="Anim2"/>
-<apply toObject="DATALABELS" styles="DataShadow,Anim2"/>
-</application>
-</styles>
-		</chart>';
-		echo $chart;
-	}
-
 	public function base_params($data) {
 		$data['link'] = "purchase_management";
 

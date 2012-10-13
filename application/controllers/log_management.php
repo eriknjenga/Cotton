@@ -23,10 +23,33 @@ class Log_Management extends MY_Controller {
 			$data['pagination'] = $this -> pagination -> create_links();
 		}
 		$data['logs'] = $logs;
+		$data['type'] = $type;
 		$data['title'] = "All System Logs";
 		$data['content_view'] = "list_system_logs_v";
 		$data['styles'] = array("pagination.css");
 		$this -> base_params($data);
+	}
+
+	public function download($type) {
+		$this -> load -> database(); 
+		if ($type > 0) {
+			$sql = "select * from system_log s left join user u on s.user = u.id where log_type = '".$type."' order by s.id desc";
+		} else {
+			$sql = "select * from system_log s left join user u on s.user = u.id order by s.id desc";
+		}
+		$log_result = $this -> db -> query($sql);;
+		$logs = $log_result->result_array();
+		$log_types = array("1" => "Record Creation", 2 => "Record Modification", 3 => "Record Deletion", 4 => "Report Download");
+		$data_buffer = "Log Type\tUser\tLog Message\tTimestamp\t\n";
+		foreach ($logs as $log) {
+			$data_buffer .= $log_types[$log['log_type']] . "\t" . $log['Name'] . "\t" . $log['log_message'] . "\t" . date("d/m/Y h:i:s", $log['timestamp']) . "\n";
+		}
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+		header("Content-Disposition: filename=System Logs.xls");
+		// Fix for crappy IE bug in download.
+		header("Pragma: ");
+		header("Cache-Control: ");
+		echo $data_buffer;
 	}
 
 	public function view_log_details($log_id) {

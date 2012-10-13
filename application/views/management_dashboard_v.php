@@ -6,162 +6,37 @@ $(function() {
 			modal: true,
 			autoOpen: false
 	});
-	$("#daily_purchases_from").datepicker({
+	$("#date_from").datepicker({
 			defaultDate : new Date(),
 			changeYear : true,
 			changeMonth : true,
 			dateFormat: 'dd-mm-yy'
 	});
-	$("#daily_purchases_to").datepicker({
+	$("#date_to").datepicker({
 			defaultDate : new Date(),
 			changeYear : true,
 			changeMonth : true,
 			dateFormat: 'dd-mm-yy'
 	});
-	$("#larger_daily_dispatches_graph_container").dialog( {
-			height: 520,
-			width: 980,
-			modal: true,
-			autoOpen: false
-	});
-	$("#daily_dispatches_from").datepicker({
-			defaultDate : new Date(),
-			changeYear : true,
-			changeMonth : true,
-			dateFormat: 'dd-mm-yy'
-	});
-	$("#daily_dispatches_to").datepicker({
-			defaultDate : new Date(),
-			changeYear : true,
-			changeMonth : true,
-			dateFormat: 'dd-mm-yy'
-	});
-	$("#larger_daily_sg_graph_container").dialog( {
-			height: 520,
-			width: 980,
-			modal: true,
-			autoOpen: false
-	});
-	$("#daily_sg_from").datepicker({
-			defaultDate : new Date(),
-			changeYear : true,
-			changeMonth : true,
-			dateFormat: 'dd-mm-yy'
-	});
-	$("#daily_sg_to").datepicker({
-			defaultDate : new Date(),
-			changeYear : true,
-			changeMonth : true,
-			dateFormat: 'dd-mm-yy'
-	});
-	$("#larger_daily_rg_graph_container").dialog( {
-			height: 520,
-			width: 980,
-			modal: true,
-			autoOpen: false
-	});
-	$("#daily_rg_from").datepicker({
-			defaultDate : new Date(),
-			changeYear : true,
-			changeMonth : true,
-			dateFormat: 'dd-mm-yy'
-	});
-	$("#daily_rg_to").datepicker({
-			defaultDate : new Date(),
-			changeYear : true,
-			changeMonth : true,
-			dateFormat: 'dd-mm-yy'
-	});	
-	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "daily_trend", "460", "300", "0", "0");
-	var url = '<?php echo base_url()."purchase_management/getDailyTrend/"?>'; 
+	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/MSLine.swf"?>", "daily_trend", "970", "600", "0", "0");
+	var url = '<?php echo base_url()."activity_graph/getDailyTrend/purchases-dispatches-seeds-sg-rg-"?>'; 
 	chart.setDataURL(url);
-	chart.render("daily_purchases");
-	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "daily_trend", "460", "300", "0", "0");
-	var url = '<?php echo base_url()."weighbridge_management/getDailyTrend/"?>'; 
-	chart.setDataURL(url);
-	chart.render("daily_dispatches");
-	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "daily_trend", "460", "300", "0", "0");
-	var url = '<?php echo base_url()."production_management/getDailyTrend/1/"?>'; 
-	chart.setDataURL(url);
-	chart.render("daily_sow");
-	var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "daily_trend", "460", "300", "0", "0");
-	var url = '<?php echo base_url()."production_management/getDailyTrend/2/"?>'; 
-	chart.setDataURL(url);
-	chart.render("daily_roller");
-	$(".view_larger_graph").click(function(){
-			var id  = $(this).attr("id"); 
-			if(id == "daily_purchases_graph"){
-				$("#larger_daily_purchases_graph_container").dialog('option', 'title', 'Daily Purchases Trend');
-				$("#larger_daily_purchases_graph_container").dialog("open");
-				var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "ChartId", "900", "450", "0", "0");
-				var url = '<?php echo base_url()."purchase_management/getDailyTrend/"?>'; 
+	chart.render("activity_graph");
+	$("#filter_graph").click(function(){
+				var graphs_string = "";
+				$(".graphs").each(function(index,item) {
+					if($(this).is(':checked')){
+						var graph_value = $(this).attr("value");
+				  		graphs_string += graph_value+"-";
+					}		 
+				});
+				console.log(graphs_string);
+				var date_from = $("#date_from").attr("value");
+				var date_to = $("#date_to").attr("value"); 
+				var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/MSLine.swf"?>", "ChartId", "900", "600", "0", "0");	
+				var url = '<?php echo base_url()?>activity_graph/getDailyTrend/'+graphs_string+'/'+date_from+'/'+date_to+''; 
 				chart.setDataURL(url);
-				chart.render("daily_purchases_larger_graph");
-			}
-			if(id == "daily_dispatches_graph"){
-				$("#larger_daily_dispatches_graph_container").dialog('option', 'title', 'Daily Dispatches Trend');
-				$("#larger_daily_dispatches_graph_container").dialog("open");
-				var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "ChartId", "900", "450", "0", "0");
-				var url = '<?php echo base_url()."weighbridge_management/getDailyTrend/"?>'; 
-				chart.setDataURL(url);
-				chart.render("daily_dispatches_larger_graph");
-			}
-			if(id == "daily_sow_graph"){
-				$("#larger_daily_sg_graph_container").dialog('option', 'title', 'Daily Sow Gin Production Trend');
-				$("#larger_daily_sg_graph_container").dialog("open");
-				var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "ChartId", "900", "450", "0", "0");
-				var url = '<?php echo base_url()."production_management/getDailyTrend/1/"?>'; 
-				chart.setDataURL(url);
-				chart.render("daily_sg_larger_graph");
-			}
-			if(id == "daily_roller_graph"){
-				$("#larger_daily_rg_graph_container").dialog('option', 'title', 'Daily Roller Gin Production Trend');
-				$("#larger_daily_rg_graph_container").dialog("open");
-				var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "ChartId", "900", "450", "0", "0");
-				var url = '<?php echo base_url()."production_management/getDailyTrend/2"?>'; 
-				chart.setDataURL(url);
-				chart.render("daily_rg_larger_graph");
-			}
-	});
-	$("#refresh_daily_purchases_graph").click(function(){
-				var date_from = $("#daily_purchases_from").attr("value");
-				var date_to = $("#daily_purchases_to").attr("value"); 
-				$("#larger_daily_purchases_graph_container").dialog('option', 'title', 'Daily Purchases Trend');
-				$("#larger_daily_purchases_graph_container").dialog("open");
-				var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "ChartId", "900", "450", "0", "0");	
-				var url = '<?php echo base_url()?>purchase_management/getDailyTrend/'+date_from+'/'+date_to+''; 
-				chart.setDataURL(url);
-				chart.render("daily_purchases_larger_graph");
-	});
-	$("#refresh_daily_dispatches_graph").click(function(){
-				var date_from = $("#daily_dispatches_from").attr("value");
-				var date_to = $("#daily_dispatches_to").attr("value"); 
-				$("#larger_daily_dispatches_graph_container").dialog('option', 'title', 'Daily Dispatches Trend');
-				$("#larger_daily_dispatches_graph_container").dialog("open");
-				var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "ChartId", "900", "450", "0", "0");	
-				var url = '<?php echo base_url()?>weighbridge_management/getDailyTrend/'+date_from+'/'+date_to+''; 
-				chart.setDataURL(url);
-				chart.render("daily_dispatches_larger_graph");
-	});
-	$("#refresh_daily_sg_graph").click(function(){
-				var date_from = $("#daily_sg_from").attr("value");
-				var date_to = $("#daily_sg_to").attr("value"); 
-				$("#larger_daily_sg_graph_container").dialog('option', 'title', 'Daily Sow Gin Production Trend');
-				$("#larger_daily_sg_graph_container").dialog("open");
-				var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "ChartId", "900", "450", "0", "0");
-				var url = '<?php echo base_url()?>production_management/getDailyTrend/1/'+date_from+'/'+date_to+''; 
-				chart.setDataURL(url);
-				chart.render("daily_sg_larger_graph");
-	});
-	$("#refresh_daily_rg_graph").click(function(){
-				var date_from = $("#daily_rg_from").attr("value");
-				var date_to = $("#daily_rg_to").attr("value"); 
-				$("#larger_daily_rg_graph_container").dialog('option', 'title', 'Daily Roller Gin Production Trend');
-				$("#larger_daily_rg_graph_container").dialog("open");
-				var chart = new FusionCharts("<?php echo base_url()."Scripts/FusionCharts/Charts/Line.swf"?>", "ChartId", "900", "450", "0", "0");
-				var url = '<?php echo base_url()?>production_management/getDailyTrend/2/'+date_from+'/'+date_to+''; 
-				chart.setDataURL(url);
-				chart.render("daily_rg_larger_graph");
+				chart.render("activity_graph");
 	});
 });
 </script>
@@ -171,16 +46,8 @@ $(function() {
 		margin: 0 auto;
 		overflow: hidden;
 	}
-	.larger_graph{
-		float: right;
-	}
-	.larger_graph_container{
-		width:950px;
-		height: 500px;
-	}
 	.graph{
-		width:460px;
-		float:left; 
+		width:970px;  
 	}
 	.graph_title{
 		letter-spacing: 1px;
@@ -200,9 +67,8 @@ $(function() {
 		float:left;
 		margin: 5px;
 	}
-	h3{
-		margin-left:100px;
-		text-decoration: underline;
+	h2{
+		margin-left:100px; 
 	}
 </style>
 <div id="notifications_panel">
@@ -225,61 +91,14 @@ $(function() {
 </div>
 <div class="top_graphs_container">
 <div class="graph">
-<h3>Daily Purchases Trend</h3>
-<div class="larger_graph">
+<h2>Daily Activity</h2> 
+<div id="daily_rg_filter">
+	<b>From: </b><input type="text" id="date_from" /> <b>To: </b><input type="text" id="date_to" />
+	<fieldset style="width:400px; display: inline;"><legend>Graphs to Display</legend><input type="checkbox" class="graphs" checked value="purchases"/>Purchases<input type="checkbox" class="graphs" checked value="dispatches"/>Dispatches<input type="checkbox" class="graphs" checked value="seeds"/>Seeds<input type="checkbox" class="graphs" checked value="sg"/>Sow Gin<input type="checkbox" class="graphs" checked value="rg"/>Roller Gin</fieldset>
 	
-	<a class="link view_larger_graph" id="daily_purchases_graph">Enlarge to Filter</a>
+	<input type="button" id="filter_graph" value="Filter Graph" class="button"/>
 </div>
-<div id = "daily_purchases" title="Daily Purchases Graph" ></div>
-</div>
-<div class="graph">
-<h3>Daily Dispatches Trend</h3>
-<div class="larger_graph">
-	<a class="link view_larger_graph" id="daily_dispatches_graph">Enlarge to Filter</a>
-</div>
-<div id = "daily_dispatches" title="Daily Dispatches Graph" ></div>
-</div>  
-<div class="graph">
-<h3>Daily Sow Gin Production Trend</h3>
-<div class="larger_graph">
-	<a class="link view_larger_graph" id="daily_sow_graph">Enlarge to Filter</a>
-</div>
-<div id = "daily_sow" title="Daily SG Production Graph" ></div>
-</div> 
-<div class="graph">
-<h3>Daily Roller Gin Production Trend</h3>
-<div class="larger_graph">
-	<a class="link view_larger_graph" id="daily_roller_graph">Enlarge to Filter</a>
-</div>
-<div id = "daily_roller" title="Daily RG Production Graph" ></div>
-</div> 
-</div> 
-<div id="larger_daily_purchases_graph_container">
-<div id="daily_purchases_filter">
-	<b>From: </b><input type="text" id="daily_purchases_from" /> <b>To: </b><input type="text" id="daily_purchases_to" />
-	<input type="button" id="refresh_daily_purchases_graph" value="Filter Graph" class="button"/>
-</div>
-<div id="daily_purchases_larger_graph"></div>
-</div>
-<div id="larger_daily_dispatches_graph_container">
-<div id="daily_dispatches_filter">
-	<b>From: </b><input type="text" id="daily_dispatches_from" /> <b>To: </b><input type="text" id="daily_dispatches_to" />
-	<input type="button" id="refresh_daily_dispatches_graph" value="Filter Graph" class="button"/>
-</div>
-<div id="daily_dispatches_larger_graph"></div>
+<div id = "activity_graph" title="Daily Activity Graph" ></div>
 </div>
 
-<div id="larger_daily_sg_graph_container">
-<div id="daily_sg_filter">
-	<b>From: </b><input type="text" id="daily_sg_from" /> <b>To: </b><input type="text" id="daily_sg_to" />
-	<input type="button" id="refresh_daily_sg_graph" value="Filter Graph" class="button"/>
-</div>
-<div id="daily_sg_larger_graph"></div>
-</div>
-<div id="larger_daily_rg_graph_container">
-<div id="daily_rg_filter">
-	<b>From: </b><input type="text" id="daily_rg_from" /> <b>To: </b><input type="text" id="daily_rg_to" />
-	<input type="button" id="refresh_daily_rg_graph" value="Filter Graph" class="button"/>
-</div>
-<div id="daily_rg_larger_graph"></div>
 </div>
