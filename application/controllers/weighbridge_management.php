@@ -27,9 +27,18 @@ class Weighbridge_Management extends MY_Controller {
 	}
 
 	public function fetch_data() {
-		$this -> load -> library('csvreader');
 
-		$filePath = '/weigh.csv';
+		// Define the parameters for the shell command
+		$location = "\\\Alliance\\Agl";
+		$user = "admin";
+		$pass = "goodbrands";
+		$letter = "Z";
+
+		// Map the drive
+		$text = "net use " . $letter . ": \"" . $location . "\" " . $pass . " /user:" . $user . " /persistent:no>nul 2>&1";
+		system($text); 
+		$this -> load -> library('csvreader');
+		$filePath = 'Z:/wbridge/weigh.csv';
 		$resource = @fopen($filePath, 'r');
 		if (!$resource) {
 			$data['content_view'] = "weighbridge_error";
@@ -87,7 +96,7 @@ class Weighbridge_Management extends MY_Controller {
 				$weighbridge_data -> Operator = $row[40];
 				$weighbridge_data -> save();
 			}
-		}
+		} 
 		$file = fopen($filePath, 'w');
 		fclose($file);
 		$data['records'] = $records;
